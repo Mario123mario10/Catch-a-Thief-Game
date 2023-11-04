@@ -13,6 +13,7 @@ container_at(chest, otherplace).
 contain(chest, robe).
 is_locked(chest).
 
+
 /* These rules describe how to pick up an object. */
 
 take(X) :-
@@ -80,28 +81,11 @@ open(_) :-
 
 /* These rules define the direction letters as calls to go/1. */
 
-n :- go(n).
-
-s :- go(s).
-
-e :- go(e).
-
-w :- go(w).
-
-
-add_path(Here, Direction, There) :-
-	oposite_direction(Direction, Opos),
-	assert(path(There, Direction, Here)),
-	assert(path(Here, Opos, There)).
-
-	
-/* This rule tells how to move in a given direction. */
-
-go(Direction) :-
+go(Place) :-
         i_am_at(Here),
-        path(Here, Direction, There),
+	(door(Here,Place);door(Place,Here)),
 	retract(i_am_at(Here)),
-        assert(i_am_at(There)),
+        assert(i_am_at(Place)),
         !, look.
 
 go(_) :-
@@ -114,16 +98,18 @@ look :-
         i_am_at(Place),
         describe(Place),
         nl,
-        notice_objects_at(Place),
+        /*notice_objects_at(Place);*/
+	notice_persons(Place),
         nl.
 
 
 describe(Place) :- write('You are at '), write(Place), nl, 
-	place(Place, Description), write(Description), nl,
-	write("You can go to "), print_way(Place), nl.
+	place(Place, Description),
+	write(Description), nl,
+	write("You can go to "), (print_way(Place); nl).
 
 print_way(Way) :-
-	door(Way, X),
+	(door(Way, X);door(X, Way)),
 	write(X), write(", "),
 	fail.
 
@@ -141,7 +127,11 @@ notice_objects_at(Place) :-
 
 notice_objects_at(_).
 
-
+notice_persons(Place) :-
+	
+        person(Place, X),
+        write('There is a '), write(X), write(' here.'), nl,
+	fail.
 /* This rule tells how to die. */
 
 die :-

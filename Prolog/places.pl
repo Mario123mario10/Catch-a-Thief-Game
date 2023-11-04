@@ -1,4 +1,4 @@
-:- module(places, [place/2, door/2]).  
+:- module(places, [place/2, door/2, person/2]).  
 
 place(vault, "place where diamond was stored but there is nothing anymore").
 place(hall, "big, crouded, splendid chamber with big throne in the center").
@@ -11,6 +11,16 @@ place(servants_house, "place with bedrooms for all workforces").
 place(forest, "big forest with wild animals and many plants and mushrooms").
 place(courtyard, "center of the castle").
 
+person(hall, king).
+person(kitchen, cook).
+person(butler_room, butler).
+person(garden, gardener).
+person(guard_house, guard).
+person(wizard_house, wizard).
+
+/*person(servants_house, cook).
+person(servants_house, butler).
+person(servants_house, gardener).*/
  
 door(vault, hall).
 door(hall, butler_room).
@@ -21,3 +31,5 @@ door(guard_house, hall).
 door(courtyard, wizard_house).
 door(hall, kitchen).
 door(wizard_house, forest).
+
+
