@@ -194,3 +194,5 @@ start :-
 describe(otherplace) :- write('You are otherplace.'), nl. */
 
 describe(X) :- write('You are at '), write(X), nl.
+
+
