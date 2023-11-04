@@ -3,25 +3,15 @@
 :- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1.
 :- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)).
 
-i_am_at(someplace).
+:- [places].
 
-thing_at(thing, someplace).
-thing_at(sword, someplace).
-thing_at(key, someplace).
+i_am_at(courtyard).
 
-thing_at(thing, otherplace).
-/*thing_at(something, otherplace).*/
 
 container_at(chest, otherplace).
 
 contain(chest, robe).
 is_locked(chest).
-
-oposite_direction(n, s).
-oposite_direction(w, e).
-oposite_direction(s, n).
-oposite_direction(e, w).
-	
 
 /* These rules describe how to pick up an object. */
 
@@ -128,6 +118,15 @@ look :-
         nl.
 
 
+describe(Place) :- write('You are at '), write(Place), nl, 
+	place(Place, Description), write(Description), nl,
+	write("You can go to "), print_way(Place), nl.
+
+print_way(Way) :-
+	door(Way, X),
+	write(X), write(", "),
+	fail.
+
 /* These rules set up a loop to mention all the objects
    in your vicinity. */
 
@@ -193,6 +192,5 @@ start :-
 /*describe(someplace) :- write('You are someplace.'), nl.
 describe(otherplace) :- write('You are otherplace.'), nl. */
 
-describe(X) :- write('You are at '), write(X), nl.
 
 
