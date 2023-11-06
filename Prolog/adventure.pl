@@ -1,7 +1,7 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_key/1.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)).
 
 :- [places].
 
@@ -11,8 +11,12 @@ i_am_at(courtyard).
 
 container_at(chest, otherplace).
 
-contain(chest, robe).
-is_locked(chest).
+/*contain(chest, robe).*/
+
+is_locked(butler_chest).
+is_locked(gardener_chest).
+is_locked(cook_chest).
+
 
 
 /* These rules describe how to pick up an object. */
@@ -88,12 +92,14 @@ choose(List, Elt) :-
         nth0(Index, List, Elt).
 
 
-thief(Thief) :-
-	choose([cook, butler, gardener], Thief), !.
+choose_thief() :-
+	choose([cook, butler, gardener], Thief),
+	assert(thief(Thief)).
 
 
-
-
+prepare_key() :-
+	choose([cook, butler, gardener], Has_key),
+	assert(has_key(Has_key)).
 
 /* These rules define the direction letters as calls to go/1. */
 
@@ -148,12 +154,14 @@ notice_persons(Place) :-
         person(Place, X),
         write('There is a '), write(X), write(' here.'), nl,
 	fail.
+
+notice_persons(Place).
 /* This rule tells how to die. */
 
 go_to_chest(Person) :-
-	write ("You are near chest person: "), write(Person).
+	write("You are near chest of "), write(Person).
 
-
+	
 
 die :-
         finish.
@@ -193,11 +201,11 @@ start :-
         look,
 	
 
-	add_path(someplace, n, otherplace),
+	/*add_path(someplace, n, otherplace),
 	add_path(otherplace, s, someplace),
-	add_path(otherplace, n, someplace).
-		
-	choose([cook, butler, gardener], Thief).
+	add_path(otherplace, n, someplace).*/
+	choose_thief(),		
+	prepare_key().	
 		
 /* These rules describe the various rooms.  Depending on
    circumstances, a room may have more than one description. */
