@@ -35,3 +35,6 @@ door(wizard_house, forest).
 chest(butler).
 chest(gardener).
 chest(cook).
+
+has_chests(servants_house).
+

@@ -155,12 +155,15 @@ notice_persons(Place) :-
         write('There is a '), write(X), write(' here.'), nl,
 	fail.
 
-notice_persons(Place).
+notice_persons(_).
 /* This rule tells how to die. */
 
 go_to_chest(Person) :-
-	write("You are near chest of "), write(Person).
+	i_am_at(servants_house),
+	write("You are near the chest of "), write(Person),!.
 
+go_to_chest(_) :-
+	write("You are not in the servants house").
 	
 
 die :-
