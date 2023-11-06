@@ -7,7 +7,7 @@ place(butler_room, "there are keys to every room on the castle").
 place(garden, "big garden, there are vegetables growing and is many flowers").
 place(guard_house, "small chamber with lots of weapons").
 place(wizard_house, "small, incredible place with many curious magic subjects").
-place(servants_house, "place with bedrooms for all workforces").
+place(servants_house, "place with bedrooms for all workforces, this is the place where cook, gardener and butler are sleeping. Each of them has 1 chest").
 place(forest, "big forest with wild animals and many plants and mushrooms").
 place(courtyard, "center of the castle").
 
@@ -30,6 +30,8 @@ door(courtyard, servants_house).
 door(guard_house, hall).
 door(courtyard, wizard_house).
 door(hall, kitchen).
-door(wizard_house, forest).
+door(wizard_house, forest). 
 
-
+chest(butler).
+chest(gardener).
+chest(cook).

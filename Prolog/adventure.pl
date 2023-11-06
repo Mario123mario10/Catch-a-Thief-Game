@@ -5,6 +5,7 @@
 
 :- [places].
 
+
 i_am_at(courtyard).
 
 
@@ -79,6 +80,21 @@ open(_) :-
 	write("You don't have a key!"),nl. 
 	
 
+/*choose([], []).*/
+
+choose(List, Elt) :-
+        length(List, Length),
+        random(0, Length, Index),
+        nth0(Index, List, Elt).
+
+
+thief(Thief) :-
+	choose([cook, butler, gardener], Thief), !.
+
+
+
+
+
 /* These rules define the direction letters as calls to go/1. */
 
 go(Place) :-
@@ -134,6 +150,11 @@ notice_persons(Place) :-
 	fail.
 /* This rule tells how to die. */
 
+go_to_chest(Person) :-
+	write ("You are near chest person: "), write(Person).
+
+
+
 die :-
         finish.
 
@@ -175,7 +196,9 @@ start :-
 	add_path(someplace, n, otherplace),
 	add_path(otherplace, s, someplace),
 	add_path(otherplace, n, someplace).
-
+		
+	choose([cook, butler, gardener], Thief).
+		
 /* These rules describe the various rooms.  Depending on
    circumstances, a room may have more than one description. */
 
