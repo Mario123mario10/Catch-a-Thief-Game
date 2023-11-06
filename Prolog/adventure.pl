@@ -1,13 +1,14 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)).
 
 :- [places].
 
 
 i_am_at(courtyard).
 
+went_to_servants_house(no).
 
 /*container_at(chest, otherplace).*/
 
@@ -58,7 +59,7 @@ drop(_) :-
         write('You aren''t holding it!'),
         nl.
 
-
+/* these rules describe what to do with chest */
 search(X) :-
 	\+is_locked(X),
 	contain(X, Thing),
@@ -88,8 +89,10 @@ open_chest(What) :-
 open_chest(_) :-
 	write("You don't have a key!"),nl. 
 	
+/* Those rules describe game preparations */
 
 /*choose([], []).*/
+
 
 choose(List, Elt) :-
         length(List, Length),
@@ -119,21 +122,26 @@ go(_) :-
         write('You can''t go that way.').
 
 
+
+
 /* This rule tells how to look about you. */
 
 look :-
         i_am_at(Place),
-        describe(Place),
-        nl,
+        describe(Place),nl,
         /*notice_objects_at(Place);*/
-	notice_persons(Place),
-        nl.
+	notice_persons(Place),nl,
+	=(Place, servants_house),	
+	went_servants_house().
 
+look.
 
 describe(Place) :- write('You are at '), write(Place), nl, 
 	place(Place, Description),
 	write(Description), nl,
 	write("You can go to "), (print_way(Place); nl).
+
+
 
 print_way(Way) :-
 	(door(Way, X);door(X, Way)),
@@ -186,7 +194,22 @@ talk(Person) :-
 talk(Thing) :-
 	write("You can not talk to a "), write(Thing), write("!").
 	
+after_enter(butler) :-
+	try_go_servants_house(no),
+	write("You see that there are many keys there. Maybe you can take one and use it on something").
 
+after_enter(butler) :-
+	try_go_servants_house(yes),
+	write("You see that there are many keys. Maybe you can open servant's house with one of them?"),nl,
+	write("New quest: Try to distract the cloakroom attendant with soil from the garden by scattering it in the hallway. Then try to take the key.").
+
+
+went_servants_house() :-
+	assert(went_to_servants_house(yes)),
+	retract(went_to_servants_house(no)),
+	write("quest started - get the door key and open servants house").
+
+	
 die :-
         finish.
 
