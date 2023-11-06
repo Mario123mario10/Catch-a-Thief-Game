@@ -1,7 +1,7 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1, need_soil/1.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)).
 
 :- [places].
 
@@ -9,7 +9,7 @@
 i_am_at(courtyard).
 
 went_to_servants_house(no).
-
+need_soil(no).
 /*container_at(chest, otherplace).*/
 
 /*contain(chest, robe).*/
@@ -25,6 +25,7 @@ able_to_talk(king).
 able_to_talk(wizard).
 able_to_talk(guard).
 
+thing_at(soil, garden).
 /* These rules describe how to pick up an object. */
 
 take(X) :-
@@ -131,10 +132,22 @@ look :-
         describe(Place),nl,
         /*notice_objects_at(Place);*/
 	notice_persons(Place),nl,
-	=(Place, servants_house),	
-	went_servants_house().
+	after_enter(Place),nl,
+	check_quests(Place).
 
-look.
+
+
+check_quests(Place) :-
+	=(Place, servants_house),	
+	went_to_servants_house(no),	
+	went_servants_house(),!.
+
+check_quests(Place) :-
+	=(Place, garden),
+	need_soil(no),
+	soil(),!.	
+
+check_quests(_).
 
 describe(Place) :- write('You are at '), write(Place), nl, 
 	place(Place, Description),
@@ -194,20 +207,42 @@ talk(Person) :-
 talk(Thing) :-
 	write("You can not talk to a "), write(Thing), write("!").
 	
-after_enter(butler) :-
-	try_go_servants_house(no),
-	write("You see that there are many keys there. Maybe you can take one and use it on something").
+after_enter(butler_room) :-
+	went_to_servants_house(yes),
+	holding(soil),!,	
+	write("You can now distract the butler. Try using scatter(soil).").
 
-after_enter(butler) :-
-	try_go_servants_house(yes),
+after_enter(butler_room) :-
+	went_to_servants_house(yes),
 	write("You see that there are many keys. Maybe you can open servant's house with one of them?"),nl,
-	write("New quest: Try to distract the cloakroom attendant with soil from the garden by scattering it in the hallway. Then try to take the key.").
+	write("continue quest: Try to distract the butler with soil from the garden by scattering it in the hallway. Then try to take the key."),!,nl.
 
+after_enter(butler_room) :-
+	went_to_servants_house(no),
+	write("You see that there are many keys there. Maybe you can take one and use it on something"),!.
+
+
+after_enter(garden) :-
+	need_soil(no),
+	write("You see there's a lot of soil here. You are wondering if it will ever come in handy"),!,nl.
+
+after_enter(garden) :-
+	need_soil(yes),
+	write("You see there's a lot of land here. You can now take it to distract the butler with command take(soil)."),!, nl. 
+
+after_enter(_) :-
+	write("There is nothing special yet").
 
 went_servants_house() :-
 	assert(went_to_servants_house(yes)),
 	retract(went_to_servants_house(no)),
 	write("quest started - get the door key and open servants house").
+
+
+
+soil() :-
+	assert(need_soil(yes)),
+	retract(need_soil(no)).
 
 	
 die :-
