@@ -1,7 +1,7 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_key/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)).
 
 :- [places].
 
@@ -9,7 +9,7 @@
 i_am_at(courtyard).
 
 
-container_at(chest, otherplace).
+/*container_at(chest, otherplace).*/
 
 /*contain(chest, robe).*/
 
@@ -69,18 +69,18 @@ search(X) :-
 	write(X), write(' is empty'),nl.
 
 	
-open(What) :-
+open_chest(What) :-
 	is_locked(What),
 	holding(key),
 	retract(holding(key)),
         retract(is_locked(What)),
 	write(What), write(' is open'),!,nl.
 
-open(What) :-
+open_chest(What) :-
 	\+is_locked(What),
 	write(What), write(' is arleady open'),!,nl.
 
-open(_) :-
+open_chest(_) :-
 	write("You don't have a key!"),nl. 
 	
 
@@ -97,9 +97,9 @@ choose_thief() :-
 	assert(thief(Thief)).
 
 
-prepare_key() :-
-	choose([cook, butler, gardener], Has_key),
-	assert(has_key(Has_key)).
+prepare_diament() :-
+	choose([cook, butler, gardener], Has_diament),
+	assert(has_diament(Has_diament)).
 
 /* These rules define the direction letters as calls to go/1. */
 
@@ -160,7 +160,8 @@ notice_persons(_).
 
 go_to_chest(Person) :-
 	i_am_at(servants_house),
-	write("You are near the chest of "), write(Person),!.
+	write("You are near the chest of "), write(Person), nl,
+	write("You can now open it using command open_chest(<person>_chest)"), !.
 
 go_to_chest(_) :-
 	write("You are not in the servants house").
@@ -208,7 +209,7 @@ start :-
 	add_path(otherplace, s, someplace),
 	add_path(otherplace, n, someplace).*/
 	choose_thief(),		
-	prepare_key().	
+	prepare_diament().	
 		
 /* These rules describe the various rooms.  Depending on
    circumstances, a room may have more than one description. */
