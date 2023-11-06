@@ -17,7 +17,12 @@ is_locked(butler_chest).
 is_locked(gardener_chest).
 is_locked(cook_chest).
 
-
+able_to_talk(butler).
+able_to_talk(gardener).
+able_to_talk(cook).
+able_to_talk(king).
+able_to_talk(wizard).
+able_to_talk(guard).
 
 /* These rules describe how to pick up an object. */
 
@@ -152,7 +157,7 @@ notice_objects_at(_).
 notice_persons(Place) :-
 	
         person(Place, X),
-        write('There is a '), write(X), write(' here.'), nl,
+        write('There is a '), write(X), write(' here you can talk to'), nl,
 	fail.
 
 notice_persons(_).
@@ -165,6 +170,21 @@ go_to_chest(Person) :-
 
 go_to_chest(_) :-
 	write("You are not in the servants house").
+
+talk(Person) :-
+	able_to_talk(Person),
+	i_am_at(Place),
+	person(Place, Person),
+	write("Hello "), write(Person),!.
+
+talk(Person) :-
+	able_to_talk(Person),
+	person(Place, Person),
+	write("You can meet that person only in "), write(Place),!.
+
+
+talk(Thing) :-
+	write("You can not talk to a "), write(Thing), write("!").
 	
 
 die :-
