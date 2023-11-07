@@ -1,7 +1,7 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)).
 
 :- [places].
 
@@ -11,6 +11,7 @@ i_am_at(courtyard).
 went_to_servants_house(no).
 need_soil(no).
 went_to_butler_room(no).
+went_again_to_butler_room(no).
 /*container_at(chest, otherplace).*/
 
 /*contain(chest, robe).*/
@@ -27,6 +28,7 @@ able_to_talk(wizard).
 able_to_talk(guard).
 
 thing_at(soil, garden).
+thing_at(key, butler_room).
 /* These rules describe how to pick up an object. */
 
 take(X) :-
@@ -37,15 +39,29 @@ take(X) :-
 take(X) :-
         i_am_at(Place),
         thing_at(X, Place),
+	take_thing(X, Place),
         retract(thing_at(X, Place)),
         assert(holding(X)),
-        write('OK.'),
-        !, nl.
+        write('OK.'),!,nl.
+
+take(soil) :-!.
 
 take(_) :-
-        write('I don''t see it here.'),
+        write("You can't take that!"),
         nl.
 
+take_thing(soil, garden) :-
+	assert(holding(soil)), !, fail.
+
+take_thing(key, butler_room) :-
+	thing_at(soil, butler_room),
+	went_again_to_butler_room(yes),
+	write("You successfully take the key! Now run before the butler see you!"),!.
+
+take_thing(key, butler_room) :-
+	!, fail.
+
+take_thing(_, _).
 
 /* These rules describe how to put down an object. */
 
@@ -54,13 +70,24 @@ drop(X) :-
         i_am_at(Place),
         retract(holding(X)),
         assert(thing_at(X, Place)),
-        write('OK.'),
-        !, nl.
+        drop_thing(X, Place),!, nl.
+
 
 drop(_) :-
         write('You aren''t holding it!'),
         nl.
 
+
+drop_thing(soil, butler_room) :-	
+	went_again_to_butler_room(yes),
+	write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it. Butler agree with you and start cleaning. Now is your chance! Grab the key with command take(key)!"),!.
+
+drop_thing(soil, butler_room) :-
+	write("You don't know what it will do yet you cheater!"),!.
+
+drop_thing(_, _).
+	
+		
 /* these rules describe what to do with chest */
 search(X) :-
 	\+is_locked(X),
@@ -158,7 +185,14 @@ check_quests(Place) :-
 	went_to_servants_house(yes),
 	went_to_butler_room(no),
 	assert(went_to_butler_room(yes)),
-	retract(went_to_butler_room(no)).
+	retract(went_to_butler_room(no)),!.
+
+check_quests(Place) :-
+	=(Place, butler_room),
+	need_soil(yes),
+	went_again_to_butler_room(no),
+	assert(went_again_to_butler_room(yes)),	
+	retract(went_again_to_butler_room(no)).	
 
 check_quests(_).
 
@@ -205,6 +239,9 @@ go_to_chest(Person) :-
 go_to_chest(_) :-
 	write("You are not in the servants house").
 
+	
+	
+
 talk(Person) :-
 	able_to_talk(Person),
 	i_am_at(Place),
@@ -221,9 +258,14 @@ talk(Thing) :-
 	write("You can not talk to a "), write(Thing), write("!").
 	
 after_enter(butler_room) :-
-	went_to_servants_house(yes),
-	holding(soil),!,	
-	write("You can now distract the butler. Try using scatter(soil).").
+	went_again_to_butler_room(yes),
+	holding(soil),
+	write("You can now distract the butler. Try using scatter(soil)."),!.
+
+after_enter(butler_room) :-
+	went_again_to_butler_room(yes),
+	\+ holding(soil),
+	write("You don't have soil so you can't distract the butler"),!.
 
 after_enter(butler_room) :-
 	went_to_servants_house(yes),
@@ -233,6 +275,7 @@ after_enter(butler_room) :-
 after_enter(butler_room) :-
 	went_to_servants_house(no),
 	write("You see that there are many keys there. Maybe you can take one and use it on something in the future?"),!.
+
 
 after_enter(garden) :-
 	need_soil(no),
