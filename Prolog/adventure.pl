@@ -1,7 +1,7 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1, need_soil/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)).
 
 :- [places].
 
@@ -10,6 +10,7 @@ i_am_at(courtyard).
 
 went_to_servants_house(no).
 need_soil(no).
+went_to_butler_room(no).
 /*container_at(chest, otherplace).*/
 
 /*contain(chest, robe).*/
@@ -132,20 +133,32 @@ look :-
         describe(Place),nl,
         /*notice_objects_at(Place);*/
 	notice_persons(Place),nl,
-	after_enter(Place),nl,
-	check_quests(Place).
+	check_quests(Place), nl,
+	after_enter(Place),nl.
+	
 
 
 
 check_quests(Place) :-
 	=(Place, servants_house),	
 	went_to_servants_house(no),	
-	went_servants_house(),!.
+	assert(went_to_servants_house(yes)),
+	retract(went_to_servants_house(no)),!.
+	
 
 check_quests(Place) :-
 	=(Place, garden),
+	went_to_butler_room(yes),
 	need_soil(no),
-	soil(),!.	
+	assert(need_soil(yes)),
+	retract(need_soil(no)),!.
+	
+check_quests(Place) :-
+	=(Place, butler_room),
+	went_to_servants_house(yes),
+	went_to_butler_room(no),
+	assert(went_to_butler_room(yes)),
+	retract(went_to_butler_room(no)).
 
 check_quests(_).
 
@@ -219,8 +232,7 @@ after_enter(butler_room) :-
 
 after_enter(butler_room) :-
 	went_to_servants_house(no),
-	write("You see that there are many keys there. Maybe you can take one and use it on something"),!.
-
+	write("You see that there are many keys there. Maybe you can take one and use it on something in the future?"),!.
 
 after_enter(garden) :-
 	need_soil(no),
@@ -230,19 +242,11 @@ after_enter(garden) :-
 	need_soil(yes),
 	write("You see there's a lot of land here. You can now take it to distract the butler with command take(soil)."),!, nl. 
 
+after_enter(servants_house) :-
+	write("quest started - get the door key and open servants house"),!,nl.
+
 after_enter(_) :-
 	write("There is nothing special yet").
-
-went_servants_house() :-
-	assert(went_to_servants_house(yes)),
-	retract(went_to_servants_house(no)),
-	write("quest started - get the door key and open servants house").
-
-
-
-soil() :-
-	assert(need_soil(yes)),
-	retract(need_soil(no)).
 
 	
 die :-
