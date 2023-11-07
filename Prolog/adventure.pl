@@ -55,7 +55,7 @@ take_thing(soil, garden) :-
 
 take_thing(key, butler_room) :-
 	thing_at(soil, butler_room),
-	went_again_to_butler_room(yes),
+	went_to_servants_house(yes),
 	write("You successfully take the key! Now run before the butler see you!"),!.
 
 take_thing(key, butler_room) :-
@@ -79,12 +79,13 @@ drop(_) :-
 
 
 drop_thing(soil, butler_room) :-	
-	went_again_to_butler_room(yes),
+	went_to_servants_house(yes),
 	write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it. Butler agree with you and start cleaning. Now is your chance! Grab the key with command take(key)!"),!.
 
 drop_thing(soil, butler_room) :-
 	write("You don't know what it will do yet you cheater!"),!.
 
+	
 drop_thing(_, _).
 	
 		
