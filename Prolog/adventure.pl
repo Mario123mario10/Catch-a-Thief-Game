@@ -1,7 +1,7 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, is_locked/1, thief/1, has_diamond/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1, chosen_thief/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(i_was_at(_)), retractall(chosen_thief(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, is_locked/1, thief/1, has_diamond/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1, chosen_thief/1, sus_ratio/2.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(i_was_at(_)), retractall(chosen_thief(_)), retractall(sus_ratio(_, _)).
 
 :- [places].
 
@@ -28,6 +28,11 @@ able_to_talk(guard).
 
 thing_at(soil, garden).
 thing_at(keys, butler_room).
+
+sus_ratio(gardener, 0).
+sus_ratio(cook, 0).
+sus_ratio(butler, 0).
+
 /* These rules describe how to pick up an object. */
 
 take(X) :-
@@ -86,20 +91,30 @@ drop_thing(_, _).
 	
 		
 /* these rules describe what to do with chest */
+
 search(What) :-
-	\+is_locked(What),
+	\+ is_locked(What),
 	thing_at(Thing, What),
 	write('You found '), write(Thing), nl,
 	assert(holding(Thing)),
-	retract(thing_at(Thing, What)),!.
-	
-search(X) :-
-	is_locked(X),
-	write(X), write(' is locked'),!,nl.
+	retract(thing_at(Thing, What)),
+	check_ratio(Thing, What),!.
 
-search(X) :-
-	write(X), write(' is empty'),nl.
+search(What) :-
+	is_locked(What),
+	write(What), write(' is locked'),!,nl.
 
+
+search(What) :-
+	write(What), write(' is empty'),nl.
+
+
+check_ratio(Thing, What) :-	
+	=(Thing, diamond),
+	whose(Person, What),
+	inc_sus_ratio(Person),!.
+
+check_ratio(_, _).
 	
 open(What) :-
 	is_locked(What),
@@ -145,6 +160,8 @@ prepare_diamond() :-
 	assert(has_diamond(Has_diamond)),
 	whose(Has_diamond, Chest),	
 	assert(thing_at(diamond, Chest)).
+
+
 /* These rules define the direction letters as calls to go/1. */
 
 go(Place) :-
@@ -274,6 +291,26 @@ talk(Person) :-
 
 talk(Thing) :-
 	write("You can not talk to a "), write(Thing), write("!"),nl.
+
+
+inc_sus_ratio(Person) :-
+	sus_ratio(Person, Ratio),
+	\+ Ratio is 2,
+	New_ratio is Ratio + 1,
+	retract(sus_ratio(Person, Ratio)),
+	assert(sus_ratio(Person, New_ratio)),
+	write("Now suspiciousness ratio of "), write(Person), write(" is equal "), write(New_ratio), write("."),!, nl.
+
+inc_sus_ratio(Person) :-
+	sus_ratio(Person, Ratio),
+	New_ratio is Ratio + 1,
+	retract(sus_ratio(Person, Ratio)),
+	assert(sus_ratio(Person, New_ratio)),
+	write("Suspiciousness ratio of "), write(Person), write(" is equal 3."), nl,
+	write("Now you know that "), write(Person), write(" is the thief!"), !, nl.	
+
+inc_sus_ratio(_) :-
+	write("You can't increase the non-suspect ratio."). 
 	
 after_enter(butler_room) :-
 	went_again_to_butler_room(yes),
