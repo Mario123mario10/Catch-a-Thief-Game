@@ -1,7 +1,7 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, is_locked/1, thief/1, has_diamond/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(i_was_at(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, is_locked/1, thief/1, has_diamond/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1, chosen_thief/1.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(i_was_at(_)), retractall(chosen_thief(_)).
 
 :- [places].
 
@@ -332,11 +332,21 @@ finish :-
         write('The game is over. Please enter the "halt." command.').
 	
 choose_the_thief(Thief) :-
+	retractall(chosen_thief(_)),
+	write("Attention, you have only one chance who the thief is. If you are sure write 'sure.'"),	
+	assert(chosen_thief(Thief)).
+sure :-	
 	thief(Thief),
+	chosen_thief(Ch_thief),
+	=(Thief, Ch_thief),
 	write("It was the thief! You won"),!,nl,
 	finish.
+sure :-
+	\+ chosen_thief(_),
+	write("You haven't chosen any thief yet"),!,nl.
 
-choose_the_thief(Thief) :-
+sure :-
+	thief(Thief),
 	write("It wasn't the thief. You lose. The thief was "), write(Thief),nl, 
 	finish.
 
