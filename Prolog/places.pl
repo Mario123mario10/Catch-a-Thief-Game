@@ -1,4 +1,4 @@
-:- module(places, [place/2, door/2, person/2]).  
+:- module(places, [place/2, door/2, person/2, chest/1, has_chests/1]).  
 
 place(vault, "place where diamond was stored but there is nothing anymore").
 place(hall, "big, crouded, splendid chamber with big throne in the center").

@@ -5,8 +5,8 @@
 
 :- [places].
 
-i_was_at(courtyard).
 i_am_at(courtyard).
+i_was_at(courtyard).
 
 went_to_servants_house(no).
 need_soil(no).
@@ -19,6 +19,7 @@ went_again_to_butler_room(no).
 is_locked(butler_chest).
 is_locked(gardener_chest).
 is_locked(cook_chest).
+is_locked(servants_house).
 
 able_to_talk(butler).
 able_to_talk(gardener).
@@ -105,20 +106,24 @@ search(X) :-
 	write(X), write(' is empty'),nl.
 
 	
-open_chest(What) :-
+open(What) :-
 	is_locked(What),
 	holding(key),
 	retract(holding(key)),
         retract(is_locked(What)),
-	write(What), write(' is open'),!,nl.
+	write(What), write(' is open'),nl,
+	open_thing(What),!.
 
-open_chest(What) :-
+open(What) :-
 	\+is_locked(What),
 	write(What), write(' is arleady open'),!,nl.
 
-open_chest(_) :-
+open(_) :-
 	write("You don't have a key!"),nl. 
-	
+
+open_thing(servants_house) :-	
+	write("You see place with bedrooms for all workforces, this is the place where cook, gardener and butler are sleeping. Each of them has 1 chest. You can go to these chest using command go_to_chest(<Person>)").	
+
 /* Those rules describe game preparations */
 
 /*choose([], []).*/
@@ -172,8 +177,6 @@ look :-
 	check_quests(Place), nl,
 	after_enter(Place),nl.
 	
-
-
 
 check_quests(Place) :-
 	=(Place, servants_house),	
@@ -242,8 +245,13 @@ notice_persons(_).
 
 go_to_chest(Person) :-
 	i_am_at(servants_house),
+	\+ is_locked(servants_house),
 	write("You are near the chest of "), write(Person), nl,
-	write("You can now open it using command open_chest(<person>_chest)"), !.
+	write("You can now open it using command open_chest(<person>_chest)"),!.
+
+go_to_chest(Person) :-
+	i_am_at(servants_house),
+	write("You can't go to "), write(Person), write(" chest where servants house is locked"),!.
 
 go_to_chest(_) :-
 	write("You are not in the servants house").
@@ -269,7 +277,7 @@ talk(Thing) :-
 after_enter(butler_room) :-
 	went_again_to_butler_room(yes),
 	holding(soil),
-	write("You can now distract the butler. Try using scatter(soil)."),!.
+	write("You can now distract the butler. Try using drop(soil)."),!.
 
 after_enter(butler_room) :-
 	went_again_to_butler_room(yes),
@@ -295,10 +303,18 @@ after_enter(garden) :-
 	write("You see there's a lot of land here. You can now take it to distract the butler with command take(soil)."),!, nl. 
 
 after_enter(servants_house) :-
+	\+ holding(key),
+	is_locked(servants_house),
 	write("quest started - get the door key and open servants house"),!,nl.
 
+after_enter(servants_house) :-
+	holding(key),
+	is_locked(servants_house),
+	write("You can now enter the servants house"),!,nl.
+
+
 after_enter(_) :-
-	write("There is nothing special yet").
+	write("There is nothing special yet"),nl.
 
 	
 die :-
