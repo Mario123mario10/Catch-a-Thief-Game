@@ -1,6 +1,6 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1.
+:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, is_locked/1, thief/1, has_diamond/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1.
 :- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(i_was_at(_)).
 
 :- [places].
@@ -12,9 +12,7 @@ went_to_servants_house(no).
 need_soil(no).
 went_to_butler_room(no).
 went_again_to_butler_room(no).
-/*container_at(chest, otherplace).*/
 
-/*contain(chest, robe).*/
 
 is_locked(butler_chest).
 is_locked(gardener_chest).
@@ -29,21 +27,19 @@ able_to_talk(wizard).
 able_to_talk(guard).
 
 thing_at(soil, garden).
-thing_at(key, butler_room).
+thing_at(keys, butler_room).
 /* These rules describe how to pick up an object. */
 
 take(X) :-
         holding(X),
-        write('You''re already holding it!'),
-        !, nl.
+        write('You''re already holding it!'),!, nl.
 
 take(X) :-
         i_am_at(Place),
         thing_at(X, Place),
 	take_thing(X, Place),
         retract(thing_at(X, Place)),
-        assert(holding(X)),
-        write('OK.'),!,nl.
+        assert(holding(X)),!.
 
 take(soil) :-!.
 
@@ -54,12 +50,12 @@ take(_) :-
 take_thing(soil, garden) :-
 	assert(holding(soil)), !, fail.
 
-take_thing(key, butler_room) :-
+take_thing(keys, butler_room) :-
 	thing_at(soil, butler_room),
 	went_to_servants_house(yes),
-	write("You successfully take the key! Now run before the butler see you!"),!.
+	write("You successfully take the keys! Now run before the butler see you!"),!,nl.
 
-take_thing(key, butler_room) :-
+take_thing(keys, butler_room) :-
 	!, fail.
 
 take_thing(_, _).
@@ -81,7 +77,7 @@ drop(_) :-
 
 drop_thing(soil, butler_room) :-	
 	went_to_servants_house(yes),
-	write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it. Butler agree with you and start cleaning. Now is your chance! Grab the key with command take(key)!"),!.
+	write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it. Butler agree with you and start cleaning. Now is your chance! Grab the key with command take(keys)!"),!.
 
 drop_thing(soil, butler_room) :-
 	write("You don't know what it will do yet you cheater!"),!.
@@ -91,12 +87,12 @@ drop_thing(_, _).
 	
 		
 /* these rules describe what to do with chest */
-search(X) :-
-	\+is_locked(X),
-	contain(X, Thing),
+search(What) :-
+	\+is_locked(What),
+	thing_at(Thing, What),
 	write('You found '), write(Thing), nl,
 	assert(holding(Thing)),
-	retract(contain(X, Thing)),!.
+	retract(thing_at(Thing, What)),!.
 	
 search(X) :-
 	is_locked(X),
@@ -108,8 +104,7 @@ search(X) :-
 	
 open(What) :-
 	is_locked(What),
-	holding(key),
-	retract(holding(key)),
+	holding(keys),
         retract(is_locked(What)),
 	write(What), write(' is open'),nl,
 	open_thing(What),!.
@@ -122,7 +117,13 @@ open(_) :-
 	write("You don't have a key!"),nl. 
 
 open_thing(servants_house) :-	
-	write("You see place with bedrooms for all workforces, this is the place where cook, gardener and butler are sleeping. Each of them has 1 chest. You can go to these chest using command go_to_chest(<Person>)").	
+	write("You see place with bedrooms for all workforces, this is the place where cook, gardener and butler are sleeping. Each of them has 1 chest. You can go to these chest using command go_to_chest(<Person>)"),!,nl.
+
+open_thing(What) :-
+	(=(What, cook_chest);=(What, butler_chest);=(What, gardener_chest)),
+	write("Your set of keys can open "), write(What), write("!"),!,nl.
+
+open_thing(_).	
 
 /* Those rules describe game preparations */
 
@@ -140,10 +141,11 @@ choose_thief() :-
 	assert(thief(Thief)).
 
 
-prepare_diament() :-
-	choose([cook, butler, gardener], Has_diament),
-	assert(has_diament(Has_diament)).
-
+prepare_diamond() :-
+	choose([cook, butler, gardener], Has_diamond),
+	assert(has_diamond(Has_diamond)),
+	whose(Has_diamond, Chest),	
+	assert(thing_at(diamond, Chest)).
 /* These rules define the direction letters as calls to go/1. */
 
 go(Place) :-
@@ -227,9 +229,9 @@ notice_objects_at(Place) :-
         thing_at(X, Place),
         write('There is a '), write(X), write(' here.'), nl,
         
-	container_at(Y, Place),
+	/*container_at(Y, Place),
 	
-        write('There is a '), write(Y), write(' here.'), nl,
+        write('There is a '), write(Y), write(' here.'), nl,*/
 	fail.
 
 notice_objects_at(_).
@@ -247,7 +249,7 @@ go_to_chest(Person) :-
 	i_am_at(servants_house),
 	\+ is_locked(servants_house),
 	write("You are near the chest of "), write(Person), nl,
-	write("You can now open it using command open_chest(<person>_chest)"),!.
+	write("You can now open it using command open(<person>_chest)"),!.
 
 go_to_chest(Person) :-
 	i_am_at(servants_house),
@@ -286,12 +288,12 @@ after_enter(butler_room) :-
 
 after_enter(butler_room) :-
 	went_to_servants_house(yes),
-	write("You see that there are many keys. Maybe you can open servant's house with one of them?"),nl,
-	write("continue quest: Try to distract the butler with soil from the garden by scattering it in the hallway. Then try to take the key."),!,nl.
+	write("You see that there is a set of keys. Maybe you can open servant's house with one of them?"),nl,
+	write("continue quest: Try to distract the butler with soil from the garden by scattering it in the hallway. Then try to take the set of keys."),!,nl.
 
 after_enter(butler_room) :-
 	went_to_servants_house(no),
-	write("You see that there are many keys there. Maybe you can take one and use it on something in the future?"),!.
+	write("You see that there are is a set of keys on the table. But the butler is watching it too. Maybe you can take it and use it on something in the future?"),!.
 
 
 after_enter(garden) :-
@@ -303,12 +305,12 @@ after_enter(garden) :-
 	write("You see there's a lot of land here. You can now take it to distract the butler with command take(soil)."),!, nl. 
 
 after_enter(servants_house) :-
-	\+ holding(key),
+	\+ holding(keys),
 	is_locked(servants_house),
 	write("quest started - get the door key and open servants house"),!,nl.
 
 after_enter(servants_house) :-
-	holding(key),
+	holding(keys),
 	is_locked(servants_house),
 	write("You can now enter the servants house"),!,nl.
 
@@ -359,7 +361,7 @@ start :-
 	add_path(otherplace, s, someplace),
 	add_path(otherplace, n, someplace).*/
 	choose_thief(),		
-	prepare_diament().	
+	prepare_diamond().	
 		
 /* These rules describe the various rooms.  Depending on
    circumstances, a room may have more than one description. */

@@ -1,4 +1,4 @@
-:- module(places, [place/2, door/2, person/2, chest/1, has_chests/1]).  
+:- module(places, [place/2, door/2, person/2, whose/2]).  
 
 place(vault, "place where diamond was stored but there is nothing anymore").
 place(hall, "big, crouded, splendid chamber with big throne in the center").
@@ -7,7 +7,7 @@ place(butler_room, "there are keys to every room on the castle").
 place(garden, "big garden, there are vegetables growing and is many flowers").
 place(guard_house, "small chamber with lots of weapons").
 place(wizard_house, "small, incredible place with many curious magic subjects").
-place(servants_house, "place with bedrooms for all workforces, this is the place where cook, gardener and butler are sleeping. Each of them has 1 chest. You can go to these chest using command go_to_chest(<Person>)").
+place(servants_house, "place with bedrooms for all workforces").
 place(forest, "big forest with wild animals and many plants and mushrooms").
 place(courtyard, "center of the castle").
 
@@ -32,9 +32,6 @@ door(courtyard, wizard_house).
 door(hall, kitchen).
 door(wizard_house, forest). 
 
-chest(butler).
-chest(gardener).
-chest(cook).
-
-has_chests(servants_house).
-
+whose(butler, butler_chest).
+whose(cook, cook_chest).
+whose(gardener, gardener_chest).
