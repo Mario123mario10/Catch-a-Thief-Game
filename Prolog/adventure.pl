@@ -1,7 +1,7 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, is_locked/1, thief/1, has_diamond/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(i_was_at(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, is_locked/1, thief/1, has_diamond/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(i_was_at(_)).
 
 :- [places].
 
@@ -338,36 +338,36 @@ finish :-
 
 instructions :-
         nl,
-        write('Enter commands using standard Prolog syntax.'), nl,
-        write('Available commands are:'), nl,
-        write('start.             -- to start the game.'), nl,
-        write('n.  s.  e.  w.     -- to go in that direction.'), nl,
-        write('take(Object).      -- to pick up an object.'), nl,
-        write('drop(Object).      -- to put down an object.'), nl,
-        write('look.              -- to look around you again.'), nl,
-        write('instructions.      -- to see this message again.'), nl,
-        write('halt.              -- to end the game and quit.'), nl,
-        nl.
+	write("Enter commands using standard Prolog syntax."), nl,
+	write("Attention! Elements in angle brackets <> mean that the element you want to check is to be entered there."),nl,
+	write("If you want to check if any element satisfies the condition, enter X."),nl,
+	write("This is only possible with commands that check something"), nl,nl,
+	write("Commands that change something:"), nl,        
+        write("start.			  -- to start the game."), nl,
+        write("go(<Place>)		  -- to go in that direction."), nl,
+	write("back.			  -- to go to the previous place."), nl,
+        write("take(<Object>).		  -- to pick up an object."), nl,
+        write("drop(<Object>).		  -- to put down an object."), nl,
+	write("search(<Container>).	  -- to search something in an object"), nl,
+	write("go_to_chest(<Person>).	  -- to go to the chest of the chosen person"), nl,
+	write("talk(<Person>).		  -- to talk to the chosen person."), nl,
+	write("open(<Container>).	  -- to open an object"), nl,
+        write("halt.			  -- to end the game and quit."), nl,nl, 
+	write("Commands that only check something:"), nl,
+	write("instructions.              -- to see this message again."), nl,
+	write("look.                      -- to look around you again."), nl,
+	write("i_am_at(<Place>).          -- to check where you are right now"), nl,
+	write("i_was_at(<Place>).         -- to check where you were earlier"), nl,
+	write("is_locked(<Person>_chest). -- to check if person's chest is locked"),nl,	
+	write("holding(<Objects>).        -- to check what you are having right now"),nl,
+	write("(print ; whenever you want to check another thing you are holding)."), nl,
+nl.
+	
 
 
-/* This rule prints out instructions and tells where you are. */
-
+/* This rule prepare the game */
 start :-
         instructions,
         look,
-	
-
-	/*add_path(someplace, n, otherplace),
-	add_path(otherplace, s, someplace),
-	add_path(otherplace, n, someplace).*/
 	choose_thief(),		
 	prepare_diamond().	
-		
-/* These rules describe the various rooms.  Depending on
-   circumstances, a room may have more than one description. */
-
-/*describe(someplace) :- write('You are someplace.'), nl.
-describe(otherplace) :- write('You are otherplace.'), nl. */
-
-
-
