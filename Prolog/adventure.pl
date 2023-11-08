@@ -329,9 +329,17 @@ die :-
    routine requests the user to perform the final "halt." */
 
 finish :-
-        nl,
-        write('The game is over. Please enter the "halt." command.'),
-        nl.
+        write('The game is over. Please enter the "halt." command.').
+	
+choose_the_thief(Thief) :-
+	thief(Thief),
+	write("It was the thief! You won"),!,nl,
+	finish.
+
+choose_the_thief(Thief) :-
+	write("It wasn't the thief. You lose. The thief was "), write(Thief),nl, 
+	finish.
+
 
 
 /* This rule just writes out game instructions. */
@@ -343,23 +351,24 @@ instructions :-
 	write("If you want to check if any element satisfies the condition, enter X."),nl,
 	write("This is only possible with commands that check something"), nl,nl,
 	write("Commands that change something:"), nl,        
-        write("start.			  -- to start the game."), nl,
-        write("go(<Place>)		  -- to go in that direction."), nl,
-	write("back.			  -- to go to the previous place."), nl,
-        write("take(<Object>).		  -- to pick up an object."), nl,
-        write("drop(<Object>).		  -- to put down an object."), nl,
-	write("search(<Container>).	  -- to search something in an object"), nl,
-	write("go_to_chest(<Person>).	  -- to go to the chest of the chosen person"), nl,
-	write("talk(<Person>).		  -- to talk to the chosen person."), nl,
-	write("open(<Container>).	  -- to open an object"), nl,
-        write("halt.			  -- to end the game and quit."), nl,nl, 
+        write("start.			    -- to start the game."), nl,
+        write("go(<Place>)		    -- to go in that direction."), nl,
+	write("back.			    -- to go to the previous place."), nl,
+        write("take(<Object>).		    -- to pick up an object."), nl,
+        write("drop(<Object>).		    -- to put down an object."), nl,
+	write("search(<Container>).	    -- to search something in an object."), nl,
+	write("go_to_chest(<Person>).	    -- to go to the chest of the chosen person."), nl,
+	write("talk(<Person>).		    -- to talk to the chosen person."), nl,
+	write("open(<Container>).	    -- to open an object."), nl,
+	write("choose_the_thief(<Person>). -- to check if you are right, who the thief is."), nl,
+        write("halt.			    -- to end the game and quit."), nl,nl, 
 	write("Commands that only check something:"), nl,
-	write("instructions.              -- to see this message again."), nl,
-	write("look.                      -- to look around you again."), nl,
-	write("i_am_at(<Place>).          -- to check where you are right now"), nl,
-	write("i_was_at(<Place>).         -- to check where you were earlier"), nl,
-	write("is_locked(<Person>_chest). -- to check if person's chest is locked"),nl,	
-	write("holding(<Objects>).        -- to check what you are having right now"),nl,
+	write("instructions.                -- to see this message again."), nl,
+	write("look.                        -- to look around you again."), nl,
+	write("i_am_at(<Place>).            -- to check where you are right now."), nl,
+	write("i_was_at(<Place>).           -- to check where you were earlier."), nl,
+	write("is_locked(<Person>_chest).   -- to check if person's chest is locked."),nl,	
+	write("holding(<Objects>).          -- to check what you are having right now."),nl,
 	write("(print ; whenever you want to check another thing you are holding)."), nl,
 nl.
 	
