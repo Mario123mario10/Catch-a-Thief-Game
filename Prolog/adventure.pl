@@ -77,7 +77,7 @@ drop(_) :-
 
 drop_thing(soil, butler_room) :-	
 	went_to_servants_house(yes),
-	write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it. Butler agree with you and start cleaning. Now is your chance! Grab the key with command take(keys)!"),!.
+	write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it. Butler agree with you and start cleaning. Now is your chance! Grab the key!"),!.
 
 drop_thing(soil, butler_room) :-
 	write("You don't know what it will do yet you cheater!"),!.
@@ -117,7 +117,7 @@ open(_) :-
 	write("You don't have a key!"),nl. 
 
 open_thing(servants_house) :-	
-	write("You see place with bedrooms for all workforces, this is the place where cook, gardener and butler are sleeping. Each of them has 1 chest. You can go to these chest using command go_to_chest(<Person>)"),!,nl.
+	write("You see place with bedrooms for all workforces, this is the place where cook, gardener and butler are sleeping. Each of them has 1 chest. You can go to these chest"),!,nl.
 
 open_thing(What) :-
 	(=(What, cook_chest);=(What, butler_chest);=(What, gardener_chest)),
@@ -249,7 +249,7 @@ go_to_chest(Person) :-
 	i_am_at(servants_house),
 	\+ is_locked(servants_house),
 	write("You are near the chest of "), write(Person), nl,
-	write("You can now open it using command open(<person>_chest)"),!.
+	write("You can now open it"),!.
 
 go_to_chest(Person) :-
 	i_am_at(servants_house),
@@ -279,7 +279,7 @@ talk(Thing) :-
 after_enter(butler_room) :-
 	went_again_to_butler_room(yes),
 	holding(soil),
-	write("You can now distract the butler. Try using drop(soil)."),!.
+	write("You can now distract the butler by dropping the soil."),!.
 
 after_enter(butler_room) :-
 	went_again_to_butler_room(yes),
@@ -302,7 +302,7 @@ after_enter(garden) :-
 
 after_enter(garden) :-
 	need_soil(yes),
-	write("You see there's a lot of land here. You can now take it to distract the butler with command take(soil)."),!, nl. 
+	write("You see there's a lot of land here. You can now take it to distract the butler"),!, nl. 
 
 after_enter(servants_house) :-
 	\+ holding(keys),
