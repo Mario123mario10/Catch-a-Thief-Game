@@ -1,11 +1,11 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1.
-:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)).
+:- dynamic i_am_at/1, thing_at/2, holding/1, add_path/3, contain/2, is_locked/1, thief/1, has_diament/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1.
+:- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(has_key(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(i_was_at(_)).
 
 :- [places].
 
-
+i_was_at(courtyard).
 i_am_at(courtyard).
 
 went_to_servants_house(no).
@@ -146,13 +146,21 @@ go(Place) :-
 	(door(Here,Place);door(Place,Here)),
 	retract(i_am_at(Here)),
         assert(i_am_at(Place)),
+	retract(i_was_at(_)),
+	assert(i_was_at(Here)),
         !, look.
 
 go(_) :-
         write('You can''t go that way.').
 
 
-
+back() :-
+	i_am_at(Here),
+	i_was_at(There),
+	retract(i_am_at(Here)),
+	assert(i_am_at(There)),
+	retract(i_was_at(There)),
+	assert(i_was_at(Here)), look.	
 
 /* This rule tells how to look about you. */
 
