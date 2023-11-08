@@ -67,20 +67,19 @@ drop(X) :-
         i_am_at(Place),
         retract(holding(X)),
         assert(thing_at(X, Place)),
-        drop_thing(X, Place),!, nl.
+        drop_thing(X, Place),!.
 
 
 drop(_) :-
-        write('You aren''t holding it!'),
-        nl.
+        write('You aren''t holding it!'),nl.
 
 
 drop_thing(soil, butler_room) :-	
 	went_to_servants_house(yes),
-	write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it. Butler agree with you and start cleaning. Now is your chance! Grab the key!"),!.
+	write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it. Butler agree with you and start cleaning. Now is your chance! Grab the key!"),!, nl.
 
 drop_thing(soil, butler_room) :-
-	write("You don't know what it will do yet you cheater!"),!.
+	write("You don't know what it will do yet you cheater!"),!,nl.
 
 	
 drop_thing(_, _).
@@ -158,7 +157,7 @@ go(Place) :-
         !, look.
 
 go(_) :-
-        write('You can''t go that way.').
+        write('You can''t go that way.'),nl.
 
 
 back() :-
@@ -173,11 +172,11 @@ back() :-
 
 look :-
         i_am_at(Place),
-        describe(Place),nl,
+        describe(Place),
         /*notice_objects_at(Place);*/
-	notice_persons(Place),nl,
-	check_quests(Place), nl,
-	after_enter(Place),nl.
+	notice_persons(Place),
+	check_quests(Place),
+	after_enter(Place).
 	
 
 check_quests(Place) :-
@@ -253,10 +252,10 @@ go_to_chest(Person) :-
 
 go_to_chest(Person) :-
 	i_am_at(servants_house),
-	write("You can't go to "), write(Person), write(" chest where servants house is locked"),!.
+	write("You can't go to "), write(Person), write(" chest where servants house is locked"),!,nl.
 
 go_to_chest(_) :-
-	write("You are not in the servants house").
+	write("You are not in the servants house"),nl.
 
 	
 	
@@ -265,26 +264,26 @@ talk(Person) :-
 	able_to_talk(Person),
 	i_am_at(Place),
 	person(Place, Person),
-	write("Hello "), write(Person),!.
+	write("Hello "), write(Person),!, nl.
 
 talk(Person) :-
 	able_to_talk(Person),
 	person(Place, Person),
-	write("You can meet that person only in "), write(Place),!.
+	write("You can meet that person only in "), write(Place),!,nl.
 
 
 talk(Thing) :-
-	write("You can not talk to a "), write(Thing), write("!").
+	write("You can not talk to a "), write(Thing), write("!"),nl.
 	
 after_enter(butler_room) :-
 	went_again_to_butler_room(yes),
 	holding(soil),
-	write("You can now distract the butler by dropping the soil."),!.
+	write("You can now distract the butler by dropping the soil."),!,nl.
 
 after_enter(butler_room) :-
 	went_again_to_butler_room(yes),
 	\+ holding(soil),
-	write("You don't have soil so you can't distract the butler"),!.
+	write("You don't have soil so you can't distract the butler"),!,nl.
 
 after_enter(butler_room) :-
 	went_to_servants_house(yes),
@@ -293,7 +292,7 @@ after_enter(butler_room) :-
 
 after_enter(butler_room) :-
 	went_to_servants_house(no),
-	write("You see that there are is a set of keys on the table. But the butler is watching it too. Maybe you can take it and use it on something in the future?"),!.
+	write("You see that there are is a set of keys on the table. But the butler is watching it too. Maybe you can take it and use it on something in the future?"),!,nl.
 
 
 after_enter(garden) :-
@@ -329,11 +328,11 @@ die :-
    routine requests the user to perform the final "halt." */
 
 finish :-
-        write('The game is over. Please enter the "halt." command.').
+        write('The game is over. Please enter the "halt." command.'), nl.
 	
 choose_the_thief(Thief) :-
 	retractall(chosen_thief(_)),
-	write("Attention, you have only one chance who the thief is. If you are sure write 'sure.'"),	
+	write("Attention, you have only one chance who the thief is. If you are sure write 'sure.'"),nl,	
 	assert(chosen_thief(Thief)).
 sure :-	
 	thief(Thief),
