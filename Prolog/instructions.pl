@@ -1,5 +1,7 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, describe/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, describe/1, i_am_at/1, print_string/1]).
 
+:- dynamic i_am_at/1, i_was_at/1.
+:- retractall(i_am_at(_)), retractall(i_was_at(_)).
 
 instructions :-
         nl,
@@ -28,6 +30,11 @@ instructions :-
         write("holding(<Objects>).          -- to check what you are having right now."),nl,
         write("(print ; whenever you want to check another thing you are holding)."), nl,
 nl.
+
+
+i_am_at(courtyard).
+i_was_at(courtyard).
+
 
 take(What) :-
         holding(What),

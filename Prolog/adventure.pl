@@ -1,15 +1,21 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, holding/1, thief/1, has_diamond/1, i_was_at/1, chosen_thief/1, sus_ratio/2.
-:- retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(i_was_at(_)), retractall(chosen_thief(_)), retractall(sus_ratio(_, _)).
+:- dynamic holding/1, thief/1, has_diamond/1, chosen_thief/1, sus_ratio/2.
+:- retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(chosen_thief(_)), retractall(sus_ratio(_, _)).
 
 :- [places].
 :- [instructions].
 :- [plot].
 :- [world].
+:- [people].
 
-i_am_at(courtyard).
-i_was_at(courtyard).
+
+is_first_say(cook).
+is_first_say(butler).
+is_first_say(gardener).
+is_first_say(guard).
+is_first_say(wizard).
+is_first_say(king).
 
 notice_persons(Place) :-
 	
@@ -35,21 +41,34 @@ go_to_chest(_) :-
 
 	
 	
-
 talk(Person) :-
 	able_to_talk(Person),
 	i_am_at(Place),
 	person(Place, Person),
-	write("Hello "), write(Person),!, nl.
-
-talk(Person) :-
-	able_to_talk(Person),
-	person(Place, Person),
-	write("You can meet that person only in "), write(Place),!,nl.
-
+	is_first_say(Person),
+	first_say(Person, Text),
+	print_string(Text),!.
 
 talk(Thing) :-
+	\+ able_to_talk(Thing),
 	write("You can not talk to a "), write(Thing), write("!"),nl.
+
+
+talk(Person) :-
+	i_am_at(Place),
+	\+ person(Place, Person),
+	person(Right_place, Person),
+	write("You can meet that person only in "), write(Right_place),!,nl.
+
+talk(Person) :-
+	\+ is_first_say(Person),
+	write("This is not a first statement"),!,nl.
+
+talk(_).
+
+
+
+
 
 
 inc_sus_ratio(Person) :-
