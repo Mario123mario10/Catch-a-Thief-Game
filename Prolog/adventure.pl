@@ -36,6 +36,23 @@ sus_ratio(butler, 0).
 
 /* These rules describe how to pick up an object. */
 
+print_place(Place) :-
+	all_desc_place(Place, Desc),
+	print_string(Desc).
+
+print_string(Desc) :-
+        [H|T] = Desc, 
+	\+ =(H,"<\n>"),
+	write(H),
+        print_string(T),!.
+
+print_string([]) :- !.
+
+print_string(Desc) :-
+	[_|T] = Desc,
+	nl,
+	print_string(T),!.	
+
 take(What) :-
         holding(What),
         write('You''re already holding it!'),!, nl.
