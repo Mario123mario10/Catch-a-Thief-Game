@@ -1,6 +1,6 @@
-:- module(world, [is_locked/1, able_to_talk/1, thing_at/2, first_time/1]).
+:- module(world, [is_locked/1, able_to_talk/1, thing_at/2, first_time/1, is_first_say/1]).
 
-:- dynamic is_locked/1, thing_at/2, first_time/1.
+:- dynamic is_locked/1, thing_at/2, first_time/1, is_first_say/1.
 :- retractall(is_locked(_)), retractall(thing_at(_, _)).
 
 
@@ -29,3 +29,10 @@ first_time(wizard_house).
 first_time(servants_house).
 first_time(forest).
 first_time(courtyard).
+
+is_first_say(cook).
+is_first_say(butler).
+is_first_say(gardener).
+is_first_say(guard).
+is_first_say(wizard).
+is_first_say(king).
