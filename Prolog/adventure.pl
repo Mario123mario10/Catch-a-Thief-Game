@@ -1,6 +1,6 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- dynamic i_am_at/1, thing_at/2, holding/1, is_locked/1, thief/1, has_diamond/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1, chosen_thief/1, sus_ratio/2, butler_busy/1.
+:- dynamic i_am_at/1, thing_at/2, holding/1, is_locked/1, thief/1, has_diamond/1, went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, i_was_at/1, chosen_thief/1, sus_ratio/2, butler_busy/1, first_time/1.
 :- retractall(thing_at(_, _)), retractall(i_am_at(_)), retractall(alive(_)), retractall(holding(_)), retractall(thief(_)), retractall(is_locked(_)), retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(i_was_at(_)), retractall(chosen_thief(_)), retractall(sus_ratio(_, _)), retractall(butler_busy(_)).
 
 :- [places].
@@ -34,24 +34,21 @@ sus_ratio(gardener, 0).
 sus_ratio(cook, 0).
 sus_ratio(butler, 0).
 
+first_time(vault).
+first_time(hall).
+first_time(kitchen).
+first_time(butler_room).
+first_time(garden).
+first_time(guard_house).
+first_time(wizard_house).
+first_time(servants_house).
+first_time(forest).
+first_time(courtyard).
+
+
+
 /* These rules describe how to pick up an object. */
 
-print_place(Place) :-
-	all_desc_place(Place, Desc),
-	print_string(Desc).
-
-print_string(Desc) :-
-        [H|T] = Desc, 
-	\+ =(H,"<\n>"),
-	write(H),
-        print_string(T),!.
-
-print_string([]) :- !.
-
-print_string(Desc) :-
-	[_|T] = Desc,
-	nl,
-	print_string(T),!.	
 
 take(What) :-
         holding(What),
@@ -220,13 +217,45 @@ back() :-
 
 look :-
         i_am_at(Place),
-        describe(Place),
+	first_time(Place),
+	retract(first_time(Place)),
+	full_describe(Place),
+	where_go(Place),
+        /*notice_objects_at(Place);*/
+	notice_persons(Place),
+	check_quests(Place),
+	after_enter(Place),
+	after_leave(Place),!.
+
+look :-
+	i_am_at(Place),
+	describe(Place),
+	where_go(Place),
         /*notice_objects_at(Place);*/
 	notice_persons(Place),
 	check_quests(Place),
 	after_enter(Place),
 	after_leave(Place).
+	
 
+full_describe(Place) :-
+	all_desc_place(Place, Desc),
+	print_string(Desc).
+
+print_string(Desc) :-
+        [H|T] = Desc, 
+	\+ =(H,"<\n>"),
+	write(H),
+        print_string(T),!.
+
+print_string([]) :- !.
+
+print_string(Desc) :-
+	[_|T] = Desc,
+	nl,
+	print_string(T),!.
+
+	
 check_quests(Place) :-
 	=(Place, servants_house),	
 	went_to_servants_house(no),	
@@ -259,7 +288,9 @@ check_quests(_).
 
 describe(Place) :- write('You are at '), write(Place), nl, 
 	place(Place, Description),
-	write(Description), nl,
+	write(Description), nl.
+
+where_go(Place) :-
 	write("You can go to "), (print_way(Place); nl).
 
 
