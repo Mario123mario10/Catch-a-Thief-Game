@@ -104,7 +104,8 @@ drop(_) :-
 
 drop_thing(soil, butler_room) :-
         went_to_servants_house(yes),
-        write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it. Butler agree with you and start cleaning. Now is your chance! Grab the keys!"),
+        write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it."),nl,
+	write("Butler agree with you and start cleaning. Now is your chance! Grab the keys!"),
         assert(butler_busy(yes)),!, nl.
 
 drop_thing(soil, butler_room) :-
@@ -149,7 +150,9 @@ open(_) :-
         write("You don't have a key!"),nl.
 
 open_thing(servants_house) :-
-        write("You see place with bedrooms for all workforces, this is the place where cook, gardener and butler are sleeping. Each of them has 1 chest. You can go to these chest"),!,nl.
+        write("You see place with bedrooms for all workforces,"),nl,
+ 	write("this is the place where cook, gardener and butler are sleeping."),nl,
+	write("Each of them has 1 chest. You can go to these chest"),!,nl.
 
 open_thing(What) :-
         (=(What, cook_chest);=(What, butler_chest);=(What, gardener_chest)),
@@ -257,7 +260,9 @@ print_places(List) :-
 
 print_places(List) :-
 	last(List, Last),        
-	write(Last), write(".").
+	write(Last), write("."),
+	retract(places_list(_)),
+	assert(places_list([])).
 
 
 notice_people(Place) :-
@@ -304,7 +309,8 @@ talk(Person) :-
         person(Place, Person),
         is_first_say(Person),
         first_say(Person, Text),
-        print_string(Text),!.
+        print_string(Text),
+	retract(is_first_say(Person)),!.
 
 talk(Thing) :-
         \+ able_to_talk(Thing),
@@ -342,7 +348,8 @@ after_enter(butler_room) :-
 
 after_enter(butler_room) :-
         went_to_servants_house(no),
-        write("You see that there are is a set of keys on the table. But the butler is watching it too. Maybe you can take it and use it on something in the future?"),!,nl.
+        write("You see that there are is a set of keys on the table. But the butler is watching it too."),nl,
+	write("Maybe you can take it and use it on something in the future?"),!,nl.
 
 
 after_enter(garden) :-
@@ -366,8 +373,7 @@ after_enter(servants_house) :-
         write("You can now enter the servants house"),!,nl.
 
 
-after_enter(_) :-
-        write("There is nothing special yet"),nl.
+after_enter(_).
 
 after_leave(butler_room) :-
         butler_busy(yes),
