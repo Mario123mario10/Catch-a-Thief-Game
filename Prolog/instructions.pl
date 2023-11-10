@@ -1,7 +1,7 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc/1, i_am_at/1, i_was_at/1]).
 
-:- dynamic places_list/1.
-:- retractall(places_list(_)).
+:- dynamic places_list/1, i_am_at/1, i_was_at/1.
+:- retractall(places_list(_)), retractall(i_am_at(_)), retractall(i_was_at(_)).
 
 :- [world].
 
@@ -34,6 +34,9 @@ instructions :-
 	write("holding.                     -- to check all things you are holding right now."), nl, 
 nl.
 
+
+i_am_at(courtyard).
+i_was_at(courtyard).
 
 holding :-
 	\+ holding(_),
@@ -233,7 +236,7 @@ look :-
 	after_enter(Place),
 	after_leave(Place),nl,
 
-	where_go(Place).
+	where_go(Place),!.
 
 
 look :- 
@@ -295,8 +298,9 @@ print_places(List) :-
 	last(List, Last),        
 	write(Last), write("."),
 	retract(places_list(_)),
-	assert(places_list([])).
+	assert(places_list([])),!.
 
+print_places(_).
 
 notice_people(Place) :-
 

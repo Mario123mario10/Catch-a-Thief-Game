@@ -1,6 +1,6 @@
-:- module(world, [i_am_at/1, i_was_at/1, is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_first_say/1, is_person/1, is_quest/1]).
+:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_first_say/1, is_person/1, is_quest/1]).
 
-:- dynamic i_am_at/1, i_was_at/1, is_locked/1, holding/1, thing_at/2, first_time/1, is_first_say/1, chosen_thief/1.
+:- dynamic is_locked/1, holding/1, thing_at/2, first_time/1, is_first_say/1, chosen_thief/1.
 :- retractall(is_locked(_)), retractall(thing_at(_, _)), retractall(holding(_)), retractall(chosen_thief(_)).
 
 
@@ -11,8 +11,6 @@ is_quest(garden).
 is_quest(servants_house).
 
 
-i_am_at(courtyard).
-i_was_at(courtyard).
 
 
 is_locked(butler_chest).
