@@ -200,7 +200,7 @@ look :-
 
         /*notice_objects_at(Place);*/
         is_person(Place),
-	notice_people(Place),nl,
+	notice_people(Place),
 
         check_quests(Place),
         after_enter(Place),
@@ -216,7 +216,7 @@ look :-
 	
         /*notice_objects_at(Place);*/
 	is_person(Place),
-        notice_people(Place),nl,
+        notice_people(Place),
 
         is_quest(Place),
 	check_quests(Place),
@@ -305,7 +305,7 @@ print_places(_).
 notice_people(Place) :-
 
         person(Place, X),
-        write('There is a '), write(X), write(' here you can talk to'), nl,
+        write('There is a '), write(X), write(' here you can talk to'),nl,
         fail.
 
 notice_people(_).

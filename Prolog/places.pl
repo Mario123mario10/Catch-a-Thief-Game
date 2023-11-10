@@ -10,6 +10,8 @@ place(wizard_house, "small, incredible place with many curious magic subjects").
 place(servants_house, "place with bedrooms for all workforces").
 place(forest, "big forest with wild animals and many plants and mushrooms").
 place(courtyard, "center of the castle").
+place(corridor, "A corridor connecting the kitchen and the royal bedroom, where the butler often stays").
+
 
 person(hall, king).
 person(kitchen, cook).
@@ -22,15 +24,19 @@ person(wizard_house, wizard).
 person(servants_house, butler).
 person(servants_house, gardener).*/
  
-door(vault, hall).
-door(hall, butler_room).
-door(butler_room, courtyard).
+door(hall, vault).
+door(hall, corridor).
+door(hall, guard_house).
+door(hall, courtyard).
+
+door(corridor, kitchen).
+door(corridor, butler_room).
+
 door(courtyard, garden).
 door(courtyard, servants_house).
-door(guard_house, hall).
 door(courtyard, wizard_house).
-door(hall, kitchen).
-door(wizard_house, forest). 
+
+
 
 whose(butler, butler_chest).
 whose(cook, cook_chest).
@@ -67,5 +73,15 @@ all_desc_place(kitchen, ["Welcome to the kitchen! The aroma of fresh herbs, cook
 all_desc_place(guard_room, ["You are now in one of the castle guards’ rooms.", "<\n>",
 			    "It’s not very spacious, most of the space is taken by a bed and simple wooden wardrobe.", "<\n>",
 			    "Reportedly, he keeps some equipment in there. Stark and spartan style of the room suits the guard, without a doubt.", "<\n>"]).
+
+/* places where key vault could be */
+
+inside_place(garden, garden_pond).
+inside_place(butler_room, royal_bedroom).
+inside_place(kitchen, oven).
+
+/* places where pouch could be */
+
+inside_place(garden, rose_bushes).
 
 

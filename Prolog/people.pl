@@ -78,19 +78,22 @@ first_say(cook, ["You see a man wearing a white apron that is now slightly stain
 		 "He puts down the knife he was sharpening and shifts the egg from one hand to the other, suddenly becoming more careful.", "<\n>","<\n>",
 		 "'What are you looking for?' asks the cook, a little concerned in his voice.", "<\n>","<\n>",
 		 "'This place is closed; you shouldn't be here without the king's permission.'", "<\n>",
-		 "His reaction suggests he's irritated by your presence in the kitchen and wonders what brought you there."]).
+		 "His reaction suggests he's irritated by your presence in the kitchen and wonders what brought you there.", "<\n>",
+		 "'Oh? It's about the robbery?' says the cook with a bit of shock.", "<\n>", "<\n>",
+		 "'Fair enough, if you must snoop around, then do what you must. Just don't get in my way. People are trying to work here!'", "<\n>",
+		 "he says, irritated."]).
 
-first_say(butler, ["Stoisz naprzeciw skromnego lokaja o delikatnej budowie ciała,", "<\n>",
-		   "który wydaje się być jednym z tych cichych obecnych na dworze przez całe lata.", "<\n>",
-		   "Jego blada twarz wydaje się wtapiać w tło, a oczy pełne tajemniczego blasku skanują otoczenie.", "<\n>",
-		   "Lokaj nosi skromny mundur, który zdradza jego niski status na dworze, lecz mimo to jest starannie wyprasowany i czysty.", "<\n>",
-		   "((opcjonalnie) Na lewym policzku widać świeżą ranę po skaleczeniu się)", "<\n>",
-		   "Lokaj stoi nieruchomo i czeka na jakiś sygnał. Po chwili otwiera usta i mówi spokojnie.", "<\n>","<\n>",
-		   "'Co was tu przynosi, szlachetny panie?'", "<\n>",
-		   "'Kradzież? To musiało się dziać, gdy byłem zajęty przynoszeniem książek do biblioteczki,'", "<\n>",
-		   "wyznaje z lekkim smutkiem w głosie.", "<\n>","<\n>",
-		   "Nie miałem pojęcia o tym, co się działo na dziedzińcu, ani o zamieszaniu przy skarbcu. To naprawdę dziwne.", "<\n>",
-		   "Mogę zapewnić, że nie miałem z tym nic wspólnego. Pracowałem przez większość dnia, niestety nie ma kto o tym poświadczyć.'"]).
+first_say(butler, ["You stand before an unassuming, delicately built butler, seemingly one of the quieter figures at the court throughout the years.", "<\n>",
+		   "His pale face seems to blend into the background, and his eyes, filled with a mysterious glow, scan the surroundings.", "<\n>",
+		   "The butler wears a modest uniform that betrays his low status at court, yet it's carefully ironed and clean.", "<\n>",
+		   "((opcjonalne) There is a fresh wound on his left cheek; he cut himself with something.)", "<\n>",
+		   "The butler stands still and awaits a signal. After a while, he opens his mouth and speaks calmly.", "<\n>", "<\n>",
+		   "'What brings you here, noble lord?'", "<\n>",
+		   "'Theft? It must have happened while I was busy bringing books to the library,' he confesses with a hint of sadness in his voice.", "<\n>", "<\n>", 
+		   "'I had no idea what was happening in the courtyard or the commotion at the vault. It's really strange.", "<\n>",
+		   "I can assure you that I had nothing to do with it. I worked most of the day, unfortunately, there is no one to testify about it.'"]).
+
+		   
 
 
 
