@@ -1,7 +1,7 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, describe/1, i_am_at/1, print_string/1, go_to_chest/1, talk/1, choose_the_thief/1, sure/0, holding/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, describe/1, i_am_at/1, print_string/1, go_to_chest/1, talk/1, choose_the_thief/1, sure/0, holding/1, print_holding/0, print_way/1]).
 
-:- dynamic i_am_at/1, i_was_at/1, chosen_thief/1, holding/1.
-:- retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(chosen_thief(_)), retractall(holding(_)).
+:- dynamic i_am_at/1, i_was_at/1, chosen_thief/1, holding/1, places_list/1.
+:- retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(chosen_thief(_)), retractall(holding(_)), retractall(places_list(_)).
 
 instructions :-
         nl,
@@ -19,20 +19,30 @@ instructions :-
         write("go_to_chest(<Person>).       -- to go to the chest of the chosen person."), nl,
         write("talk(<Person>).              -- to talk to the chosen person."), nl,
         write("open(<Container>).           -- to open an object."), nl,
-        write("choose_the_thief(<Person>). -- to check if you are right, who the thief is."), nl,
+        write("choose_the_thief(<Person>).  -- to check if you are right, who the thief is."), nl,
         write("halt.                        -- to end the game and quit."), nl,nl,
         write("Commands that only check something:"), nl,
         write("instructions.                -- to see this message again."), nl,
         write("look.                        -- to look around you again."), nl,
         write("i_am_at(<Place>).            -- to check where you are right now."), nl,
         write("i_was_at(<Place>).           -- to check where you were earlier."), nl,
-        write("is_locked(<Person>_chest).   -- to check if person's chest is locked."),nl,
-        write("holding(<Objects>).          -- to check what you are having right now."),nl,
-        write("(print ; whenever you want to check another thing you are holding)."), nl,
+        write("is_locked(<Person>_chest).   -- to check if person's chest is locked."), nl,
+        write("holding(<Object>).           -- to check if you are holding an object."), nl,
+	write("print_holding.               -- to check all things you are holding right now."), nl, 
 nl.
 
-holding(_).
 
+print_holding :-
+	\+ holding(_),
+	write("You are not holding anything"),!,nl.
+
+print_holding :-
+	write("You are now holding:"), nl,
+	holding(What),
+	write("-"), write(What),nl,
+	fail.
+
+print_holding.
 
 i_am_at(courtyard).
 i_was_at(courtyard).
@@ -181,7 +191,7 @@ look :-
         full_describe(Place),
         where_go(Place),
         /*notice_objects_at(Place);*/
-        notice_persons(Place),
+        notice_people(Place),
         check_quests(Place),
         after_enter(Place),
         after_leave(Place),!.
@@ -191,7 +201,7 @@ look :-
         describe(Place),
         where_go(Place),
         /*notice_objects_at(Place);*/
-        notice_persons(Place),
+        notice_people(Place),
         check_quests(Place),
         after_enter(Place),
         after_leave(Place).
@@ -221,27 +231,42 @@ describe(Place) :- write('You are at '), write(Place), nl,
         place(Place, Description),
         write(Description), nl.
 
-
+places_list([]).
 
 where_go(Place) :-
-        write("You can go to "), (print_way(Place); nl).
+        write("From here you can go to "), print_way(Place), nl.
 
 
 
-print_way(Way) :-
-        (door(Way, X);door(X, Way)),
-        write(X), write(", "),
-        fail.
+print_way(Place) :-
+        (door(Place, Way);door(Way, Place)),
+	places_list(List),
+	append(List, [Way], New_list),
+	assert(places_list(New_list)),
+	retract(places_list(List)),fail.
+
+print_way(_) :- 
+	places_list(List),
+	print_places(List).
+
+print_places(List) :-
+	last(List, Last),        
+	[H|T] = List,
+	\+ =(H, Last),
+	write(H), write(", "), print_places(T),!.
+
+print_places(List) :-
+	last(List, Last),        
+	write(Last), write(".").
 
 
-
-notice_persons(Place) :-
+notice_people(Place) :-
 
         person(Place, X),
         write('There is a '), write(X), write(' here you can talk to'), nl,
         fail.
 
-notice_persons(_).
+notice_people(_).
 /* These rules set up a loop to mention all the objects
    in your vicinity. */
 
@@ -332,8 +357,8 @@ after_enter(garden) :-
 after_enter(servants_house) :-
         \+ holding(keys),
         is_locked(servants_house),
-        write("Oh no! Servants house is closed. If you want to go there maybe you can discover something interesting."),nl,
-        write("Get the door key and open servants house"),!,nl.
+        write("Oh no! Servants house is closed. Maybe you can discover something interesting there."),nl,
+        write("Get the door key and open the servants house"),!,nl.
 
 after_enter(servants_house) :-
         holding(keys),
