@@ -27,5 +27,5 @@ finish :-
 start :-
         instructions,
         look,
-	choose_thief(),		
+	choose_thief_by_machine(),		
 	prepare_diamond().	

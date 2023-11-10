@@ -1,4 +1,4 @@
-:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, choose_thief/0, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1]).
+:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, choose_thief_by_machine/0, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1]).
 
 :- dynamic went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, sus_ratio/2, thief/1.
 :- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)).
@@ -31,7 +31,7 @@ choose(List, Elt) :-
         nth0(Index, List, Elt).
 
 
-choose_thief() :-
+choose_thief_by_machine() :-
         choose([cook, butler, gardener], Thief),
         assert(thief(Thief)).
 

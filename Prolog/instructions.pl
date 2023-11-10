@@ -1,14 +1,16 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, describe/1, i_am_at/1, print_string/1, go_to_chest/1, talk/1, choose_the_thief/1, sure/0, holding/1, print_holding/0, print_way/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc/1]).
 
-:- dynamic i_am_at/1, i_was_at/1, chosen_thief/1, holding/1, places_list/1.
-:- retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(chosen_thief(_)), retractall(holding(_)), retractall(places_list(_)).
+:- dynamic places_list/1.
+:- retractall(places_list(_)).
+
+:- [world].
 
 instructions :-
         nl,
         write("Enter commands using standard Prolog syntax."), nl,
         write("Attention! Elements in angle brackets <> mean that the element you want to check is to be entered there."),nl,
-        write("If you want to check if any element satisfies the condition, enter X."),nl,
-        write("This is only possible with commands that check something"), nl,nl,
+        write("In 'Commands that only check something' heading, if command has an argument, than as an argument write X."),nl,
+	write("Then you know which element/elements satisfy the condition."),nl,nl,
         write("Commands that change something:"), nl,
         write("start.                       -- to start the game."), nl,
         write("go(<Place>)                  -- to go in that direction."), nl,
@@ -19,33 +21,32 @@ instructions :-
         write("go_to_chest(<Person>).       -- to go to the chest of the chosen person."), nl,
         write("talk(<Person>).              -- to talk to the chosen person."), nl,
         write("open(<Container>).           -- to open an object."), nl,
-        write("choose_the_thief(<Person>).  -- to check if you are right, who the thief is."), nl,
+        write("choose_thief(<Person>).      -- to check if you are right, who the thief is."), nl,
         write("halt.                        -- to end the game and quit."), nl,nl,
         write("Commands that only check something:"), nl,
         write("instructions.                -- to see this message again."), nl,
-        write("look.                        -- to look around you again."), nl,
-        write("i_am_at(<Place>).            -- to check where you are right now."), nl,
+        write("look.                        -- to check the most important things about the place you are right now."), nl,
+	write("full_desc(<Place>)           -- to check look and history about the place"),nl,
+	write("i_am_at(<Place>).            -- to check where you are right now."), nl,
         write("i_was_at(<Place>).           -- to check where you were earlier."), nl,
         write("is_locked(<Person>_chest).   -- to check if person's chest is locked."), nl,
         write("holding(<Object>).           -- to check if you are holding an object."), nl,
-	write("print_holding.               -- to check all things you are holding right now."), nl, 
+	write("holding.                     -- to check all things you are holding right now."), nl, 
 nl.
 
 
-print_holding :-
+holding :-
 	\+ holding(_),
 	write("You are not holding anything"),!,nl.
 
-print_holding :-
+holding :-
 	write("You are now holding:"), nl,
 	holding(What),
 	write("-"), write(What),nl,
 	fail.
 
-print_holding.
+holding.
 
-i_am_at(courtyard).
-i_was_at(courtyard).
 
 
 take(What) :-
@@ -189,30 +190,62 @@ back() :-
 
 look :-
         i_am_at(Place),
+
         first_time(Place),
         retract(first_time(Place)),
-        full_describe(Place),
-        where_go(Place),
+        full_desc(Place),nl,
+
         /*notice_objects_at(Place);*/
-        notice_people(Place),
+        is_person(Place),
+	notice_people(Place),nl,
+
         check_quests(Place),
         after_enter(Place),
-        after_leave(Place),!.
+        after_leave(Place),nl,
+	
+        where_go(Place),!.
 
 look :-
         i_am_at(Place),
-        describe(Place),
-        where_go(Place),
+
+	\+ first_time(Place),
+        describe(Place),nl,
+	
         /*notice_objects_at(Place);*/
-        notice_people(Place),
-        check_quests(Place),
+	is_person(Place),
+        notice_people(Place),nl,
+
+        is_quest(Place),
+	check_quests(Place),
         after_enter(Place),
-        after_leave(Place).
+        after_leave(Place),nl,
+	
+        where_go(Place),!.
+
+
+look :-
+	i_am_at(Place),
+
+	\+ is_person(Place),
+
+	is_quest(Place),
+	check_quests(Place),
+	after_enter(Place),
+	after_leave(Place),nl,
+
+	where_go(Place).
+
+
+look :- 
+	i_am_at(Place),
+
+	\+ is_quest(Place),
+
+	where_go(Place).
 
 
 
-
-full_describe(Place) :-
+full_desc(Place) :-
         all_desc_place(Place, Desc),
         print_string(Desc).
 
@@ -384,7 +417,7 @@ after_leave(_).
 
 
 
-choose_the_thief(Thief) :-
+choose_thief(Thief) :-
         retractall(chosen_thief(_)),
         write("Attention, you have only one chance who the thief is. If you are sure write 'sure.'"),nl,
         assert(chosen_thief(Thief)).
