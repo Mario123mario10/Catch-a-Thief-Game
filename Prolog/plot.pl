@@ -3,7 +3,7 @@
 :- dynamic went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, sus_ratio/2, thief/1, has_wound/1.
 :- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)), retractall(has_wound(_)).
 
-
+:- [world].
 
 went_to_servants_house(no).
 need_soil(no).
@@ -17,12 +17,6 @@ sus_ratio(cook, 0).
 sus_ratio(butler, 0).
 
 
-check_ratio(Thing, What) :-
-        =(Thing, diamond),
-        whose(Person, What),
-        inc_sus_ratio(Person),!.
-
-check_ratio(_, _).
 
 
 choose(List, Elt) :-

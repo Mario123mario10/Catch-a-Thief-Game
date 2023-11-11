@@ -127,8 +127,7 @@ search(What) :-
         thing_at(Thing, What),
         write('You found '), write(Thing), nl,
         assert(holding(Thing)),
-        retract(thing_at(Thing, What)),
-        check_ratio(Thing, What),!.
+        retract(thing_at(Thing, What)).
 
 search(What) :-
         is_locked(What),
