@@ -42,8 +42,8 @@ first_say(guard, ["You are standing in front of the king's loyal guard. His figu
 		  "No crime is perfect, and this one is definitely not an exception.'"]).
 
 first_say(wizard, ["You stand before the court wizard of King Alaric III, an old man with observant eyes.", "<\n>",
-		   "He has a long beard and a distinctive black sorcerer's hat. He is well known throughout the kingdom,", "<\n>",
-		   "both for his astonishing sorcery and his arrogance, as well as his incredible wisdom.", "<\n>",
+		   "He has a long beard and a distinctive black sorcerer's hat.", "<\n>",
+		   "He is well known throughout the kingdom, both for his astonishing sorcery and his arrogance, as well as his incredible wisdom.", "<\n>",
 		   "At first glance, it is clear that even the king himself would not dare to go against him.", "<\n>", "<\n>",
 		   "'Hello, soldier,' says the wizard with a look of sneer.", "<\n>", "<\n>",
 		   "'It appears that you have a reason to visit my humble chambers. I understand that you have come to ask me about the king's jewel.", "<\n>",
@@ -58,7 +58,7 @@ first_say(wizard, ["You stand before the court wizard of King Alaric III, an old
 
 first_say(gardener, ["While wandering through the royal garden, you come across a gardener.", "<\n>",
 		     "He is a middle-aged man with hard hands and dark spots on his clothes.", "<\n>",
-		     "((opcjonalne)There is a fresh wound on his forearm, as if something cut him).", "<\n>",
+		     "<wound>", "<\n>",
 		     "His gaze shows signs of hard work and devotion to the royal garden.", "<\n>",
 		     "Surprised by your presence, the gardener puts down his tools and approaches you.", "<\n>", "<\n>",
 		     "'What kind of surprise is this?' he asks, leaning on his spade.", "<\n>","<\n>",
@@ -72,7 +72,7 @@ first_say(gardener, ["While wandering through the royal garden, you come across 
 
 first_say(cook, ["You see a man wearing a white apron that is now slightly stained from working in the kitchen.", "<\n>",
 		 "There are traces of flour on his hands, and his face is slightly flushed from the heat.", "<\n>",
-		 "((opcjonalne)You notice a fresh blade wound on his hand).", "<\n>",
+		 "<wound>", "<\n>",
 		 "The cook seems to be a hard-working and busy man who devotes himself to his role in the royal kitchen with passion.", "<\n>",
 		 "When you enter the kitchen as a knight, the cook seems surprised by your presence.", "<\n>",
 		 "He puts down the knife he was sharpening and shifts the egg from one hand to the other, suddenly becoming more careful.", "<\n>","<\n>",
@@ -86,7 +86,7 @@ first_say(cook, ["You see a man wearing a white apron that is now slightly stain
 first_say(butler, ["You stand before an unassuming, delicately built butler, seemingly one of the quieter figures at the court throughout the years.", "<\n>",
 		   "His pale face seems to blend into the background, and his eyes, filled with a mysterious glow, scan the surroundings.", "<\n>",
 		   "The butler wears a modest uniform that betrays his low status at court, yet it's carefully ironed and clean.", "<\n>",
-		   "((opcjonalne) There is a fresh wound on his left cheek; he cut himself with something.)", "<\n>",
+		   "<wound>","<\n>",
 		   "The butler stands still and awaits a signal. After a while, he opens his mouth and speaks calmly.", "<\n>", "<\n>",
 		   "'What brings you here, noble lord?'", "<\n>",
 		   "'Theft? It must have happened while I was busy bringing books to the library,' he confesses with a hint of sadness in his voice.", "<\n>", "<\n>", 

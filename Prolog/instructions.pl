@@ -1,10 +1,10 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc/1, i_am_at/1, i_was_at/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, i_am_at/1, i_was_at/1]).
 
 :- dynamic places_list/1, i_am_at/1, i_was_at/1.
 :- retractall(places_list(_)), retractall(i_am_at(_)), retractall(i_was_at(_)).
 
 :- [world].
-
+:- [plot].
 instructions :-
         nl,
         write("Enter commands using standard Prolog syntax."), nl,
@@ -26,7 +26,7 @@ instructions :-
         write("Commands that only check something:"), nl,
         write("instructions.                -- to see this message again."), nl,
         write("look.                        -- to check the most important things about the place you are right now."), nl,
-	write("full_desc(<Place>)           -- to check look and history about the place"),nl,
+	write("full_desc_place(<Place>)     -- to check look and history about the place"),nl,
 	write("i_am_at(<Place>).            -- to check where you are right now."), nl,
         write("i_was_at(<Place>).           -- to check where you were earlier."), nl,
         write("is_locked(<Person>_chest).   -- to check if person's chest is locked."), nl,
@@ -196,7 +196,7 @@ look :-
 
         first_time(Place),
         retract(first_time(Place)),
-        full_desc(Place),nl,
+        full_desc_place(Place),nl,
 
         /*notice_objects_at(Place);*/
         is_person(Place),
@@ -248,22 +248,41 @@ look :-
 
 
 
-full_desc(Place) :-
+full_desc_place(Place) :-
         all_desc_place(Place, Desc),
-        print_string(Desc).
+        print_string(Desc, _).
 
-print_string(Desc) :-
+full_desc_person(Person) :-
+	first_say(Person, Desc),	
+	print_string(Desc, Person).
+
+print_string(Desc, Person) :-
         [H|T] = Desc,
         \+ =(H,"<\n>"),
+	\+ =(H, "<wound>"),
         write(H),
-        print_string(T),!.
+        print_string(T, Person),!.
 
-print_string([]) :- !.
+print_string([], _) :- !.
 
-print_string(Desc) :-
-        [_|T] = Desc,
+print_string(Desc, Person) :-
+        [H|T] = Desc,
+	=(H,"<\n>"),	
         nl,
-        print_string(T),!.
+        print_string(T, Person),!.
+
+print_string(Desc, Person) :-
+	[_|T] = Desc,
+	has_wound(Person),
+	wound(Person, Wound),
+	write(Wound),
+	print_string(T, Person),!.
+		
+print_string(Desc, Person) :-
+	[_|T] = Desc,
+	print_string(T, Person),!.
+
+
 
 
 describe(Place) :- write('You are at '), write(Place), nl,
@@ -345,8 +364,7 @@ talk(Person) :-
         i_am_at(Place),
         person(Place, Person),
         is_first_say(Person),
-        first_say(Person, Text),
-        print_string(Text),
+	full_desc_person(Person),        
 	retract(is_first_say(Person)),!.
 
 talk(Thing) :-

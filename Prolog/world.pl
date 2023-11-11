@@ -1,4 +1,4 @@
-:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_first_say/1, is_person/1, is_quest/1]).
+:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_first_say/1, is_person/1, is_quest/1, wound/2]).
 
 :- dynamic is_locked/1, holding/1, thing_at/2, first_time/1, is_first_say/1, chosen_thief/1.
 :- retractall(is_locked(_)), retractall(thing_at(_, _)), retractall(holding(_)), retractall(chosen_thief(_)).
@@ -52,4 +52,10 @@ is_person(butler_room).
 is_person(garden).
 is_person(guard_house).
 is_person(wizard_house).
+
+
+
+wound(gardener, "There is a fresh wound on his forearm, as if something cut him.").
+wound(cook, "You notice a fresh blade wound on his hand.").
+wound(butler, "There is a fresh wound on his left cheek; he cut himself with something.").
 

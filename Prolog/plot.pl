@@ -1,7 +1,7 @@
-:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, choose_thief_by_machine/0, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1]).
+:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, choose_thief_by_machine/0, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1, has_wound/1, prepare_wound/0]).
 
-:- dynamic went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, sus_ratio/2, thief/1.
-:- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)).
+:- dynamic went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, sus_ratio/2, thief/1, has_wound/1.
+:- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)), retractall(has_wound(_)).
 
 
 
@@ -42,6 +42,11 @@ prepare_diamond() :-
         whose(Has_diamond, Chest),
         assert(thing_at(diamond, Chest)).
 
+prepare_wound() :-
+	choose([cook, butler, gardener], Has_wound),
+	assert(has_wound(Has_wound)).
+
+	
 
 check_quests(Place) :-
         =(Place, servants_house),
@@ -92,3 +97,7 @@ inc_sus_ratio(Person) :-
 
 inc_sus_ratio(_) :-
         write("You can't increase the non-suspect ratio.").
+
+
+
+
