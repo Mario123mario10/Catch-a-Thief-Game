@@ -22,6 +22,7 @@ instructions :-
         write("talk(<Person>).              -- to talk to the chosen person."), nl,
         write("open(<Container>).           -- to open an object."), nl,
         write("choose_thief(<Person>).      -- to check if you are right, who the thief is."), nl,
+	write("inc_sus_ratio(<Person>).     -- to increase suspiciousness ratio for person you think is more suspicious."),nl,
         write("halt.                        -- to end the game and quit."), nl,nl,
         write("Commands that only check something:"), nl,
         write("instructions.                -- to see this message again."), nl,
