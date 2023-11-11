@@ -1,4 +1,4 @@
-:- module(places, [place/2, door/2, person/2, whose/2, all_desc_place/2]).  
+:- module(places, [place/2, door/2, person/2, whose/2, all_desc_place/2, inside_place/2, are_objects/1]).  
 
 place(vault, "place where diamond was stored but there is nothing anymore").
 place(hall, "big, crouded, splendid chamber with big throne in the center").
@@ -12,7 +12,6 @@ place(forest, "big forest with wild animals and many plants and mushrooms").
 place(courtyard, "center of the castle").
 place(corridor, "A corridor connecting the kitchen and the royal bedroom, where the butler often stays").
 
-
 person(hall, king).
 person(kitchen, cook).
 person(butler_room, butler).
@@ -20,11 +19,6 @@ person(garden, gardener).
 person(guard_house, guard).
 person(wizard_house, wizard).
 
-/*person(servants_house, cook).
-person(servants_house, butler).
-person(servants_house, gardener).*/
- 
-door(hall, vault).
 door(hall, corridor).
 door(hall, guard_house).
 door(hall, courtyard).
@@ -77,11 +71,24 @@ all_desc_place(guard_room, ["You are now in one of the castle guards’ rooms.",
 /* places where key vault could be */
 
 inside_place(garden, garden_pond).
-inside_place(butler_room, royal_bedroom).
+inside_place(butler_room, mirror).
 inside_place(kitchen, oven).
 
 /* places where pouch could be */
 
 inside_place(garden, rose_bushes).
+inside_place(butler_room, bed).
+inside_place(kitchen, bag_of_floor).
+
+/* places where nothing could be */
+
+inside_place(garden, king_sculpture).
+inside_place(butler_room, wardrobe).
+inside_place(kitchen, kitchen_unit). 
+
+
+are_objects(kitchen).
+are_objects(butler_room).
+are_objects(garden).
 
 

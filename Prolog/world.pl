@@ -12,7 +12,6 @@ is_quest(servants_house).
 
 
 
-
 is_locked(butler_chest).
 is_locked(gardener_chest).
 is_locked(cook_chest).

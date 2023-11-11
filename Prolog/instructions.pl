@@ -5,6 +5,8 @@
 
 :- [world].
 :- [plot].
+:- [places].
+
 instructions :-
         nl,
         write("Enter commands using standard Prolog syntax."), nl,
@@ -166,9 +168,8 @@ open_thing(_).
 
 
 
-
 go(Place) :-
-        i_am_at(Here),
+	i_am_at(Here),
         (door(Here,Place);door(Place,Here)),
         retract(i_am_at(Here)),
         assert(i_am_at(Place)),
@@ -198,10 +199,13 @@ look :-
         retract(first_time(Place)),
         full_desc_place(Place),nl,
 
-        /*notice_objects_at(Place);*/
         is_person(Place),
 	notice_people(Place),
 
+	are_objects(Place),
+        notice_objects_at(Place),
+	
+	is_quest(Place),
         check_quests(Place),
         after_enter(Place),
         after_leave(Place),nl,
@@ -214,9 +218,11 @@ look :-
 	\+ first_time(Place),
         describe(Place),nl,
 	
-        /*notice_objects_at(Place);*/
 	is_person(Place),
         notice_people(Place),
+	
+	are_objects(Place),
+        notice_objects_at(Place),
 
         is_quest(Place),
 	check_quests(Place),
@@ -230,6 +236,9 @@ look :-
 	i_am_at(Place),
 
 	\+ is_person(Place),
+	
+	are_objects(Place),
+        notice_objects_at(Place),
 
 	is_quest(Place),
 	check_quests(Place),
@@ -238,6 +247,17 @@ look :-
 
 	where_go(Place),!.
 
+look :-
+	i_am_at(Place),
+	
+	\+ are_objects(Place),
+	
+	is_quest(Place),
+	check_quests(Place),
+	after_enter(Place),
+	after_leave(Place),nl,
+
+	where_go(Place),!.
 
 look :- 
 	i_am_at(Place),
@@ -333,8 +353,8 @@ notice_people(_).
 
 
 notice_objects_at(Place) :-
-        thing_at(X, Place),
-        write('There is a '), write(X), write(' here.'), nl,
+        inside_place(Place, Thing),
+	write('There is a '), write(Thing), write(' here.'), nl,
 
         /*container_at(Y, Place),
 

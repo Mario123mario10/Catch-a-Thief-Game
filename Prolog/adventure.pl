@@ -29,4 +29,5 @@ start :-
         look,
 	choose_thief_by_machine(),		
 	prepare_diamond(),
-	prepare_wound().	
+	prepare_wound(),
+	prepare_objects().	
