@@ -1,4 +1,4 @@
-:- module(places, [place/2, door/2, person/2, whose/2, all_desc_place/2, inside_place/2, are_objects/1]).  
+:- module(places, [place/2, door/2, person/2, whose/2, all_desc_place/2, inside_place/2, are_inner_places/1]).  
 
 place(vault, "place where diamond was stored but there is nothing anymore").
 place(hall, "big, crouded, splendid chamber with big throne in the center").
@@ -87,8 +87,8 @@ inside_place(butler_room, wardrobe).
 inside_place(kitchen, kitchen_unit). 
 
 
-are_objects(kitchen).
-are_objects(butler_room).
-are_objects(garden).
+are_inner_places(kitchen).
+are_inner_places(butler_room).
+are_inner_places(garden).
 
 

@@ -196,21 +196,21 @@ look :-
         i_am_at(Place),
 
         first_time(Place),
-        retract(first_time(Place)),
         full_desc_place(Place),nl,
 
         is_person(Place),
-	notice_people(Place),
+	notice_people(Place),nl,
 
-	are_objects(Place),
-        notice_objects_at(Place),
+	are_inner_places(Place),
+        notice_inner_places(Place),nl,
 	
 	is_quest(Place),
         check_quests(Place),
         after_enter(Place),
         after_leave(Place),nl,
 	
-        where_go(Place),!.
+        where_go(Place),
+	after_look(Place),!.
 
 look :-
         i_am_at(Place),
@@ -219,17 +219,18 @@ look :-
         describe(Place),nl,
 	
 	is_person(Place),
-        notice_people(Place),
+        notice_people(Place),nl,
 	
-	are_objects(Place),
-        notice_objects_at(Place),
+	are_inner_places(Place),
+        notice_inner_places(Place),nl,
 
         is_quest(Place),
 	check_quests(Place),
         after_enter(Place),
         after_leave(Place),nl,
 	
-        where_go(Place),!.
+        where_go(Place),
+	after_look(Place),!.
 
 
 look :-
@@ -237,35 +238,43 @@ look :-
 
 	\+ is_person(Place),
 	
-	are_objects(Place),
-        notice_objects_at(Place),
+	are_inner_places(Place),
+        notice_inner_places(Place),nl,
 
 	is_quest(Place),
 	check_quests(Place),
 	after_enter(Place),
 	after_leave(Place),nl,
 
-	where_go(Place),!.
+	where_go(Place),
+	after_look(Place),!.
 
 look :-
 	i_am_at(Place),
 	
-	\+ are_objects(Place),
+	\+ are_inner_places(Place),
 	
 	is_quest(Place),
 	check_quests(Place),
 	after_enter(Place),
 	after_leave(Place),nl,
 
-	where_go(Place),!.
+	where_go(Place),
+	after_look(Place),!.
 
 look :- 
 	i_am_at(Place),
 
 	\+ is_quest(Place),
 
-	where_go(Place).
+	where_go(Place),
+	after_look(Place).
 
+
+after_look(Place) :-	
+        retract(first_time(Place)),!.
+
+after_look(_).
 
 
 full_desc_place(Place) :-
@@ -352,18 +361,17 @@ notice_people(_).
    in your vicinity. */
 
 
-notice_objects_at(Place) :-
-        inside_place(Place, Thing),
-	write('There is a '), write(Thing), write(' here.'), nl,
+notice_inner_places(Place) :-
+        write("You see certain places that you can approach, maybe you'll find something interesting there:"),nl,
+	print_inner_places(Place).
+	
 
-        /*container_at(Y, Place),
+print_inner_places(Place) :-	
+	inside_place(Place, Thing),
+	write("-"), write(Thing), nl,
+	fail.
 
-        write('There is a '), write(Y), write(' here.'), nl,*/
-        fail.
-
-notice_objects_at(_).
-
-
+print_inner_places(_).
 
 go_to_chest(Person) :-
         i_am_at(servants_house),
