@@ -25,14 +25,18 @@ finish :-
 
 /* This rule prepare the game */
 start :-
-        instructions,nl,
-
+      
 	i_am_at(Place),
-	notice_people(Place),nl,
+	notice_people(Place),
+
+	instructions,nl,
 	full_desc_place(Place),nl,
+	retract(first_time(Place)),
 	where_go(Place),
 
 	choose_thief_by_machine(),		
 	prepare_diamond(),
 	prepare_wound(),
-	prepare_objects().	
+	prepare_objects(),
+	prepare_guard_sus().
+	

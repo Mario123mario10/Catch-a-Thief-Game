@@ -207,7 +207,7 @@ look :-
         i_am_at(Place),
 
         first_time(Place),
-        full_desc_place(Place),nl,
+        full_desc_place(Place),
 
         is_person(Place),
 	notice_people(Place),nl,
@@ -300,6 +300,7 @@ print_string(Desc, Person) :-
         [H|T] = Desc,
         \+ =(H,"<\n>"),
 	\+ =(H, "<wound>"),
+	\+ =(H, "<suspect>"),
         write(H),
         print_string(T, Person),!.
 
@@ -312,15 +313,24 @@ print_string(Desc, Person) :-
         print_string(T, Person),!.
 
 print_string(Desc, Person) :-
-	[_|T] = Desc,
+	[H|T] = Desc,
+	=(H,"<wound>"),
 	has_wound(Person),
 	wound(Person, Wound),
 	write(Wound),
 	print_string(T, Person),!.
-		
+
+print_string(Desc, Person) :-
+	[H|T] = Desc,
+	=(H,"<wound>"),
+	print_string(T, Person),!.
+
 print_string(Desc, Person) :-
 	[_|T] = Desc,
+	guard_sus(Who),
+	write(Who),
 	print_string(T, Person),!.
+	
 
 
 
@@ -361,11 +371,18 @@ print_places(List) :-
 
 print_places(_).
 
+
+notice_people(guard_house) :-
+	first_time(guard_house),nl,
+	first_say(guard, Desc),
+	full_desc_person(Desc, guard),!,nl. 	
+
 notice_people(Place) :-
 	first_time(Place),nl,
         person(Place, Person),
 	first_say(Person, Desc),
 	full_desc_person(Desc, Person),!,nl.
+
 
 notice_people(Place) :-
 	person(Place, Person),

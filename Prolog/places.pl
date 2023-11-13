@@ -22,6 +22,7 @@ person(wizard_house, wizard).
 door(hall, corridor).
 door(hall, guard_house).
 door(hall, courtyard).
+door(hall, vault).
 
 door(corridor, kitchen).
 door(corridor, butler_room).
@@ -64,7 +65,7 @@ all_desc_place(kitchen, ["Welcome to the kitchen! The aroma of fresh herbs, cook
 			 "large oven for roasted dishes, and a bread oven. There are kitchen utensils hanging on the wall but one hook is empty…", "<\n>"]).
 
 
-all_desc_place(guard_room, ["You are now in one of the castle guards’ rooms.", "<\n>",
+all_desc_place(guard_house, ["You are now in one of the castle guards’ rooms.", "<\n>",
 			    "It’s not very spacious, most of the space is taken by a bed and simple wooden wardrobe.", "<\n>",
 			    "Reportedly, he keeps some equipment in there. Stark and spartan style of the room suits the guard, without a doubt.", "<\n>"]).
 
@@ -73,7 +74,7 @@ all_desc_place(butler_room, ["You are now in the royal bedroom. You see a spacio
 			     "that no servant could afford it even if he worked all his life for it.", "<\n>",
 			     "This is the place where the butler often stays, serving the king in every way possible.", "<\n>"]).
 
-all_desc_place(courtyard, ["You are in the courtyard. This is the middle of the castle from where you can get to many places.", "<\n>"]).  
+all_desc_place(courtyard, ["You are in the courtyard. This is the middle of the castle from where you can get to many places.", "<\n>", "<\n>"]).  
 
 
 

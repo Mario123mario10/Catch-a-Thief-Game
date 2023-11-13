@@ -20,8 +20,7 @@ first_say(king, ["You stand before King Alaric III, a unique figure in this day 
 		"'The thief was almost caught red-handed, so we managed to react quickly and put the entire castle on lockdown.", "<\n>",
 		"Whoever the thief is, he’s still in the castle.", "<\n>",
 		"Put all of my servants under suspicion, except for my loyal guard who has served me for many years and holds me in high regard.", "<\n>",
-		"I am sure he would not betray me for money, his honor wouldn’t allow that.'", "<\n>", "<\n>",
-		"You will find him in a room to your left"]).
+		"I am sure he would not betray me for money, his honor wouldn’t allow that.'", "<\n>"]).
 
 first_say(guard, ["You are standing in front of the king's loyal guard. His figure reveals that in his youth, he was an outstanding knight.", "<\n>",
 		  "However, the passage of time has left its mark on this once-powerful man.", "<\n>",
@@ -30,7 +29,7 @@ first_say(guard, ["You are standing in front of the king's loyal guard. His figu
 		  "'Greetings, noble knight,' the guard says, somewhat thoughtfully.", "<\n>", "<\n>",
 		  "'Please let me keep my name to myself. I don't want this disaster to taint my noble family.", "<\n>",
 		  "Lean in, and I'll tell you what I know,' he continues, encouraging you to come closer.", "<\n>","<\n>",
-		  "'Just before the robbery, I noticed that the [gardener/cook/butler] was moving around restlessly in the throne room.", "<\n>",
+		  "'Just before the robbery, I noticed that the ", "<suspect>", " was moving around restlessly in the throne room.", "<\n>",
 	 	  "I had to loudly remind him of his duties because he stood there as if paralyzed and was examining the vault door from afar,'", "<\n>",
 		  "the guard whispers.", "<\n>", "<\n>",
 		  "'As you probably already know, I was standing guard over the vault and keeping watch until I heard a disturbing bang", "<\n>",
