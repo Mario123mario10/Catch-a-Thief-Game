@@ -43,9 +43,11 @@ prepare_wound() :-
 prepare_objects() :-
 	choose([rose_bushes, bed, bag_of_floor], Pouch_place),
 	assert(is_pouch(Pouch_place)),
+	assert(thing_at(pouch, Pouch_place)),
 	
 	choose([garden_pond, mirror, oven], Key_place),
-	assert(is_vault_key(Key_place)). 	
+	assert(is_vault_key(Key_place)),
+	assert(thing_at(vault_key, Key_place)). 	
 
 check_quests(Place) :-
         =(Place, servants_house),

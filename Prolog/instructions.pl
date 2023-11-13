@@ -1,7 +1,7 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, i_am_at/1, i_was_at/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, i_am_at/1, i_was_at/1, approach/1, i_am_at_inner_place/1]).
 
-:- dynamic places_list/1, i_am_at/1, i_was_at/1.
-:- retractall(places_list(_)), retractall(i_am_at(_)), retractall(i_was_at(_)).
+:- dynamic places_list/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1.
+:- retractall(places_list(_)), retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(i_am_at_inner_place(_)).
 
 :- [world].
 :- [plot].
@@ -37,6 +37,7 @@ instructions :-
 	write("holding.                     -- to check all things you are holding right now."), nl, 
 nl.
 
+i_am_at_inner_place(_).
 
 i_am_at(courtyard).
 i_was_at(courtyard).
@@ -63,8 +64,19 @@ take(What) :-
         i_am_at(Place),
         thing_at(What, Place),
         take_thing(What, Place),
+	write("You succesfully took "), write(What),nl,
         retract(thing_at(What, Place)),
         assert(holding(What)),!.
+
+take(What) :-
+	i_am_at(Place),
+	\+ thing_at(What, Place),
+	i_am_at_inner_place(Inner_place),
+	thing_at(What, Inner_place),
+	write("You succesfully took "), write(What),nl,
+	retract(thing_at(What, Inner_place)),
+	assert(holding(What)),!.
+
 
 take(soil) :-!.
 
@@ -127,9 +139,7 @@ drop_thing(_, _).
 search(What) :-
         \+ is_locked(What),
         thing_at(Thing, What),
-        write('You found '), write(Thing), nl,
-        assert(holding(Thing)),
-        retract(thing_at(Thing, What)).
+        write('You found '), write(Thing),!,nl.
 
 search(What) :-
         is_locked(What),
@@ -386,6 +396,11 @@ go_to_chest(Person) :-
 go_to_chest(_) :-
         write("You are not in the servants house"),nl.
 
+
+approach(Inner_place) :-
+	write("You are near the "), write(Inner_place), write("."),	
+	retract(i_am_at_inner_place(_)),
+	assert(i_am_at_inner_place(Inner_place)).
 
 talk(Person) :-
         able_to_talk(Person),
