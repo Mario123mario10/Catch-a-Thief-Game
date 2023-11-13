@@ -68,6 +68,12 @@ all_desc_place(guard_room, ["You are now in one of the castle guards’ rooms.",
 			    "It’s not very spacious, most of the space is taken by a bed and simple wooden wardrobe.", "<\n>",
 			    "Reportedly, he keeps some equipment in there. Stark and spartan style of the room suits the guard, without a doubt.", "<\n>"]).
 
+all_desc_place(butler_room, ["You are now in the royal bedroom. You see a spacious room full of expensive furniture and numerous paintings.", "<\n>",
+			     "There are huge mirrors and an ornate bed that is probably so expensive", "<\n>",
+			     "that no servant could afford it even if he worked all his life for it.", "<\n>",
+			     "This is the place where the butler often stays, serving the king in every way possible.", "<\n>"]).
+
+
 /* places where key vault could be */
 
 inside_place(garden, garden_pond).
