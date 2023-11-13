@@ -54,7 +54,7 @@ all_desc_place(forest, ["Shhh… did you hear that sound? It was kind of… magi
 			"One thing is for sure - you can find unusual plants and animals here. Maybe they have some special use, who knows?", "<\n>"]).
 
 
-all_desc_place(hall, ["It is the main hall of the castle. You can get to several places from here. Many people move around here too.", "<\n>",
+all_desc_place(hall, ["You start in the main hall of the castle. You can get to several places from here. Many people move around here too.", "<\n>",
 		      "Candle lanterns, even combined with thin beams of light from narrow windows, don’t make this place well lit.", "<\n>",
 		      "If you saw anyone in the distance, you could even mistake somebody for somebody, especially at night!", "<\n>"]).
 
@@ -72,6 +72,9 @@ all_desc_place(butler_room, ["You are now in the royal bedroom. You see a spacio
 			     "There are huge mirrors and an ornate bed that is probably so expensive", "<\n>",
 			     "that no servant could afford it even if he worked all his life for it.", "<\n>",
 			     "This is the place where the butler often stays, serving the king in every way possible.", "<\n>"]).
+
+all_desc_place(courtyard, ["You are in the courtyard. This is the middle of the castle from where you can get to many places.", "<\n>"]).  
+
 
 
 /* places where key vault could be */

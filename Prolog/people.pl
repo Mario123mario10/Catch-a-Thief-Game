@@ -1,5 +1,5 @@
 
-:- module(people, [first_say/2, able_to_talk/1]).
+:- module(people, [first_say/2]).
 
 
 first_say(king, ["You stand before King Alaric III, a unique figure in this day and age.", "<\n>", 
