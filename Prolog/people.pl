@@ -1,5 +1,5 @@
 
-:- module(people, [first_say/2, after_mushrooms/2]).
+:- module(people, [first_say/2, after_mushrooms/2, before_mushrooms/2, end_talk/2]).
 
 
 first_say(king, ["You stand before King Alaric III, a unique figure in this day and age.", "<\n>", 
@@ -29,7 +29,7 @@ first_say(guard, ["You are standing in front of the king's loyal guard. His figu
 		  "'Greetings, noble knight,' the guard says, somewhat thoughtfully.", "<\n>", "<\n>",
 		  "'Please let me keep my name to myself. I don't want this disaster to taint my noble family.", "<\n>",
 		  "Lean in, and I'll tell you what I know,' he continues, encouraging you to come closer.", "<\n>","<\n>",
-		  "'Just before the robbery, I noticed that the ", "<suspect>", " was moving around restlessly in the throne room.", "<\n>",
+		  "'Just before the robbery, I noticed that the ", "<guard_sus>", " was moving around restlessly in the throne room.", "<\n>",
 	 	  "I had to loudly remind him of his duties because he stood there as if paralyzed and was examining the vault door from afar,'", "<\n>",
 		  "the guard whispers.", "<\n>", "<\n>",
 		  "'As you probably already know, I was standing guard over the vault and keeping watch until I heard a disturbing bang", "<\n>",
@@ -101,11 +101,11 @@ after_mushrooms(wizard, ["When you give the wizard magic mushrooms from the ench
 			 "'Deep in the forest, in the shade of the trees, these mushrooms are a source of great power,'", "<\n>",
 			 "the wizard says solemnly and freezes for a second. After a while, he wakes up as if from a trance.", "<\n>", "<\n>",
 			 "'Now, what I promised.' He shrugs and says,", "<\n>",
-			 "Some time ago, the [gardener/cook/butler] was at my tower.", "<\n>",
+			 "Some time ago, the ", "<wizard_sus>", " was at my tower.", "<\n>",
 			 "He asked me for a certain toy, which I gave to the prince for his birthday.", "<\n>",
 			 "I gave him a couple of crystals, when one of them breaks, the other one explodes with a loud bang", "<\n>",
 			 "and turns into a thick cloud of smoke. Naturally, this toy is completely harmless,' he explained.", "<\n>", "<\n>",
-			 "'The [gardener/cook/butler] was trying to excuse himself, saying he needed this toy for a certain prank.", "<\n>",
+			 "'The ", "<wizard_sus>", " was trying to excuse himself, saying he needed this toy for a certain prank.", "<\n>",
 			 "It was just innocent fun, he told me,' the wizard says mockingly.", "<\n>",
 			 "'It seemed quite suspicious, but it is above my pay grade,' the wizard says dismissingly.", "<\n>", "<\n>",
 			 "'I said what I knew. Now it is the time for you to leave my tower.' the wizard says, clearly implying that the conversation is over."]).
@@ -113,6 +113,9 @@ after_mushrooms(wizard, ["When you give the wizard magic mushrooms from the ench
 
 
 
+before_mushrooms(wizard, ["'I'm still waiting for my mushrooms, I won't tell you anything until I get my mushrooms.' said the wizard stubbornly."]).
+
+end_talk(wizard, ["'You found who was guilty? No? I don't know anything else so go and leave me alone. I have many things to do.' said the wizard."]).
 
 
 

@@ -30,6 +30,8 @@ able_to_talk(guard).
 thing_at(soil, garden).
 thing_at(keys, butler_room).
 thing_at(mushroom, forest).
+thing_at(handle, vault).
+
 
 first_time(vault).
 first_time(hall).

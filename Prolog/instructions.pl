@@ -1,4 +1,4 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, i_am_at/1, i_was_at/1, approach/1, i_am_at_inner_place/1, full_desc_person/2, notice_people/1, where_go/1, give/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, i_am_at/1, i_was_at/1, approach/1, i_am_at_inner_place/1, full_desc_person/2, notice_people/1, where_go/1, give/1]).
 
 :- dynamic places_list/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1.
 :- retractall(places_list(_)), retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(i_am_at_inner_place(_)).
@@ -101,6 +101,21 @@ take(mushroom) :-
 	\+ i_am_at(forest),
 	write("You are not in the forest"),!.
 
+
+take(keys) :-
+        (went_to_servants_house(no); \+ thing_at(soil, butler_room)),
+        write("You can't take that!"),!,nl.
+
+take(keys) :-
+	i_am_at(butler_room),
+	thing_at(keys, butler_room),
+	take_thing(keys, butler_room),	
+        retract(thing_at(keys, butler_room)),
+        assert(holding(keys)),!.
+
+take(keys):-!.
+
+
 take(What) :-
         holding(What),
         write('You''re already holding it!'),!, nl.
@@ -113,6 +128,9 @@ take(What) :-
         retract(thing_at(What, Place)),
         assert(holding(What)),!.
 
+
+take(soil) :-!.
+
 take(What) :-
 	i_am_at(Place),
 	\+ thing_at(What, Place),
@@ -123,26 +141,16 @@ take(What) :-
 	assert(holding(What)),!.
 
 
-take(soil) :-!.
-
-take(keys) :-
-        (went_to_servants_house(no); \+ thing_at(soil, butler_room)),
-        write("You can't take that!"),!,nl.
-
-take(keys) :-!.
 
 take(_) :-
         write("You can't take that!"),!,nl.
 
 
-take_thing(soil, garden) :-
-        assert(holding(soil)), !, fail.
-
 take_thing(keys, butler_room) :-
         thing_at(soil, butler_room),
         went_to_servants_house(yes),
         butler_busy(yes),
-        write("You successfully take the keys! Now run before the butler see you!"),!,nl.
+        write("You successfully took the keys! Now run before the butler see you!"),!,nl.
 
 take_thing(keys, butler_room) :-
         \+ thing_at(soil, butler_room),!, fail.
@@ -152,6 +160,11 @@ take_thing(keys, butler_room) :-
 
 take_thing(keys, butler_room) :-
         write("The butler is no longer busy, try scatter the soil again."),!, fail.
+
+
+take_thing(soil, garden) :-
+        assert(holding(soil)), !, fail.
+
 
 
 drop(X) :-
@@ -213,7 +226,7 @@ open(_) :-
 open_thing(servants_house) :-
         write("You see place with bedrooms for all workforces,"),nl,
  	write("this is the place where cook, gardener and butler are sleeping."),nl,
-	write("Each of them has 1 chest. You can go to these chest"),!,nl.
+	write("Each of them has 1 chest. You can approach them."),!,nl.
 
 open_thing(What) :-
         (=(What, cook_chest);=(What, butler_chest);=(What, gardener_chest)),
@@ -344,8 +357,9 @@ print_string(Desc, Person) :-
         [H|T] = Desc,
         \+ =(H,"<\n>"),
 	\+ =(H, "<wound>"),
-	\+ =(H, "<suspect>"),
+	\+ =(H, "<guard_sus>"),
 	\+ =(H, "<number>"),
+	\+ =(H, "<wizard_sus>"),
         write(H),
         print_string(T, Person),!.
 
@@ -372,18 +386,24 @@ print_string(Desc, Person) :-
 
 print_string(Desc, Person) :-
 	[H|T] = Desc,
-	=(H,"<suspect>"),
+	=(H,"<guard_sus>"),
 	guard_sus(Who),
 	write(Who),
 	print_string(T, Person),!.
 	
 print_string(Desc, Person) :-
-	[_|T] = Desc,
+	[H|T] = Desc,
+	=(H, "<number>"),
 	needed_mushrooms(Number),
 	write(Number),
 	print_string(T, Person),!.
 
-
+print_string(Desc, Person) :-
+	[_|T] = Desc,
+	wizard_sus(Who),
+	write(Who),
+	print_string(T, Person),!.
+	
 
 describe(Place) :- write('You are at '), write(Place), nl,
         place(Place, Description),
@@ -443,6 +463,13 @@ notice_people(Place) :-
 /* These rules set up a loop to mention all the objects
    in your vicinity. */
 
+notice_inner_places(servants_house) :-
+	\+ is_locked(servants_house),	
+        write("You see certain places that you can approach, maybe you'll find something interesting there:"),nl,
+	print_inner_places(servants_house),!.
+
+notice_inner_places(servants_house) :-
+	is_locked(servants_house),!.
 
 notice_inner_places(Place) :-
         write("You see certain places that you can approach, maybe you'll find something interesting there:"),nl,
@@ -456,24 +483,48 @@ print_inner_places(Place) :-
 
 print_inner_places(_).
 
-go_to_chest(Person) :-
-        i_am_at(servants_house),
-        \+ is_locked(servants_house),
-        write("You are near the chest of "), write(Person), nl,
-        write("You can now open it"),!.
-
-go_to_chest(Person) :-
-        i_am_at(servants_house),
-        write("You can't go to "), write(Person), write(" chest where servants house is locked"),!,nl.
-
-go_to_chest(_) :-
-        write("You are not in the servants house"),nl.
+approach(Chest) :-
+	i_am_at(servants_house),
+	inside_place(servants_house, Chest),
+	approach_chest(Chest),
+	retract(i_am_at_inner_place(_)),
+	assert(i_am_at_inner_place(Chest)),!.	
 
 
 approach(Inner_place) :-
+	i_am_at(Place),
+	inside_place(Place, Inner_place), 
 	write("You are near the "), write(Inner_place), write("."),	
 	retract(i_am_at_inner_place(_)),
-	assert(i_am_at_inner_place(Inner_place)).
+	assert(i_am_at_inner_place(Inner_place)),!.
+
+approach(Inner_place) :-
+	i_am_at(Place),
+	\+ inside_place(Place, Inner_place),
+	write("You can't approach it").
+
+
+approach_chest(Chest) :-
+	i_am_at(servants_house),
+	retract(i_am_at_inner_place(_)),
+	assert(i_am_at_inner_place(Chest)),
+
+	\+ is_locked(servants_house),
+	whose(Person, Chest),
+	write("You are now near the "), write(Person), write("'s chest."),!,nl.	
+	
+approach_chest(_) :-
+	\+ i_am_at(servants_house),
+	write("You are not in servants house"),!,nl.
+
+approach_chest(Chest) :-
+	i_am_at(servants_house),
+	is_locked(servants_house),
+	whose(Person, Chest),
+	write("You can't go to "), write(Person), write("'s chest when servants house is locked."),!,nl.
+
+
+approach_chests(_).	
 
 talk(Person) :-
         able_to_talk(Person),
@@ -497,10 +548,21 @@ talk(Person) :-
 talk(Person) :-
         person(Place, Person),
 	\+ first_time(Place),
-        write("This is not a first statement"),!,nl.
+	next_talk(Person),!.
+
 
 talk(_).
 
+next_talk(wizard) :-
+	gave_mushrooms(no),
+	before_mushrooms(wizard, Desc),
+	print_string(Desc, wizard),!,nl.
+
+next_talk(wizard) :-
+	end_talk(wizard, Desc),
+	print_string(Desc, wizard),!,nl.
+
+next_talk(_).
 
 after_enter(butler_room) :-
         went_again_to_butler_room(yes),
@@ -543,6 +605,9 @@ after_enter(servants_house) :-
         holding(keys),
         is_locked(servants_house),
         write("You can now enter the servants house"),!,nl,nl.
+
+after_enter(servants_house) :-
+	write("You see there are 3 chests; butler's chest, gardener's chest and cook's chest you can approach."),!,nl,nl.
 
 after_enter(forest) :-
 	went_to_wizard_house(no),

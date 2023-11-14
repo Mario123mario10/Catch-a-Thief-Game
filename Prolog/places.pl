@@ -96,9 +96,13 @@ inside_place(garden, king_sculpture).
 inside_place(butler_room, wardrobe).
 inside_place(kitchen, kitchen_unit). 
 
+inside_place(servants_house, butler_chest).
+inside_place(servants_house, cook_chest).
+inside_place(servants_house, gardener_chest).
+
 
 are_inner_places(kitchen).
 are_inner_places(butler_room).
 are_inner_places(garden).
-
+are_inner_places(servants_house).
 
