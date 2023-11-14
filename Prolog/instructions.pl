@@ -22,7 +22,6 @@ instructions :-
 	write("give(<Object/Objects>)       -- to give something to someone who is in that place."), nl,
         write("drop(<Object>).              -- to put down an object."), nl,
         write("search(<Container>).         -- to search something in an object."), nl,
-        write("go_to_chest(<Person>).       -- to go to the chest of the chosen person."), nl,
         write("talk(<Person>).              -- to talk to the chosen person."), nl,
         write("open(<Container>).           -- to open an object."), nl,
         write("choose_thief(<Person>).      -- to check if you are right, who the thief is."), nl,
