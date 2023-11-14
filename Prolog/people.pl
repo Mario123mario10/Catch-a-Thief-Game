@@ -1,5 +1,5 @@
 
-:- module(people, [first_say/2]).
+:- module(people, [first_say/2, after_mushrooms/2]).
 
 
 first_say(king, ["You stand before King Alaric III, a unique figure in this day and age.", "<\n>", 
@@ -94,6 +94,21 @@ first_say(butler, ["You stand before an unassuming, delicately built butler, see
 
 		   
 
+after_mushrooms(wizard, ["When you give the wizard magic mushrooms from the enchanted forest, his eyes light up with momentary delight.", "<\n>",
+			 "He gently takes them from your hand and places them on the table next to him,", "<\n>",
+			 "then reaches for his wand and uses his finger to carve out the runes on one of the mushrooms.", "<\n>",
+			 "Everything around you begins to glow with magical light, and the wizard carefully studies the ingredients he has just obtained.", "<\n>", "<\n>",
+			 "'Deep in the forest, in the shade of the trees, these mushrooms are a source of great power,'", "<\n>",
+			 "the wizard says solemnly and freezes for a second. After a while, he wakes up as if from a trance.", "<\n>", "<\n>",
+			 "'Now, what I promised.' He shrugs and says,", "<\n>",
+			 "Some time ago, the [gardener/cook/butler] was at my tower.", "<\n>",
+			 "He asked me for a certain toy, which I gave to the prince for his birthday.", "<\n>",
+			 "I gave him a couple of crystals, when one of them breaks, the other one explodes with a loud bang", "<\n>",
+			 "and turns into a thick cloud of smoke. Naturally, this toy is completely harmless,' he explained.", "<\n>", "<\n>",
+			 "'The [gardener/cook/butler] was trying to excuse himself, saying he needed this toy for a certain prank.", "<\n>",
+			 "It was just innocent fun, he told me,' the wizard says mockingly.", "<\n>",
+			 "'It seemed quite suspicious, but it is above my pay grade,' the wizard says dismissingly.", "<\n>", "<\n>",
+			 "'I said what I knew. Now it is the time for you to leave my tower.' the wizard says, clearly implying that the conversation is over."]).
 
 
 

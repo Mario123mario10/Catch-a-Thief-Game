@@ -71,7 +71,9 @@ give(mushrooms) :-
 	
 	retract(gave_mushrooms(no)),
 	assert(gave_mushrooms(yes)),
-	write("You succesfully gave mushrooms to the wizard"),!,nl.
+	write("You succesfully gave mushrooms to the wizard"),nl,
+	after_mushrooms(wizard, Desc),
+	print_string(Desc, wizard),!,nl.
 		
 give(mushrooms) :-
 	\+ i_am_at(wizard_house),
@@ -81,9 +83,6 @@ give(mushrooms) :-
 	gave_mushrooms(yes),
 	write("Wizard is shoked and is thanking you for giving him the mushrooms again."),!,nl. 	
 
-give(mushrooms) :-
-	went_to_wizard_house(no),
-	write("How would you know the wizard would want that you cheater!"),!,nl.
 
 give(mushrooms) :-
 	write("You don't have enough mushrooms. Come here again once you have the right amount of them."),!,nl.
@@ -480,14 +479,13 @@ talk(Person) :-
         able_to_talk(Person),
         i_am_at(Place),
         person(Place, Person),
-        is_first_say(Person),
+	first_time(Place),
 	first_say(Person, Desc),
-	full_desc_person(Desc, Person),        
-	retract(is_first_say(Person)),!.
+	full_desc_person(Desc, Person),!.        
 
 talk(Thing) :-
         \+ able_to_talk(Thing),
-        write("You can not talk to a "), write(Thing), write("!"),nl.
+        write("You can not talk to a "), write(Thing), write("!"),!,nl.
 
 
 talk(Person) :-
@@ -497,7 +495,8 @@ talk(Person) :-
         write("You can meet that person only in "), write(Right_place),!,nl.
 
 talk(Person) :-
-        \+ is_first_say(Person),
+        person(Place, Person),
+	\+ first_time(Place),
         write("This is not a first statement"),!,nl.
 
 talk(_).
