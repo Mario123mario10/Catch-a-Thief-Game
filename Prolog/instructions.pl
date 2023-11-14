@@ -1,4 +1,4 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, i_am_at/1, i_was_at/1, approach/1, i_am_at_inner_place/1, full_desc_person/2, notice_people/1, where_go/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, go_to_chest/1, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, i_am_at/1, i_was_at/1, approach/1, i_am_at_inner_place/1, full_desc_person/2, notice_people/1, where_go/1, give/1]).
 
 :- dynamic places_list/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1.
 :- retractall(places_list(_)), retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(i_am_at_inner_place(_)).
@@ -19,6 +19,7 @@ instructions :-
         write("back.                        -- to go to the previous place."), nl,
 	write("approach(<Inner_place>)      -- to approach one of the inner places of the place you are right now."), nl,
         write("take(<Object>).              -- to pick up an object."), nl,
+	write("give(<Object/Objects>)       -- to give something to someone who is in that place."), nl,
         write("drop(<Object>).              -- to put down an object."), nl,
         write("search(<Container>).         -- to search something in an object."), nl,
         write("go_to_chest(<Person>).       -- to go to the chest of the chosen person."), nl,
@@ -55,7 +56,51 @@ holding :-
 
 holding.
 
+give(mushrooms) :-
+	i_am_at(wizard_house),
+	gave_mushrooms(no),
+	went_to_wizard_house(yes),
+	having_mushrooms(Having),
+	needed_mushrooms(Needed),
+	
+	Having > Needed,
+	New_having is Having - Needed,
+	
+	retract(having_mushrooms(_)),
+	assert(having_mushrooms(New_having)),
+	
+	retract(gave_mushrooms(no)),
+	assert(gave_mushrooms(yes)),
+	write("You succesfully gave mushrooms to the wizard"),!,nl.
+		
+give(mushrooms) :-
+	\+ i_am_at(wizard_house),
+	write("There isn't anyone at this place who would want that"),!,nl.
 
+give(mushrooms) :-
+	gave_mushrooms(yes),
+	write("Wizard is shoked and is thanking you for giving him the mushrooms again."),!,nl. 	
+
+give(mushrooms) :-
+	went_to_wizard_house(no),
+	write("How would you know the wizard would want that you cheater!"),!,nl.
+
+give(mushrooms) :-
+	write("You don't have enough mushrooms. Come here again once you have the right amount of them."),!,nl.
+
+
+
+take(mushroom) :-
+	i_am_at(forest),
+	having_mushrooms(Number),
+	New_number is Number + 1,
+	retract(having_mushrooms(_)),
+	assert(having_mushrooms(New_number)),
+	write("You successfully took mashroom. Now you have "), write(New_number), write(" mushrooms"),!,nl.
+
+take(mushroom) :-
+	\+ i_am_at(forest),
+	write("You are not in the forest"),!.
 
 take(What) :-
         holding(What),
@@ -218,7 +263,7 @@ look :-
 	is_quest(Place),
         check_quests(Place),
         after_enter(Place),
-        after_leave(Place),nl,
+        after_leave(Place),
 	
         where_go(Place),
 	after_look(Place),!.
@@ -238,7 +283,7 @@ look :-
         is_quest(Place),
 	check_quests(Place),
         after_enter(Place),
-        after_leave(Place),nl,
+        after_leave(Place),
 	
         where_go(Place),
 	after_look(Place),!.
@@ -255,7 +300,7 @@ look :-
 	is_quest(Place),
 	check_quests(Place),
 	after_enter(Place),
-	after_leave(Place),nl,
+	after_leave(Place),
 
 	where_go(Place),
 	after_look(Place),!.
@@ -268,7 +313,7 @@ look :-
 	is_quest(Place),
 	check_quests(Place),
 	after_enter(Place),
-	after_leave(Place),nl,
+	after_leave(Place),
 
 	where_go(Place),
 	after_look(Place),!.
@@ -301,6 +346,7 @@ print_string(Desc, Person) :-
         \+ =(H,"<\n>"),
 	\+ =(H, "<wound>"),
 	\+ =(H, "<suspect>"),
+	\+ =(H, "<number>"),
         write(H),
         print_string(T, Person),!.
 
@@ -326,12 +372,17 @@ print_string(Desc, Person) :-
 	print_string(T, Person),!.
 
 print_string(Desc, Person) :-
-	[_|T] = Desc,
+	[H|T] = Desc,
+	=(H,"<suspect>"),
 	guard_sus(Who),
 	write(Who),
 	print_string(T, Person),!.
 	
-
+print_string(Desc, Person) :-
+	[_|T] = Desc,
+	needed_mushrooms(Number),
+	write(Number),
+	print_string(T, Person),!.
 
 
 
@@ -455,45 +506,57 @@ talk(_).
 after_enter(butler_room) :-
         went_again_to_butler_room(yes),
         holding(soil),
-        write("You can now distract the butler by dropping the soil."),!,nl.
+        write("You can now distract the butler by dropping the soil."),!,nl,nl.
 
 after_enter(butler_room) :-
         went_again_to_butler_room(yes),
         \+ holding(soil),
-        write("You don't have soil so you can't distract the butler."),!,nl.
+        write("You don't have soil so you can't distract the butler."),!,nl,nl.
 
 after_enter(butler_room) :-
         went_to_servants_house(yes),
         write("You see that there is a set of keys. Maybe you can open servant's house with one of them?"),nl,
         write("Try to distract the butler with soil by scattering it in the hallway."), nl,
-        write("Then try to take the set of keys."),!,nl.
+        write("Then try to take the set of keys."),!,nl,nl.
 
 after_enter(butler_room) :-
         went_to_servants_house(no),
-        write("You see that there are is a set of keys on the table. But the butler is watching it too."),nl,
-	write("Maybe you can take it and use it on something in the future?"),!,nl.
+        write("You see that there is a set of keys on the table. But the butler is watching it too."),nl,
+	write("Maybe you can take it and use it on something in the future?"),!,nl,nl.
 
 
 after_enter(garden) :-
         need_soil(no),
-        write("You see there's a lot of soil here. You are wondering if it will ever come in handy"),!,nl.
+        write("You see there's a lot of soil here. You are wondering if it will ever come in handy"),!,nl,nl.
 
 after_enter(garden) :-
         need_soil(yes),
-        write("You see there's a lot of soil here."),!, nl.
+        write("You see there's a lot of soil here."),!, nl,nl.
 
 
 after_enter(servants_house) :-
         \+ holding(keys),
         is_locked(servants_house),
         write("Oh no! Servants house is closed. Maybe you can discover something interesting there."),nl,
-        write("Get the door key and open the servants house"),!,nl.
+        write("Get the door key and open the servants house"),!,nl,nl.
 
 after_enter(servants_house) :-
         holding(keys),
         is_locked(servants_house),
-        write("You can now enter the servants house"),!,nl.
+        write("You can now enter the servants house"),!,nl,nl.
 
+after_enter(forest) :-
+	went_to_wizard_house(no),
+	write("You see there are a lot of mushrooms here. You are wondering if it will ever come in handy"),!,nl,nl.
+
+after_enter(forest) :-
+	went_to_wizard_house(yes),
+	write("You see there are a lot of mushrooms here."),!,nl,nl.
+
+after_enter(wizard_house) :-	
+	went_to_wizard_house(no),
+	retract(went_to_wizard_house(no)),
+	assert(went_to_wizard_house(yes)).
 
 after_enter(_).
 

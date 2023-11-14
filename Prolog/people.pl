@@ -52,7 +52,7 @@ first_say(wizard, ["You stand before the court wizard of King Alaric III, an old
 		   "'I was in my tower when I heard that noise in the courtyard. I know exactly who was responsible,", "<\n>",
 		   "and I know what was used to perform this. In fact, I gave him that item in return for a favor.", "<\n>",
 		   "I'm willing to share this information with you, but I won't do it for free.", "<\n>",
-		   "You must collect X mushrooms from the magical forest surrounding the castle, and then I will be willing to share my knowledge.'", "<\n>",
+		   "You must collect ", "<number>", " mushrooms from the magical forest surrounding the castle, and then I will be willing to share my knowledge.'", "<\n>",
 		   "The wizard expresses his tiredness in his tone of voice."]).
 
 first_say(gardener, ["While wandering through the royal garden, you come across a gardener.", "<\n>",

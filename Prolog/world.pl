@@ -1,15 +1,18 @@
-:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_first_say/1, is_person/1, is_quest/1, wound/2]).
+:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_first_say/1, is_person/1, is_quest/1, wound/2, having_mushrooms/1]).
 
-:- dynamic is_locked/1, holding/1, thing_at/2, first_time/1, is_first_say/1, chosen_thief/1.
-:- retractall(is_locked(_)), retractall(thing_at(_, _)), retractall(holding(_)), retractall(chosen_thief(_)).
+:- dynamic is_locked/1, holding/1, thing_at/2, first_time/1, is_first_say/1, chosen_thief/1, having_mushrooms/1.
+:- retractall(is_locked(_)), retractall(thing_at(_, _)), retractall(holding(_)), retractall(chosen_thief(_)), retractall(having_mushrooms(_)).
 
 
 /* with new quests add there places, where quests are doing by the players*/ 
 
+having_mushrooms(0).
+
 is_quest(butler_room).
 is_quest(garden).
 is_quest(servants_house).
-
+is_quest(forest).
+is_quest(wizard_house).
 
 
 is_locked(butler_chest).
@@ -26,6 +29,7 @@ able_to_talk(guard).
 
 thing_at(soil, garden).
 thing_at(keys, butler_room).
+thing_at(mushroom, forest).
 
 first_time(vault).
 first_time(hall).

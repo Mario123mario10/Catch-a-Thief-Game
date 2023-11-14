@@ -38,5 +38,6 @@ start :-
 	prepare_diamond(),
 	prepare_wound(),
 	prepare_objects(),
-	prepare_guard_sus().
+	prepare_sus(),
+	prepare_needed_mushrooms().
 	

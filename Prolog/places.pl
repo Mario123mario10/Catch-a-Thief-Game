@@ -30,7 +30,7 @@ door(corridor, butler_room).
 door(courtyard, garden).
 door(courtyard, servants_house).
 door(courtyard, wizard_house).
-
+door(courtyard, forest).
 
 
 whose(butler, butler_chest).
@@ -52,7 +52,7 @@ all_desc_place(wizard_house, ["Here is the wizard’s house. It’s kind of like
 
 all_desc_place(forest, ["Shhh… did you hear that sound? It was kind of… magical. This forest is like none other.", "<\n>",
 			"Some say you can hear ghost voices here, others say that this is a place where you can meet a werewolf.", "<\n>",
-			"One thing is for sure - you can find unusual plants and animals here. Maybe they have some special use, who knows?", "<\n>"]).
+			"One thing is for sure - you can find unusual plants and animals here. Maybe they have some special use, who knows?", "<\n>", "<\n>"]).
 
 
 all_desc_place(hall, ["You start in the main hall of the castle. You can get to several places from here. Many people move around here too.", "<\n>",
