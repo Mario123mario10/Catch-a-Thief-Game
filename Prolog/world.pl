@@ -65,3 +65,7 @@ wound(gardener, "There is a fresh wound on his forearm, as if something cut him.
 wound(cook, "You notice a fresh blade wound on his hand.").
 wound(butler, "There is a fresh wound on his left cheek; he cut himself with something.").
 
+
+belongs(rake, gardener).
+belongs(ladle, cook).
+belongs(duster, butler).

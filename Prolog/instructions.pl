@@ -156,7 +156,12 @@ take(third_part) :-
 	thing_at(third_part, Place),
 	went_to_vault(yes),
 	took_sec_part(yes),
+
 	write("You successfully took a third part and now you know what it is!"),nl,
+	thief_tool(Tool),
+	write("It is a "), write(Tool), write("!"),nl,
+	write("Talk with the person you think could have used that."),nl,		
+
 	retract(thing_at(third_part, Place)),
 	assert(holding(third_part)),!.
 
@@ -409,7 +414,7 @@ notice_tool_part(Place) :-
 	went_to_vault(yes),
 	sec_part(Place),
 	took_sec_part(no),	
-	write("You see the second part of the tool that the thief probably used"),!,nl.
+	write("You see the second part of the tool that the thief probably used, maybe that was his escape route."),!,nl.
 
 
 notice_tool_part(Place) :-
@@ -418,7 +423,7 @@ notice_tool_part(Place) :-
 	third_part(Place),
 	took_sec_part(yes),
 	took_third_part(no),
-	write("You see the third part of the tool that the thief probably used"),!,nl.
+	write("You see the third part of the tool that the thief probably used, now you can check what the item is."),!,nl.
 	
 notice_tool_part(_).
 
