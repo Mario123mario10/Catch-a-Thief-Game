@@ -304,6 +304,9 @@ look :-
 	are_inner_places(Place),
         notice_inner_places(Place),nl,
 	
+	is_tool_part(Place),
+	notice_tool_part(Place),nl,	
+
 	is_quest(Place),
         check_quests(Place),
         after_enter(Place),
@@ -324,6 +327,9 @@ look :-
 	are_inner_places(Place),
         notice_inner_places(Place),nl,
 
+	is_tool_part(Place),
+	notice_tool_part(Place),nl,		
+
         is_quest(Place),
 	check_quests(Place),
         after_enter(Place),
@@ -340,6 +346,9 @@ look :-
 	
 	are_inner_places(Place),
         notice_inner_places(Place),nl,
+	
+	is_tool_part(Place),
+	notice_tool_part(Place),nl,	
 
 	is_quest(Place),
 	check_quests(Place),
@@ -353,6 +362,9 @@ look :-
 	i_am_at(Place),
 	
 	\+ are_inner_places(Place),
+
+	is_tool_part(Place),
+	notice_tool_part(Place),nl,	
 	
 	is_quest(Place),
 	check_quests(Place),
@@ -361,6 +373,20 @@ look :-
 
 	where_go(Place),
 	after_look(Place),!.
+
+look :-
+	i_am_at(Place),
+
+	\+ is_tool_part(Place),
+	
+	is_quest(Place),
+	check_quests(Place),
+	after_enter(Place),
+	after_leave(Place),
+
+	where_go(Place),
+	after_look(Place),!.
+
 look :- 
 	i_am_at(Place),
 
@@ -374,6 +400,27 @@ after_look(Place) :-
         retract(first_time(Place)),!.
 
 after_look(_).
+
+
+is_tool_part(Place) :-
+	(sec_part(Place);third_part(Place)).
+
+notice_tool_part(Place) :-
+	went_to_vault(yes),
+	sec_part(Place),
+	took_sec_part(no),	
+	write("You see the second part of the tool that the thief probably used"),!,nl.
+
+
+notice_tool_part(Place) :-
+	went_to_vault(yes),
+	took_sec_part(yes),	
+	third_part(Place),
+	took_sec_part(yes),
+	took_third_part(no),
+	write("You see the third part of the tool that the thief probably used"),!,nl.
+	
+notice_tool_part(_).
 
 
 full_desc_place(Place) :-

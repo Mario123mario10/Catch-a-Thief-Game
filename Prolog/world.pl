@@ -20,6 +20,7 @@ is_locked(gardener_chest).
 is_locked(cook_chest).
 is_locked(servants_house).
 
+
 able_to_talk(butler).
 able_to_talk(gardener).
 able_to_talk(cook).
