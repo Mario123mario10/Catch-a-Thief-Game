@@ -130,18 +130,56 @@ take(soil) :-
 
 take(soil) :- 
 	\+ i_am_at(garden),
-	write("You can't take that there."),!,nl.
+	write("You can't take that from here."),!,nl.
+
+take(sec_part) :-
+	i_am_at(Place),
+	thing_at(sec_part, Place),
+	went_to_vault(yes),
+	write("You successfully took a second part but you still don't know what it is."),nl,
+	retract(thing_at(sec_part, Place)),
+	assert(holding(sec_part)),
+	retract(took_sec_part(no)),
+	assert(took_sec_part(yes)),!.
+
+take(sec_part) :-
+	i_am_at(Place),
+	\+ thing_at(sec_part, Place),
+	write("You can't take it from here"),!,nl.
+
+take(sec_part) :-
+	went_to_vault(no),
+	write("How do you know it can be here you cheater?"),!,nl.
+
+take(third_part) :-
+	i_am_at(Place),
+	thing_at(third_part, Place),
+	went_to_vault(yes),
+	took_sec_part(yes),
+	write("You successfully took a third part and now you know what it is!"),nl,
+	retract(thing_at(third_part, Place)),
+	assert(holding(third_part)),!.
+
+take(third_part) :-
+	i_am_at(Place),
+	\+ thing_at(third_part, Place),
+	write("You can't take it from here"),!,nl.
+
+
+take(third_part) :-
+	(went_to_vault(no);took_sec_part(no)),
+	write("How do you know it can be here you cheater?"),!,nl.
 
 
 take(What) :-
         holding(What),
-        write('You''re already holding it!'),!, nl.
+        write("You are already holding it!"),!, nl.
 
 
 take(What) :-
         i_am_at(Place),
         thing_at(What, Place),
-	write("You succesfully took "), write(What),nl,
+	write("You successfully took a "), write(What),nl,
         retract(thing_at(What, Place)),
         assert(holding(What)),!.
 
@@ -151,7 +189,7 @@ take(What) :-
 	\+ thing_at(What, Place),
 	i_am_at_inner_place(Inner_place),
 	thing_at(What, Inner_place),
-	write("You succesfully took "), write(What),nl,
+	write("You successfully took a "), write(What),nl,
 	retract(thing_at(What, Inner_place)),
 	assert(holding(What)),!.
 
@@ -321,8 +359,8 @@ look :-
 	after_enter(Place),
 	after_leave(Place),
 
-	where_go(Place).
-
+	where_go(Place),
+	after_look(Place),!.
 look :- 
 	i_am_at(Place),
 
@@ -612,12 +650,12 @@ after_enter(forest) :-
 after_enter(wizard_house) :-	
 	went_to_wizard_house(no),
 	retract(went_to_wizard_house(no)),
-	assert(went_to_wizard_house(yes)).
+	assert(went_to_wizard_house(yes)),!.
 
 after_enter(vault) :-
 	went_to_vault(no),
 	retract(went_to_vault(no)),
-	assert(went_to_vault(yes)).
+	assert(went_to_vault(yes)),!.
 
 after_enter(_).
 
