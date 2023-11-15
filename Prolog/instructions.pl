@@ -1,7 +1,5 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, i_am_at/1, i_was_at/1, approach/1, i_am_at_inner_place/1, full_desc_person/2, notice_people/1, where_go/1, give/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, approach/1, full_desc_person/2, notice_people/1, where_go/1, give/1]).
 
-:- dynamic places_list/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1.
-:- retractall(places_list(_)), retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(i_am_at_inner_place(_)).
 
 :- [world].
 :- [plot].
@@ -37,11 +35,6 @@ instructions :-
         write("holding(<Object>).           -- to check if you are holding an object."), nl,
 	write("holding.                     -- to check all things you are holding right now."), nl, 
 nl.
-
-i_am_at_inner_place(_).
-
-i_am_at(hall).
-i_was_at(hall).
 
 holding :-
 	\+ holding(_),
@@ -492,7 +485,6 @@ describe(Place) :- write('You are at '), write(Place), nl,
         place(Place, Description),
         write(Description),nl.
 
-places_list([]).
 
 where_go(Place) :-
         write("From here you can go to "), print_way(Place), nl.
