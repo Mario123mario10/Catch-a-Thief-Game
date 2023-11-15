@@ -34,10 +34,13 @@ start :-
 	retract(first_time(Place)),
 	where_go(Place),
 
-	choose_thief_by_machine(),		
 	prepare_diamond(),
 	prepare_wound(),
-	prepare_objects(),
-	prepare_sus(),
+	prepare_pouch(),
+	prepare_vault_key(),
+	prepare_tool(),
+	prepare_guard_sus(),
+	prepare_wizard_sus(),
+	prepare_parts(),
 	prepare_needed_mushrooms().
 	

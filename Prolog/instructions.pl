@@ -118,7 +118,7 @@ take(keys) :-
 take(soil) :-
         i_am_at(garden),
         thing_at(soil, garden),
-	write("You succesfully took soil"),nl,
+	write("You succesfully took soil."),nl,
         assert(holding(soil)), !.
 
 take(soil) :- 
@@ -254,7 +254,10 @@ open(_) :-
         write("You don't have a key!"),nl.
 
 open_thing(servants_house) :-
-        write("You see place with bedrooms for all workforces,"),nl,
+        retract(first_time(servants_house)),
+	all_desc_place(servants_house, Desc),
+	print_string(Desc, _),nl,
+	write("You see place with bedrooms for all workforces,"),nl,
  	write("this is the place where cook, gardener and butler are normally sleeping."),nl,
 	write("Each of them has 1 chest. Maybe when you approach and search these chests you will discover something."),!,nl.
 
@@ -300,7 +303,7 @@ look :-
 	notice_people(Place),nl,
 
 	are_inner_places(Place),
-        notice_inner_places(Place),nl,
+        notice_inner_places(Place),
 	
 	is_tool_part(Place),
 	notice_tool_part(Place),nl,	
@@ -323,7 +326,7 @@ look :-
         notice_people(Place),nl,
 	
 	are_inner_places(Place),
-        notice_inner_places(Place),nl,
+        notice_inner_places(Place),
 
 	is_tool_part(Place),
 	notice_tool_part(Place),nl,		
@@ -343,7 +346,7 @@ look :-
 	\+ is_person(Place),
 	
 	are_inner_places(Place),
-        notice_inner_places(Place),nl,
+        notice_inner_places(Place),
 	
 	is_tool_part(Place),
 	notice_tool_part(Place),nl,	
@@ -395,12 +398,14 @@ look :-
 
 
 after_look(Place) :-	
-        retract(first_time(Place)),!.
+        \+ =(Place,servants_house),
+	retract(first_time(Place)),!.
 
 after_look(_).
 
 
 is_tool_part(Place) :-
+	went_to_vault(yes),
 	(sec_part(Place);third_part(Place)).
 
 notice_tool_part(Place) :-
@@ -422,8 +427,12 @@ notice_tool_part(_).
 
 
 full_desc_place(Place) :-
-        all_desc_place(Place, Desc),
+        \+ =(Place, servants_house),
+	all_desc_place(Place, Desc),
         print_string(Desc, _).
+
+full_desc_place(Place) :-
+	=(Place, servants_house).
 
 full_desc_person(Desc, Person) :-
 	first_say(Person, Desc),	
@@ -481,9 +490,9 @@ print_string(Desc, Person) :-
 	print_string(T, Person),!.
 	
 
-describe(Place) :- write('You are at '), write(Place), nl,
+describe(Place) :- write('You are at '), write(Place), write("."), nl,
         place(Place, Description),
-        write(Description),nl.
+        write(Description),nl,nl.
 
 
 where_go(Place) :-
@@ -541,14 +550,14 @@ notice_people(Place) :-
 notice_inner_places(servants_house) :-
 	\+ is_locked(servants_house),	
         write("You see certain places that you can approach, maybe you'll find something interesting there:"),nl,
-	print_inner_places(servants_house),!.
+	print_inner_places(servants_house),!,nl.
 
 notice_inner_places(servants_house) :-
 	is_locked(servants_house),!.
 
 notice_inner_places(Place) :-
         write("You see certain places that you can approach, maybe you'll find something interesting there:"),nl,
-	print_inner_places(Place).
+	print_inner_places(Place),nl.
 	
 
 print_inner_places(Place) :-	
@@ -652,7 +661,7 @@ after_enter(butler_room) :-
         went_to_servants_house(yes),
         write("You see that there is a set of keys. Maybe you can open servant's house with one of them?"),nl,
         write("Try to distract the butler with soil by scattering it there."),nl,
-	write("While he will be cleaning you will quickly take the set of keys"),!,nl,nl.
+	write("While he will be cleaning you will quickly take the set of keys."),!,nl,nl.
 
 after_enter(butler_room) :-
         went_to_servants_house(no),
@@ -673,7 +682,7 @@ after_enter(servants_house) :-
         \+ holding(keys),
         is_locked(servants_house),
         write("Oh no! Servants house is closed. Maybe you can discover something interesting there."),nl,
-        write("Get the door key and open the servants house"),!,nl,nl.
+        write("Get the door key and open the servants house."),!,nl,nl.
 
 after_enter(servants_house) :-
         holding(keys),

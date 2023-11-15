@@ -1,4 +1,4 @@
-:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_person/1, is_quest/1, wound/2, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1]).
+:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_person/1, is_quest/1, wound/2, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1, belongs/2]).
 
 :- dynamic is_locked/1, holding/1, thing_at/2, first_time/1, chosen_thief/1, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1.
 :- retractall(is_locked(_)), retractall(thing_at(_, _)), retractall(holding(_)), retractall(chosen_thief(_)), retractall(having_mushrooms(_)), retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(i_am_at_inner_place(_)), retractall(places_list(_)).
@@ -51,6 +51,7 @@ first_time(wizard_house).
 first_time(servants_house).
 first_time(forest).
 first_time(courtyard).
+first_time(corridor).
 
 is_first_say(cook).
 is_first_say(butler).
