@@ -132,7 +132,7 @@ take(soil) :-
 	\+ i_am_at(garden),
 	write("You can't take that from here."),!,nl.
 
-take(sec_part) :-
+take(second_part) :-
 	i_am_at(Place),
 	thing_at(sec_part, Place),
 	went_to_vault(yes),
@@ -142,12 +142,12 @@ take(sec_part) :-
 	retract(took_sec_part(no)),
 	assert(took_sec_part(yes)),!.
 
-take(sec_part) :-
+take(second_part) :-
 	i_am_at(Place),
 	\+ thing_at(sec_part, Place),
 	write("You can't take it from here"),!,nl.
 
-take(sec_part) :-
+take(second_part) :-
 	went_to_vault(no),
 	write("How do you know it can be here you cheater?"),!,nl.
 
