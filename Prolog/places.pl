@@ -77,6 +77,7 @@ all_desc_place(butler_room, ["You are now in the royal bedroom. You see a spacio
 all_desc_place(courtyard, ["You are in the courtyard. This is the middle of the castle from where you can get to many places.", "<\n>", "<\n>"]).  
 
 
+all_desc_place(vault, ["Bla, bla, bla, blood, you can take the handle", "<\n>", "<\n>"]).
 
 /* places where key vault could be */
 

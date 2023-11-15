@@ -13,7 +13,7 @@ is_quest(garden).
 is_quest(servants_house).
 is_quest(forest).
 is_quest(wizard_house).
-
+is_quest(vault).
 
 is_locked(butler_chest).
 is_locked(gardener_chest).
