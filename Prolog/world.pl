@@ -1,7 +1,8 @@
-:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_person/1, is_quest/1, wound/2, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1, belongs/2]).
+:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_person/1, is_quest/1, wound/2, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1, belongs/2, end_time/1]).
 
-:- dynamic is_locked/1, holding/1, thing_at/2, first_time/1, chosen_thief/1, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1.
-:- retractall(is_locked(_)), retractall(thing_at(_, _)), retractall(holding(_)), retractall(chosen_thief(_)), retractall(having_mushrooms(_)), retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(i_am_at_inner_place(_)), retractall(places_list(_)).
+:- dynamic is_locked/1, holding/1, thing_at/2, first_time/1, chosen_thief/1, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1, end_time/1.
+
+:- retractall(is_locked(_)), retractall(thing_at(_, _)), retractall(holding(_)), retractall(chosen_thief(_)), retractall(having_mushrooms(_)), retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(i_am_at_inner_place(_)), retractall(places_list(_)), retractall(end_time(_)).
 
 
 /* with new quests add there places, where quests are doing by the players*/ 
@@ -15,7 +16,8 @@ i_am_at_inner_place(_).
 
 places_list([]).
 
-is_quest(butler_room).
+
+is_quest(royal_bedroom).
 is_quest(garden).
 is_quest(servants_house).
 is_quest(forest).
@@ -36,7 +38,7 @@ able_to_talk(wizard).
 able_to_talk(guard).
 
 thing_at(soil, garden).
-thing_at(keys, butler_room).
+thing_at(keys, royal_bedroom).
 thing_at(mushroom, forest).
 thing_at(handle, vault).
 
@@ -44,7 +46,7 @@ thing_at(handle, vault).
 first_time(vault).
 first_time(hall).
 first_time(kitchen).
-first_time(butler_room).
+first_time(royal_bedroom).
 first_time(garden).
 first_time(guard_house).
 first_time(wizard_house).
@@ -62,7 +64,7 @@ is_first_say(king).
 
 is_person(hall).
 is_person(kitchen).
-is_person(butler_room).
+is_person(royal_bedroom).
 is_person(garden).
 is_person(guard_house).
 is_person(wizard_house).

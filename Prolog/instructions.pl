@@ -95,19 +95,19 @@ take(mushroom) :-
 
 
 take(keys) :-
-        (went_to_servants_house(no); \+ thing_at(soil, butler_room); \+ i_am_at(butler_room)),
+        (went_to_servants_house(no); \+ thing_at(soil, royal_bedroom); \+ i_am_at(royal_bedroom)),
         write("You can't take that!"),!,nl.
 
 take(keys) :-
-	i_am_at(butler_room),
-	thing_at(keys, butler_room),
+	i_am_at(royal_bedroom),
+	thing_at(keys, royal_bedroom),
         butler_busy(yes),
         write("You successfully took the keys! Now run before the butler see you!"),!,nl,
-        retract(thing_at(keys, butler_room)),
+        retract(thing_at(keys, royal_bedroom)),
         assert(holding(keys)),!.
 
 take(keys) :- 
-	\+ thing_at(keys, butler_room),
+	\+ thing_at(keys, royal_bedroom),
 	write("You arleady took the keys"),!,nl.	
 
 take(keys) :-
@@ -209,13 +209,13 @@ drop(_) :-
         write('You aren''t holding it!'),nl.
 
 
-drop_thing(soil, butler_room) :-
+drop_thing(soil, royal_bedroom) :-
         went_to_servants_house(yes),
         write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it."),nl,
 	write("Butler agree with you and start cleaning."),
         assert(butler_busy(yes)),!, nl.
 
-drop_thing(soil, butler_room) :-
+drop_thing(soil, royal_bedroom) :-
         write("You don't know what it will do yet you cheater!"),!,nl.
 
 
@@ -268,10 +268,39 @@ open_thing(What) :-
 open_thing(_).
 
 
+set_time(Start_time) :-
+	End_time is Start_time + 100,
+	assert(end_time(End_time)).
+
 
 go(Place) :-
 	i_am_at(Here),
         (door(Here,Place);door(Place,Here)),
+
+	first_go(no),
+	get_time(Time),
+	end_time(End_time),
+	Time < End_time,
+	
+        retract(i_am_at(Here)),
+        assert(i_am_at(Place)),
+        retract(i_was_at(_)),
+        assert(i_was_at(Here)),
+        !, look.
+
+go(Place) :-	
+	i_am_at(Here),
+	\+ (door(Here, Place);door(Place, Here)),
+        write("You can't go that way."),!,nl.
+
+go(Place) :-
+	first_go(yes),
+	retract(first_go(yes)),
+	assert(first_go(no)),
+	get_time(Time),
+	set_time(Time),
+	
+	i_am_at(Here),	
         retract(i_am_at(Here)),
         assert(i_am_at(Place)),
         retract(i_was_at(_)),
@@ -279,8 +308,7 @@ go(Place) :-
         !, look.
 
 go(_) :-
-        write('You can''t go that way.'),nl.
-
+	write("Your time is up, now you have to choose the thief."),nl.
 
 back() :-
         i_am_at(Here),
@@ -407,6 +435,7 @@ after_look(_).
 is_tool_part(Place) :-
 	went_to_vault(yes),
 	(sec_part(Place);third_part(Place)).
+	
 
 notice_tool_part(Place) :-
 	went_to_vault(yes),
@@ -648,22 +677,22 @@ next_talk(wizard) :-
 
 next_talk(_).
 
-after_enter(butler_room) :-
-        went_again_to_butler_room(yes),
+after_enter(royal_bedroom) :-
+        went_again_to_royal_bedroom(yes),
         holding(soil),!.
 
-after_enter(butler_room) :-
-        went_again_to_butler_room(yes),
+after_enter(royal_bedroom) :-
+        went_again_to_royal_bedroom(yes),
         \+ holding(soil),
         write("You don't have soil so you can't distract the butler."),!,nl,nl.
 
-after_enter(butler_room) :-
+after_enter(royal_bedroom) :-
         went_to_servants_house(yes),
         write("You see that there is a set of keys. Maybe you can open servant's house with one of them?"),nl,
         write("Try to distract the butler with soil by scattering it there."),nl,
 	write("While he will be cleaning you will quickly take the set of keys."),!,nl,nl.
 
-after_enter(butler_room) :-
+after_enter(royal_bedroom) :-
         went_to_servants_house(no),
         write("You see that there is a set of keys on the table. But the butler is watching it too."),nl,
 	write("Maybe you can take it and use it on something in the future?"),!,nl,nl.
@@ -708,11 +737,16 @@ after_enter(wizard_house) :-
 after_enter(vault) :-
 	went_to_vault(no),
 	retract(went_to_vault(no)),
-	assert(went_to_vault(yes)),!.
+	assert(went_to_vault(yes)),
+	write("You see there is a handle, you could take."), nl,
+	write("It was probably the tool that the thief used during the theft, unfortunately it is incomplete."),nl,
+	write("Try to find the other parts that are spread around the castle"),nl,nl,!.
+
+after_enter(vault).	
 
 after_enter(_).
 
-after_leave(butler_room) :-
+after_leave(royal_bedroom) :-
         butler_busy(yes),
         assert(butler_busy(no)),
         retract(butler_busy(yes)),!.

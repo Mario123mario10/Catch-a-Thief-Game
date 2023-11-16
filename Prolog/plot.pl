@@ -1,22 +1,23 @@
-:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1, has_wound/1, prepare_wound/0, inc_sus_ratio/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, prepare_needed_mushrooms/0, went_to_wizard_house/1, gave_mushrooms/1, went_to_vault/1, sec_part/1, third_part/1, took_sec_part/1, took_third_part/1, thief_tool/1, prepare_pouch/0, prepare_vault_key/0, prepare_tool/0, prepare_guard_sus/0, prepare_wizard_sus/0, prepare_parts/0]).
+:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1, has_wound/1, prepare_wound/0, inc_sus_ratio/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, prepare_needed_mushrooms/0, went_to_wizard_house/1, gave_mushrooms/1, went_to_vault/1, sec_part/1, third_part/1, took_sec_part/1, took_third_part/1, thief_tool/1, prepare_pouch/0, prepare_vault_key/0, prepare_tool/0, prepare_guard_sus/0, prepare_wizard_sus/0, prepare_parts/0, first_go/1]).
 
-:- dynamic went_to_servants_house/1, need_soil/1, went_to_butler_room/1, went_again_to_butler_room/1, butler_busy/1, sus_ratio/2, thief/1, has_wound/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, went_to_wizard_house/1, gave_mushrooms/1, sec_part/1, third_part/1, without_sec_part_places/1, took_sec_part/1, took_third_part/1, thief_tool/1, machine_sus_ratio/2, first_choice_person/1.
+:- dynamic went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, sus_ratio/2, thief/1, has_wound/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, went_to_wizard_house/1, gave_mushrooms/1, sec_part/1, third_part/1, without_sec_part_places/1, took_sec_part/1, took_third_part/1, thief_tool/1, machine_sus_ratio/2, first_choice_person/1, first_go/1.
 
-:- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_butler_room(_)), retractall(went_again_to_butler_room(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)), retractall(has_wound(_)), retractall(is_vault_key(_)), retractall(is_pouch(_)), retractall(guard_sus(_)), retractall(wizard_sus(_)), retractall(needed_mushrooms(_)), retractall(went_to_wizard_house(_)), retractall(gave_mushrooms(_)), retractall(went_to_vault(_)), retractall(sec_part(_)), retractall(third_part(_)), retractall(without_sec_part_places(_)), retractall(took_sec_part(_)), retractall(took_third_part(_)), retractall(thief_tool(_)), retractall(machine_sus_ratio(_)), retractall(first_choice_person(_)).
+:- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_royal_bedroom(_)), retractall(went_again_to_royal_bedroom(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)), retractall(has_wound(_)), retractall(is_vault_key(_)), retractall(is_pouch(_)), retractall(guard_sus(_)), retractall(wizard_sus(_)), retractall(needed_mushrooms(_)), retractall(went_to_wizard_house(_)), retractall(gave_mushrooms(_)), retractall(went_to_vault(_)), retractall(sec_part(_)), retractall(third_part(_)), retractall(without_sec_part_places(_)), retractall(took_sec_part(_)), retractall(took_third_part(_)), retractall(thief_tool(_)), retractall(machine_sus_ratio(_)), retractall(first_choice_person(_)), retractall(first_go(_)).
 
 
 :- [world].
 
 went_to_servants_house(no).
 need_soil(no).
-went_to_butler_room(no).
-went_again_to_butler_room(no).
+went_to_royal_bedroom(no).
+went_again_to_royal_bedroom(no).
 butler_busy(no).
 went_to_wizard_house(no).
 went_to_vault(no).
 gave_mushrooms(no).
 took_sec_part(no).
 took_third_part(no).
+first_go(yes).
 
 sus_ratio(gardener, 0).
 sus_ratio(cook, 0).
@@ -55,56 +56,55 @@ wound_things(Has_wound) :-
 
 prepare_pouch() :-	
 	choose([rose_bushes, bed, bag_of_floor], Pouch_place),
+	pouch_things(Pouch_place).
+
+pouch_things(Pouch_place) :-
 	inside_place(Place, Pouch_place),
 	person(Place, Person),
-	pouch_things(Person).
-
-pouch_things(Person) :-
 	add_sus_ratio(Person),
 	\+ machine_sus_ratio(Person, 3),
 
-	person(Place, Person),
-	inside_place(Place, Pouch_place),
 	assert(is_pouch(Pouch_place)),
 	assert(thing_at(pouch, Pouch_place)),!.
 
-pouch_things(Person) :-
+pouch_things(Pouch_place) :-
+	inside_place(Place, Pouch_place),
+	person(Place, Person),
 	assert(thief(Person)),
 
-	person(Place, Person),
-	inside_place(Place, Pouch_place),
 	assert(is_pouch(Pouch_place)),
 	assert(thing_at(pouch, Pouch_place)).	
 
 
 prepare_vault_key() :-	
 	choose([garden_pond, mirror, oven], Key_place),
+	vault_key_things(Key_place).
+
+vault_key_things(Key_place) :-
 	inside_place(Place, Key_place),
 	person(Place, Person),
-	vault_key_things(Person).
 
-vault_key_things(Person) :-
 	\+ thief(Person),	
 	\+ machine_sus_ratio(Person, 2),
 
 	add_sus_ratio(Person),
 	
-	person(Place, Person),
-	inside_place(Place, Key_place),
 	assert(is_vault_key(Key_place)),
 	assert(thing_at(vault_key, Key_place)),!. 
 
-vault_key_things(Person) :-	
+vault_key_things(Key_place) :-	
+	inside_place(Place, Key_place),
+	person(Place, Person),
 	thief(Person),
 	prepare_vault_key(),!.
 
-vault_key_things(Person) :-
+vault_key_things(Key_place) :-
 	\+ thief(_),
+	inside_place(Place, Key_place),
+	person(Place, Person),
 	assert(thief(Person)),
 	add_sus_ratio(Person),
 	
-	person(Place, Person),
-	inside_place(Place, Key_place),
 	assert(is_vault_key(Key_place)),
 	assert(thing_at(vault_key, Key_place)),!.
 
@@ -246,22 +246,22 @@ check_quests(servants_house) :-
 
 
 check_quests(garden) :-
-        went_to_butler_room(yes),
+        went_to_royal_bedroom(yes),
         need_soil(no),
         assert(need_soil(yes)),
         retract(need_soil(no)),!.
 
-check_quests(butler_room) :-
+check_quests(royal_bedroom) :-
         went_to_servants_house(yes),
-        went_to_butler_room(no),
-        assert(went_to_butler_room(yes)),
-        retract(went_to_butler_room(no)),!.
+        went_to_royal_bedroom(no),
+        assert(went_to_royal_bedroom(yes)),
+        retract(went_to_royal_bedroom(no)),!.
 
-check_quests(butler_room) :-
+check_quests(royal_bedroom) :-
         need_soil(yes),
-        went_again_to_butler_room(no),
-        assert(went_again_to_butler_room(yes)),
-        retract(went_again_to_butler_room(no)).
+        went_again_to_royal_bedroom(no),
+        assert(went_again_to_royal_bedroom(yes)),
+        retract(went_again_to_royal_bedroom(no)).
 
 
 check_quests(_).
