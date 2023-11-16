@@ -24,7 +24,7 @@ finish :-
 
 /* This rule prepare the game */
 start :-
-     	write("				The perfect detective"),nl,nl,
+     	write("				Who stole the diamond?"),nl,nl,
 	write("		Game created by Mariusz Pakulski, Ignacy Dąbkowski, Jakub Jabłoński."),nl,nl, 
 	i_am_at(Place),
 	notice_people(Place),nl,
