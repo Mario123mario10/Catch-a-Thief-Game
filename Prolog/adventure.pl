@@ -1,7 +1,5 @@
 /* <The name of this game>, by <your name goes here>. */
 
-:- retractall(alive(_)).
-
 :- [places].
 :- [instructions].
 :- [plot].
@@ -12,6 +10,7 @@
 die :-
         finish.
 
+	
 
 /* Under UNIX, the "halt." command quits Prolog but does not
    remove the output window. On a PC, however, the window
@@ -20,14 +19,19 @@ die :-
 
 
 finish :-
-        write('The game is over. Please enter the "halt." command.'), nl.
-
+        write('The game is over. Please enter the "halt." command.'), nl,
+	assert(end_of_the_game(yes)).
 
 /* This rule prepare the game */
 start :-
-      
+     	write("				The perfect detective"),nl,nl,
+	write("		Game created by Mariusz Pakulski, Ignacy Dąbkowski, Jakub Jabłoński."),nl,nl, 
 	i_am_at(Place),
-	notice_people(Place),
+	notice_people(Place),nl,
+	
+	write("				Game description"),	
+	start_game_info(info, Desc),nl,nl,
+	print_string(Desc, _),nl,nl,
 
 	instructions,nl,
 	full_desc_place(Place),nl,

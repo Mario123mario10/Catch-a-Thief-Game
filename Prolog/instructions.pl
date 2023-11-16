@@ -1,4 +1,4 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, approach/1, full_desc_person/2, notice_people/1, where_go/1, give/1]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, approach/1, full_desc_person/2, notice_people/1, where_go/1, give/1, check_time/0, print_string/2]).
 
 
 :- [world].
@@ -34,6 +34,7 @@ instructions :-
         write("is_locked(<Person>_chest).   -- to check if person's chest is locked."), nl,
         write("holding(<Object>).           -- to check if you are holding an object."), nl,
 	write("holding.                     -- to check all things you are holding right now."), nl, 
+	write("check_time.                  -- to check how much time you have to solve the mystery."),nl,
 nl.
 
 holding :-
@@ -47,6 +48,14 @@ holding :-
 	fail.
 
 holding.
+
+give(_) :-
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	write("Your time is up, now you have to choose the thief."),!,nl.
 
 give(mushrooms) :-
 	i_am_at(wizard_house),
@@ -79,7 +88,13 @@ give(mushrooms) :-
 give(mushrooms) :-
 	write("You don't have enough mushrooms. Come here again once you have the right amount of them."),!,nl.
 
-
+take(_) :-
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	write("Your time is up, now you have to choose the thief."),!,nl.
 
 take(mushroom) :-
 	i_am_at(forest),
@@ -196,6 +211,13 @@ take(What) :-
 take(_) :-
         write("You can't take that!"),!,nl.
 
+drop(_) :-
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	write("Your time is up, now you have to choose the thief."),!,nl.
 
 drop(X) :-
         holding(X),
@@ -222,7 +244,13 @@ drop_thing(soil, royal_bedroom) :-
 drop_thing(_, _).
 
 
-
+search(_) :-
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	write("Your time is up, now you have to choose the thief."),!,nl.
 
 search(What) :-
         \+ is_locked(What),
@@ -237,7 +265,13 @@ search(What) :-
 search(What) :-
         write(What), write(' is empty'),nl.
 
-
+open(_) :-
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	write("Your time is up, now you have to choose the thief."),!,nl.
 
 open(What) :-
         is_locked(What),
@@ -269,9 +303,60 @@ open_thing(_).
 
 
 set_time(Start_time) :-
-	End_time is Start_time + 100,
-	assert(end_time(End_time)).
+	End_time is Start_time + 1200,
+	floor(End_time, Int_end_time),
+	assert(start_time(Start_time)),
+	assert(end_time(Int_end_time)).
 
+remaining_time(Actual_time) :-
+	end_time(End_time),
+	Time_all is End_time - Actual_time,
+	Time_all >= 0,
+	Time_m is Time_all // 60,
+	Time_s is mod(Time_all, 60),
+	write("Your remaining time is: "), write(Time_m), write(" min "), write(Time_s), write(" sec."). 
+
+remaining_time(Actual_time) :-	
+	end_time(End_time),
+	Time_all is End_time - Actual_time,
+	Time_all < 0,
+	write("Your remaining time is: 0 min 0 sec.").
+	
+check_time() :-	
+	get_time(Time),
+	floor(Time, Int_time),
+	remaining_time(Int_time),!.
+
+check_time() :-
+	write("Timer is not up yet."),nl.
+
+
+check_if_write(Time) :-
+	Time < 900,
+	Time > 875,
+	write("You have about 15 minutes left."),!,nl,nl.
+
+check_if_write(Time) :-
+	Time < 600,
+	Time > 575,
+	write("You have about 10 minutes left."),!,nl,nl.
+
+check_if_write(Time) :-
+	Time < 300,
+	Time > 275,
+	write("You have about 5 minutes left."),!,nl,nl.
+
+check_if_write(Time) :-
+	Time < 60,
+	Time > 45,
+	write("You have about 1 minute left!"),!,nl,nl.
+
+check_if_write(Time) :-
+	Time < 10,
+	Time > 5,
+	write("You have about 10 seconds left!"),!,nl,nl.
+
+check_if_write(_).
 
 go(Place) :-
 	i_am_at(Here),
@@ -280,7 +365,11 @@ go(Place) :-
 	first_go(no),
 	get_time(Time),
 	end_time(End_time),
-	Time < End_time,
+	floor(Time, Int_time),
+		
+	Check_time is End_time - Int_time,
+	Check_time > 0,
+	check_if_write(Check_time), 
 	
         retract(i_am_at(Here)),
         assert(i_am_at(Place)),
@@ -307,19 +396,44 @@ go(Place) :-
         assert(i_was_at(Here)),
         !, look.
 
-go(_) :-
-	write("Your time is up, now you have to choose the thief."),nl.
+go(_) :-	
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	write("Your time is up, now you have to choose the thief."),nl,
+	time_up(no),	
+	assert(time_up(yes)).
+
+go(_).	
 
 back() :-
         i_am_at(Here),
         i_was_at(There),
+
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),
+		
+	Check_time is End_time - Int_time,
+	Check_time > 0,
+	check_if_write(Check_time),
+ 
         retract(i_am_at(Here)),
         assert(i_am_at(There)),
         retract(i_was_at(There)),
-        assert(i_was_at(Here)), look.
+        assert(i_was_at(Here)),!, look.
 
 
+back() :-
+	get_time(Time),
+        end_time(End_time),
+        floor(Time, Int_time),
 
+        Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	write("Your time is up, now you have to choose the thief."),nl.
 
 look :-
         i_am_at(Place),
@@ -596,6 +710,26 @@ print_inner_places(Place) :-
 
 print_inner_places(_).
 
+
+approach(_) :-
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	time_up(no),
+	assert(time_up(yes)),	
+	write("Your time is up, now you have to choose the thief."),!,nl.
+
+approach(_) :-	
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	time_up(yes),
+	write("Your time is up, now you have to choose the thief."),!,nl.
+
 approach(Chest) :-
 	i_am_at(servants_house),
 	inside_place(servants_house, Chest),
@@ -638,6 +772,14 @@ approach_chest(Chest) :-
 
 
 approach_chests(_).	
+
+talk(_) :-
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	write("Your time is up, now you have to choose the thief."),!,nl.
 
 talk(Person) :-
         able_to_talk(Person),
@@ -771,7 +913,7 @@ sure :-
 
 sure :-
         thief(Thief),
-        write("It wasn't the thief. You lose. The thief was "), write(Thief),nl,
+        write("It wasn't the thief. You lose. The thief was "), write(Thief), write("."),nl,
         finish.
 
 

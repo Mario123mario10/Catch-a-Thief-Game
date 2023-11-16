@@ -1,8 +1,8 @@
-:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1, has_wound/1, prepare_wound/0, inc_sus_ratio/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, prepare_needed_mushrooms/0, went_to_wizard_house/1, gave_mushrooms/1, went_to_vault/1, sec_part/1, third_part/1, took_sec_part/1, took_third_part/1, thief_tool/1, prepare_pouch/0, prepare_vault_key/0, prepare_tool/0, prepare_guard_sus/0, prepare_wizard_sus/0, prepare_parts/0, first_go/1]).
+:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1, has_wound/1, prepare_wound/0, inc_sus_ratio/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, prepare_needed_mushrooms/0, went_to_wizard_house/1, gave_mushrooms/1, went_to_vault/1, sec_part/1, third_part/1, took_sec_part/1, took_third_part/1, thief_tool/1, prepare_pouch/0, prepare_vault_key/0, prepare_tool/0, prepare_guard_sus/0, prepare_wizard_sus/0, prepare_parts/0, first_go/1, end_of_the_game/1, start_game_info/2]).
 
-:- dynamic went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, sus_ratio/2, thief/1, has_wound/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, went_to_wizard_house/1, gave_mushrooms/1, sec_part/1, third_part/1, without_sec_part_places/1, took_sec_part/1, took_third_part/1, thief_tool/1, machine_sus_ratio/2, first_choice_person/1, first_go/1.
+:- dynamic went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, sus_ratio/2, thief/1, has_wound/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, went_to_wizard_house/1, gave_mushrooms/1, sec_part/1, third_part/1, without_sec_part_places/1, took_sec_part/1, took_third_part/1, thief_tool/1, machine_sus_ratio/2, first_choice_person/1, first_go/1, end_of_the_game/1.
 
-:- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_royal_bedroom(_)), retractall(went_again_to_royal_bedroom(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)), retractall(has_wound(_)), retractall(is_vault_key(_)), retractall(is_pouch(_)), retractall(guard_sus(_)), retractall(wizard_sus(_)), retractall(needed_mushrooms(_)), retractall(went_to_wizard_house(_)), retractall(gave_mushrooms(_)), retractall(went_to_vault(_)), retractall(sec_part(_)), retractall(third_part(_)), retractall(without_sec_part_places(_)), retractall(took_sec_part(_)), retractall(took_third_part(_)), retractall(thief_tool(_)), retractall(machine_sus_ratio(_)), retractall(first_choice_person(_)), retractall(first_go(_)).
+:- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_royal_bedroom(_)), retractall(went_again_to_royal_bedroom(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)), retractall(has_wound(_)), retractall(is_vault_key(_)), retractall(is_pouch(_)), retractall(guard_sus(_)), retractall(wizard_sus(_)), retractall(needed_mushrooms(_)), retractall(went_to_wizard_house(_)), retractall(gave_mushrooms(_)), retractall(went_to_vault(_)), retractall(sec_part(_)), retractall(third_part(_)), retractall(without_sec_part_places(_)), retractall(took_sec_part(_)), retractall(took_third_part(_)), retractall(thief_tool(_)), retractall(machine_sus_ratio(_)), retractall(first_choice_person(_)), retractall(first_go(_)), retractall(end_of_the_game(_)).
 
 
 :- [world].
@@ -288,4 +288,13 @@ inc_sus_ratio(_) :-
 
 
 
+start_game_info(info, ["Your task is to track down the thief and tag him with the 'choose_thief(<Person>)' command.","<\n>",
+		       "You win if the person you tagged was indeed the thief.","<\n>","<\n>",
+		       "During the gameplay, you will come across clues that will let you know that the person is more suspicious.","<\n>",
+		       "You can increase the suspicion index with the 'inc_sus_ratio(<Person>).' command.","<\n>",
+		       "If you get 3 suspicions on someone then you are sure that this person is guilty.","<\n>","<\n>",
+		       "The whole game takes 20 minutes. After that time, you have to choose a thief even if you are not sure if he actually is one.","<\n>",
+		       "The game starts as you go in any direction.  You can check how much time you have with the 'check_time.' command.","<\n>",
+		       "Below you have the rest of the instructions, which are worth reading before starting the game.","<\n>",
+		       "You can always see all the instructions again by writing 'instructions.' Good luck!"]).
 
