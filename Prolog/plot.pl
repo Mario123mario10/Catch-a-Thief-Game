@@ -281,7 +281,7 @@ inc_sus_ratio(Person) :-
         retract(sus_ratio(Person, Ratio)),
         assert(sus_ratio(Person, New_ratio)),
         write("Suspiciousness ratio of "), write(Person), write(" is equal 3."), nl,
-        write("Now you know that "), write(Person), write(" is the thief!"), !, nl.
+        write("Now you know that the "), write(Person), write(" is the thief!"), !, nl.
 
 inc_sus_ratio(_) :-
         write("You can't increase the non-suspect ratio.").

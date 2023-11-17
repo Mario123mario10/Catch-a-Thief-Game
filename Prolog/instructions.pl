@@ -23,7 +23,7 @@ instructions :-
         write("talk(<Person>).              -- to talk to the chosen person."), nl,
         write("open(<Container>).           -- to open an object."), nl,
         write("choose_thief(<Person>).      -- to check if you are right, who the thief is."), nl,
-	write("inc_sus_ratio(<Person>).     -- to increase suspiciousness ratio for person you think is more suspicious."),nl,
+	write("inc_sus_ratio(<Person>).     -- to increase suspiciousness ratio for person you think is more suspicious."),nl,       
         write("halt.                        -- to end the game and quit."), nl,nl,
         write("Commands that only check something:"), nl,
         write("instructions.                -- to see this message again."), nl,
@@ -35,6 +35,8 @@ instructions :-
         write("holding(<Object>).           -- to check if you are holding an object."), nl,
 	write("holding.                     -- to check all things you are holding right now."), nl, 
 	write("check_time.                  -- to check how much time you have to solve the mystery."),nl,
+	write("sus_ratio.                   -- to check what is the suspicioussness ratio for each person you earlier set"),nl,
+	write("                                with command inc_sus_ratio(<Person>)."),nl,
 nl.
 
 holding :-
