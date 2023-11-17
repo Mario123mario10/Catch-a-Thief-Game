@@ -35,7 +35,7 @@ instructions :-
         write("holding(<Object>).           -- to check if you are holding an object."), nl,
 	write("holding.                     -- to check all things you are holding right now."), nl, 
 	write("check_time.                  -- to check how much time you have to solve the mystery."),nl,
-	write("sus_ratio.                   -- to check what is the suspicioussness ratio for each person you earlier set"),nl,
+	write("sus_ratio.                   -- to check what is the suspiciousness ratio for each person you earlier set"),nl,
 	write("                                with command inc_sus_ratio(<Person>)."),nl,
 nl.
 
