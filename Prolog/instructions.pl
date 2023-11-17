@@ -8,7 +8,7 @@
 instructions :-
         nl,
         write("Enter commands using standard Prolog syntax."), nl,
-        write("Attention! Elements in angle brackets <> mean that the element you want to check is to be entered there."),nl,
+        write("Attention! Elements in angle brackets <> mean that the element you want to write is to be entered there."),nl,
         write("In 'Commands that only check something' heading, if command has an argument, than as an argument write X."),nl,
 	write("Then you know which element/elements satisfy the condition."),nl,nl,
         write("Commands that change something:"), nl,
@@ -142,17 +142,17 @@ take(soil) :-
 
 take(second_part) :-
 	i_am_at(Place),
-	thing_at(sec_part, Place),
+	thing_at(second_part, Place),
 	went_to_vault(yes),
 	write("You successfully took a second part but you still don't know what it is."),nl,
-	retract(thing_at(sec_part, Place)),
-	assert(holding(sec_part)),
-	retract(took_sec_part(no)),
-	assert(took_sec_part(yes)),!.
+	retract(thing_at(second_part, Place)),
+	assert(holding(second_part)),
+	retract(took_second_part(no)),
+	assert(took_second_part(yes)),!.
 
 take(second_part) :-
 	i_am_at(Place),
-	\+ thing_at(sec_part, Place),
+	\+ thing_at(second_part, Place),
 	write("You can't take it from here"),!,nl.
 
 take(second_part) :-
@@ -163,13 +163,15 @@ take(third_part) :-
 	i_am_at(Place),
 	thing_at(third_part, Place),
 	went_to_vault(yes),
-	took_sec_part(yes),
+	took_second_part(yes),
 
 	write("You successfully took a third part and now you know what it is!"),nl,
 	thief_tool(Tool),
 	write("It is a "), write(Tool), write("!"),nl,
 	write("Talk with the person you think could have used that."),nl,		
-
+	
+	retract(took_third_part(no)),
+	assert(took_third_part(yes)),
 	retract(thing_at(third_part, Place)),
 	assert(holding(third_part)),!.
 
@@ -180,7 +182,7 @@ take(third_part) :-
 
 
 take(third_part) :-
-	(went_to_vault(no);took_sec_part(no)),
+	(went_to_vault(no);took_second_part(no)),
 	write("How do you know it can be here you cheater?"),!,nl.
 
 
@@ -192,7 +194,7 @@ take(What) :-
 take(What) :-
         i_am_at(Place),
         thing_at(What, Place),
-	write("You successfully took a "), write(What),nl,
+	write("You successfully took a "), write(What), write("."),nl,
         retract(thing_at(What, Place)),
         assert(holding(What)),!.
 
@@ -202,14 +204,23 @@ take(What) :-
 	\+ thing_at(What, Place),
 	i_am_at_inner_place(Inner_place),
 	thing_at(What, Inner_place),
-	write("You successfully took a "), write(What),nl,
+	write("You successfully took a "), write(What), write("."),nl,
 	retract(thing_at(What, Inner_place)),
-	assert(holding(What)),!.
-
+	assert(holding(What)),
+	add_holding_to_talk(What),!.
 
 
 take(_) :-
         write("You can't take that!"),!,nl.
+
+add_holding_to_talk(vault_key) :-
+	assert(hold_vault_key_to_talk(yes)),!.
+
+add_holding_to_talk(diamond) :-
+	assert(hold_diamond_to_talk(yes)),!.
+	
+add_holding_to_talk(pouch) :-
+	assert(hold_pouch_to_talk(yes)),!.
 
 drop(_) :-
 	get_time(Time),
@@ -234,7 +245,7 @@ drop(_) :-
 drop_thing(soil, royal_bedroom) :-
         went_to_servants_house(yes),
         write("You successfully drop soil. You tell butler that there is soil everywhere and to clean it."),nl,
-	write("Butler agree with you and start cleaning."),
+	write("Butler agrees with you and starts cleaning."),
         assert(butler_busy(yes)),!, nl.
 
 drop_thing(soil, royal_bedroom) :-
@@ -255,7 +266,7 @@ search(_) :-
 search(What) :-
         \+ is_locked(What),
         thing_at(Thing, What),
-        write('You found '), write(Thing),!,nl.
+        write('You found '), write(Thing), write("!"),!,nl.
 
 search(What) :-
         is_locked(What),
@@ -548,21 +559,21 @@ after_look(_).
 
 is_tool_part(Place) :-
 	went_to_vault(yes),
-	(sec_part(Place);third_part(Place)).
+	(second_part(Place);third_part(Place)).
 	
 
 notice_tool_part(Place) :-
 	went_to_vault(yes),
-	sec_part(Place),
-	took_sec_part(no),	
+	second_part(Place),
+	took_second_part(no),	
 	write("You see the second part of the tool that the thief probably used, maybe that was his escape route."),!,nl.
 
 
 notice_tool_part(Place) :-
 	went_to_vault(yes),
-	took_sec_part(yes),	
+	took_second_part(yes),	
 	third_part(Place),
-	took_sec_part(yes),
+	took_second_part(yes),
 	took_third_part(no),
 	write("You see the third part of the tool that the thief probably used, now you can check what the item is."),!,nl.
 	
@@ -741,7 +752,7 @@ approach(Chest) :-
 approach(Inner_place) :-
 	i_am_at(Place),
 	inside_place(Place, Inner_place), 
-	write("You are near the "), write(Inner_place), write("."),	
+	write("You are near the "), write(Inner_place), write("."),nl,	
 	retract(i_am_at_inner_place(_)),
 	assert(i_am_at_inner_place(Inner_place)),!.
 
@@ -817,7 +828,97 @@ next_talk(wizard) :-
 	end_talk(wizard, Desc),
 	print_string(Desc, wizard),!,nl.
 
+next_talk(Person) :-
+	(=(Person, gardener); =(Person,cook); =(Person,butler)),
+	check_sus_talk(Person),!.
+
 next_talk(_).
+
+check_sus_talk(Person) :-
+	took_third_part(yes),
+
+	thief_tool(Tool),
+	belongs(Tool, Person),
+
+	retract(took_third_part(yes)),
+	completed_item(Person, Desc),
+	print_string(Desc, Person),!,nl.
+ 
+check_sus_talk(Person) :-
+	took_third_part(yes),
+	
+	thief_tool(Tool),
+	\+ belongs(Tool, Person),
+	
+	unrelated_quest_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.
+	
+check_sus_talk(Person) :-
+	hold_vault_key_to_talk(yes),
+
+	is_vault_key(Key_place),
+	inside_place(Place, Key_place),
+	person(Place, Person),
+
+	retract(hold_vault_key_to_talk(yes)),
+	vault_key_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.
+
+
+check_sus_talk(Person) :-
+	hold_vault_key_to_talk(yes),
+
+	is_vault_key(Key_place),
+	inside_place(Place, Key_place),
+	\+ person(Place, Person),
+
+	unrelated_quest_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.
+
+check_sus_talk(Person) :-
+	hold_pouch_to_talk(yes),
+	
+	is_pouch(Pouch_place),
+	inside_place(Place, Pouch_place),
+	person(Place, Person),
+
+	retract(hold_pouch_to_talk(yes)),
+	pouch_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.
+
+check_sus_talk(Person) :-
+	hold_pouch_to_talk(yes),
+	
+	is_pouch(Pouch_place),
+	inside_place(Place, Pouch_place),
+	\+ person(Place, Person),
+
+	unrelated_quest_desc(Person, Desc),	
+	print_string(Desc, Person),!,nl.
+
+check_sus_talk(Person) :-
+	hold_diamond_to_talk(yes),
+
+	has_diamond(Person),
+	
+	retract(hold_diamond_to_talk(yes)),
+	diamond_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.	
+
+
+check_sus_talk(Person) :-
+	hold_diamond_to_talk(yes),
+
+	\+ has_diamond(Person),
+	
+	unrelated_quest_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.	
+
+check_sus_talk(_) :-
+	\+ took_third_part(yes),
+	write("You found who was the thief? No? Sorry, I don't know anything that could help you."),!,nl.
+	
+
 
 after_enter(royal_bedroom) :-
         went_again_to_royal_bedroom(yes),

@@ -1,5 +1,5 @@
 
-:- module(people, [first_say/2, after_mushrooms/2, before_mushrooms/2, end_talk/2]).
+:- module(people, [first_say/2, after_mushrooms/2, before_mushrooms/2, end_talk/2, completed_item/2, vault_key_desc/2, pouch_desc/2, diamond_desc/2, unrelated_quest_desc/2]).
 
 
 first_say(king, ["You stand before King Alaric III, a unique figure in this day and age.", "<\n>", 
@@ -119,3 +119,89 @@ end_talk(wizard, ["'You found who was guilty? No? I don't know anything else so 
 
 
 
+completed_item(gardener, ["When you hand over the rake with the rake stick you found to the gardener, his expression becomes more concerned.", "<\n>",
+			  "Without a word, he takes the tool and examines it carefully, holding it strangely.", "<\n>",
+			  "After a moment, he looks at you with a look of uncertainty in his eyes.", "<\n>", "<\n>",
+			  "'Did... did you find this near the vault?' he asks carefully, trying to remain calm.", "<\n>", "<\n>",
+			  "'It's unbelievable. It's really my rake stick, but I don't know how it could have gotten there. I was not there during the robbery, I swear.'", "<\n>",
+			  "The gardener seems nervous. ", "<\n>", "<\n>",
+			  "'I must have lost it while I was going to the garden, but I've never been inside the vault. It must be a bad omen."]).
+
+
+
+completed_item(cook, ["'What is this... This is my ladle!' the cook exclaims, surprised.","<\n>", 
+		      "'How did this happen? Where did you find her? It must have been the work of that thief of yours!'","<\n>",
+		      "You notice sweat on his forehead. It's hard to tell if it's because of the heat or anxiety."]).
+
+
+
+completed_item(butler, ["When the butler notices the duster, his eyes linger over the object for a moment. He doesn't seem surprised or concerned.","<\n>",
+			"Instead, after a moment's cold glance at the duster, he turns to you and says with unflinching seriousness:","<\n>","<\n>",
+			"'This is certainly interesting evidence, noble sir. However, I am not sure how it can help clarify this matter.","<\n>",
+			"I can assure you that such a duster is widely available, and many of us use it to perform everyday duties."]).
+
+
+vault_key_desc(gardener, ["When you show the gardener the key to the vault you found, his eyes become wide with surprise.", "<\n>",
+			  "Without a word, he takes the key and examines it carefully, turning it over in his hands.", "<\n>","<\n>",
+			  "'This... this is the key to the vault,' the gardener whispers, his voice shaking with surprise.", "<\n>","<\n>",
+			  "I don't know how it ended up in the garden. I'm sure I had nothing to do with it.'", "<\n>",
+			  "The gardener seems concerned with the situation.", "<\n>", "<\n>",
+			  "'It can't be a coincidence. How am I this unlucky,' he says anxiously.", "<\n>", "<\n>"]).
+
+vault_key_desc(cook, ["When you show the chef the key to the vault, his reaction is immediate. Outrage flashes across his face.", "<\n>",
+		      "'What is this doing here? What if it ended up in one of the dishes? I have a reputation to uphold; I can't afford turmoil in my kitchen.'", "<\n>","<\n>",
+		      "After a while, he realizes what kind of key it is.", "<\n>","<\n>",
+		      "'This key... This key is from the vault,' mutters the cook with fear in his eyes.", "<\n>","<\n>",
+		      "'Where did you get it? It's not what you think!' His reaction suggests that he is baffled by the key's presence."]).
+
+
+vault_key_desc(butler, ["'Ah, the key to the treasury. Yes, it is indeed an unusual discovery to stumble upon.", "<\n>",
+			"I am entrusted with various responsibilities in the king's quarters and the meticulous care for the royal chambers.", "<\n>",
+			"However, the presence of the treasury key here seems rather out of place.", "<\n>",
+			"It might have been misplaced by the thief when he was panicking. I assure you, it wasn't my intention to have it here,' said the butler calmly."]).
+
+pouch_desc(gardener, ["'This... this is impossible!' the gardener exclaims with horror in his voice.", "<\n>",
+		      "'How did this money end up in my garden? I am surely cursed.' The gardener seems completely stunned and terrified by the situation.", "<\n>",
+		      "His reaction suggests that he is completely devastated and has no idea how this could all have happened."]).
+
+pouch_desc(cook, ["'I have no idea how this gold ended up in my kitchen,' says the cook with horror in his voice.", "<\n>","<\n>",
+		  "'I don't know whose fault it is, but the kitchen is no place for thieves to hide their treasures!' continues the cook.", "<\n>",
+		  "His hands begin to shake, and his expression shows true terror.", "<\n>", "<\n>",
+		  "'I hope I'm not on the suspect list...' he exclaims with hope in his voice, looking at you, hoping for understanding."]).
+
+pouch_desc(butler, ["When you present him with the purse of money, the butler seems surprised but maintains his composure. He says with skillful conviction:", "<\n>", "<\n>", 
+		    "I have no idea how this purse could have ended up in the king's bedroom.", "<\n>",
+		    "Of course, I am responsible for making his majesty's bed every day so I am here often, but that does not mean I am guilty.", "<\n>",
+		    "Throughout my years of service at court, I have had no problems with behavior or duties.", "<\n>",
+		    "It must be some kind of intrigue or an attempt to discredit me.'"]).
+
+diamond_desc(gardener, ["The gardener turns pale. His eyes widen in horror, and his hands begin to tremble. He seems completely stunned.", "<\n>", "<\n>",
+			"'No! It's not me! I don't know how that diamond ended up in my chest!' the gardener exclaims, trying to defend himself against the accusations.", "<\n>", "<\n>",
+		        "'It must be some kind of trap or plot. I don't know which god I offended to be punished so severely! I had nothing to do with it, really!'"]).
+
+
+
+diamond_desc(cook, ["He turns even redder than before, and his eyes widen with surprise.", "<\n>", "<\n>",
+		    "'It... it's not what you think!' the cook groans with fear in his voice, his tone trembling with emotion.", "<\n>", "<\n>",
+		    "'I have no idea how this diamond ended up in my chest. That must be some kind of intrigue! Someone is trying to cheat you!'", "<\n>",
+		    "The cook continues, becoming more and more shaky as he considers the situation.", "<\n>", "<\n>",
+		    "Suddenly, the cook starts accusing others in a frenzy.", "<\n>", "<\n>",
+		    "'It's the butler! He's the only one who has the key to our rooms!' he shouts, trying to shift the blame to another servant in the castle.'"]).
+
+
+diamond_desc(butler, ["The butler looks at the diamond for a moment, his gaze seemingly astonished.", "<\n>",
+		      "Then he shifts his gaze to you and says with a slight tremble in his voice,", "<\n>", "<\n>",
+		      "'It's... it's the king's diamond. How did you find it? I have no idea how it came to be in my chest.", "<\n>",
+		      "It must be some mistake or intrigue. I swear that I had nothing to do with it. Someone is setting me up!'", "<\n>", "<\n>",
+		      "The gardener seems completely devastated and terrified of the situation.", "<\n>",	
+		      "You see honest desperation and remorse in his eyes, trying to convince you of his innocence."]).
+
+
+unrelated_quest_desc(gardener, ["'It's very interesting,' says the gardener calmly.", "<\n>","<\n>",
+				"'Why did you come to me with this? I'm not a brainy fellow. I probably won't be any help to you.'"]).
+
+unrelated_quest_desc(cook, ["'It's not really about me, now is it?' said the annoyed cook.", "<\n>", "<\n>", 
+			    "'You'd better leave me in peace; I have cookery to run.'"]).
+
+
+unrelated_quest_desc(butler, ["'That is, of course, mighty interesting, sir! Is that all? If so, I must resume my duties.'"]).

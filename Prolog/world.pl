@@ -1,8 +1,9 @@
-:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_person/1, is_quest/1, wound/2, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1, belongs/2, end_time/1, start_time/1, time_up/1]).
+:- module(world, [is_locked/1, holding/1, able_to_talk/1, thing_at/2, first_time/1, is_person/1, is_quest/1, wound/2, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1, belongs/2, end_time/1, start_time/1, time_up/1, hold_diamond_to_talk/1, hold_vault_key_to_talk/1, hold_pouch_to_talk/1]).
 
-:- dynamic is_locked/1, holding/1, thing_at/2, first_time/1, chosen_thief/1, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1, end_time/1, start_time/1, time_up/1.
 
-:- retractall(is_locked(_)), retractall(thing_at(_, _)), retractall(holding(_)), retractall(chosen_thief(_)), retractall(having_mushrooms(_)), retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(i_am_at_inner_place(_)), retractall(places_list(_)), retractall(end_time(_)), retractall(start_time(_)), retractall(time_up(_)).
+:- dynamic is_locked/1, holding/1, thing_at/2, first_time/1, chosen_thief/1, having_mushrooms/1, i_am_at/1, i_was_at/1, i_am_at_inner_place/1, places_list/1, end_time/1, start_time/1, time_up/1, hold_diamond_to_talk/1, hold_vault_key_to_talk/1, hold_pouch_to_talk/1.
+
+:- retractall(is_locked(_)), retractall(thing_at(_, _)), retractall(holding(_)), retractall(chosen_thief(_)), retractall(having_mushrooms(_)), retractall(i_am_at(_)), retractall(i_was_at(_)), retractall(i_am_at_inner_place(_)), retractall(places_list(_)), retractall(end_time(_)), retractall(start_time(_)), retractall(time_up(_)), retractall(hold_diamond_to_talk(_)), retractall(hold_vault_key_to_talk(_)), retractall(hold_pouch_to_talk(_)).
 
 
 /* with new quests add there places, where quests are doing by the players*/ 
@@ -81,3 +82,6 @@ wound(butler, "There is a fresh wound on his left cheek; he cut himself with som
 belongs(rake, gardener).
 belongs(ladle, cook).
 belongs(duster, butler).
+
+
+

@@ -1,8 +1,8 @@
-:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1, has_wound/1, prepare_wound/0, inc_sus_ratio/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, prepare_needed_mushrooms/0, went_to_wizard_house/1, gave_mushrooms/1, went_to_vault/1, sec_part/1, third_part/1, took_sec_part/1, took_third_part/1, thief_tool/1, prepare_pouch/0, prepare_vault_key/0, prepare_tool/0, prepare_guard_sus/0, prepare_wizard_sus/0, prepare_parts/0, first_go/1, end_of_the_game/1, start_game_info/2]).
+:- module(plot, [went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, prepare_diamond/0, check_quests/1, sus_ratio/2, thief/1, has_wound/1, prepare_wound/0, inc_sus_ratio/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, prepare_needed_mushrooms/0, went_to_wizard_house/1, gave_mushrooms/1, went_to_vault/1, second_part/1, third_part/1, took_second_part/1, took_third_part/1, thief_tool/1, prepare_pouch/0, prepare_vault_key/0, prepare_tool/0, prepare_guard_sus/0, prepare_wizard_sus/0, prepare_parts/0, first_go/1, end_of_the_game/1, start_game_info/2, has_diamond/1]).
 
-:- dynamic went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, sus_ratio/2, thief/1, has_wound/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, went_to_wizard_house/1, gave_mushrooms/1, sec_part/1, third_part/1, without_sec_part_places/1, took_sec_part/1, took_third_part/1, thief_tool/1, machine_sus_ratio/2, first_choice_person/1, first_go/1, end_of_the_game/1.
+:- dynamic went_to_servants_house/1, need_soil/1, went_to_royal_bedroom/1, went_again_to_royal_bedroom/1, butler_busy/1, sus_ratio/2, thief/1, has_wound/1, is_vault_key/1, is_pouch/1, guard_sus/1, wizard_sus/1, needed_mushrooms/1, went_to_wizard_house/1, gave_mushrooms/1, second_part/1, third_part/1, without_second_part_places/1, took_second_part/1, took_third_part/1, thief_tool/1, machine_sus_ratio/2, first_choice_person/1, first_go/1, end_of_the_game/1, has_diamond/1.
 
-:- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_royal_bedroom(_)), retractall(went_again_to_royal_bedroom(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)), retractall(has_wound(_)), retractall(is_vault_key(_)), retractall(is_pouch(_)), retractall(guard_sus(_)), retractall(wizard_sus(_)), retractall(needed_mushrooms(_)), retractall(went_to_wizard_house(_)), retractall(gave_mushrooms(_)), retractall(went_to_vault(_)), retractall(sec_part(_)), retractall(third_part(_)), retractall(without_sec_part_places(_)), retractall(took_sec_part(_)), retractall(took_third_part(_)), retractall(thief_tool(_)), retractall(machine_sus_ratio(_)), retractall(first_choice_person(_)), retractall(first_go(_)), retractall(end_of_the_game(_)).
+:- retractall(went_to_servants_house(_)), retractall(need_soil(_)), retractall(went_to_royal_bedroom(_)), retractall(went_again_to_royal_bedroom(_)), retractall(butler_busy(_)), retractall(sus_ratio(_, _)), retractall(thief(_)), retractall(has_wound(_)), retractall(is_vault_key(_)), retractall(is_pouch(_)), retractall(guard_sus(_)), retractall(wizard_sus(_)), retractall(needed_mushrooms(_)), retractall(went_to_wizard_house(_)), retractall(gave_mushrooms(_)), retractall(went_to_vault(_)), retractall(second_part(_)), retractall(third_part(_)), retractall(without_second_part_places(_)), retractall(took_second_part(_)), retractall(took_third_part(_)), retractall(thief_tool(_)), retractall(machine_sus_ratio(_)), retractall(first_choice_person(_)), retractall(first_go(_)), retractall(end_of_the_game(_)), retractall(has_diamond(_)).
 
 
 :- [world].
@@ -15,7 +15,7 @@ butler_busy(no).
 went_to_wizard_house(no).
 went_to_vault(no).
 gave_mushrooms(no).
-took_sec_part(no).
+took_second_part(no).
 took_third_part(no).
 first_go(yes).
 
@@ -23,7 +23,7 @@ sus_ratio(gardener, 0).
 sus_ratio(cook, 0).
 sus_ratio(butler, 0).
 
-without_sec_part_places([]).
+without_second_part_places([]).
 
 machine_sus_ratio(gardener, 0).
 machine_sus_ratio(cook, 0).
@@ -206,11 +206,11 @@ add_sus_ratio(Person) :-
 
 prepare_parts() :-
 	choose([hall, kitchen, guard_house, wizard_house, servants_house, forest, courtyard, corridor], Sec_part_place),
-	assert(sec_part(Sec_part_place)),
-	assert(thing_at(sec_part, Sec_part_place)),
+	assert(second_part(Sec_part_place)),
+	assert(thing_at(second_part, Sec_part_place)),
 	
 	add_to_third_part_list([hall, kitchen, guard_house, wizard_house, servants_house, forest, courtyard, corridor]),
-	without_sec_part_places(List),
+	without_second_part_places(List),
 	choose(List, Third_part_place),
 	assert(third_part(Third_part_place)),
 	assert(thing_at(third_part, Third_part_place)).
@@ -219,14 +219,14 @@ prepare_parts() :-
 add_to_third_part_list([]).
 	
 add_to_third_part_list(Places_list) :-
-	thing_at(sec_part, Sec_part_place),
+	thing_at(second_part, Sec_part_place),
 	[H|T] = Places_list,
 	\+ =(H, Sec_part_place),
-	without_sec_part_places(List), 
+	without_second_part_places(List), 
 	append(List, [H], New_list),
 
-	retract(without_sec_part_places(_)),
-	assert(without_sec_part_places(New_list)),
+	retract(without_second_part_places(_)),
+	assert(without_second_part_places(New_list)),
 
 	add_to_third_part_list(T),!.
 
@@ -289,12 +289,14 @@ inc_sus_ratio(_) :-
 
 
 start_game_info(info, ["Your task is to track down the thief and tag him with the 'choose_thief(<Person>)' command.","<\n>",
-		       "You win if the person you tagged was indeed the thief.","<\n>","<\n>",
+		       "You win if the person you tagged was indeed the thief.", "<\n>", 
+		       "In each game, the thief is drawn at random, so the game can be played multiple times." ,"<\n>","<\n>",
 		       "During the gameplay, you will come across clues that will let you know that the person is more suspicious.","<\n>",
 		       "You can increase the suspicion index with the 'inc_sus_ratio(<Person>).' command.","<\n>",
-		       "If you get 3 suspicions on someone then you are sure that this person is guilty.","<\n>","<\n>",
+		       "If you get 3 suspicions on someone then you are sure that this person is guilty.", "<\n>",
+		       "Suspicions are also randomized and different in each game.","<\n>","<\n>",
 		       "The whole game takes 20 minutes. After that time, you have to choose a thief even if you are not sure if he actually is one.","<\n>",
-		       "The game starts as you go in any direction.  You can check how much time you have with the 'check_time.' command.","<\n>",
+		       "The game starts as you go in any direction. You can check how much time you have with the 'check_time.' command.","<\n>",
 		       "Below you have the rest of the instructions, which are worth reading before starting the game.","<\n>",
 		       "You can always see all the instructions again by writing 'instructions.' Good luck!"]).
 
