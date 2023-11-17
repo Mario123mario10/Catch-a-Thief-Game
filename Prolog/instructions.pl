@@ -1,4 +1,4 @@
-:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, approach/1, full_desc_person/2, notice_people/1, where_go/1, give/1, check_time/0, print_string/2]).
+:- module(instructions, [instructions/0, search/1, drop/1, take/1, open/1, go/1, look/0, back/0, talk/1, choose_thief/1, sure/0, holding/0, full_desc_place/1, approach/1, full_desc_person/2, notice_people/1, where_go/1, give/1, check_time/0, print_string/2, sus_ratio/0]).
 
 
 :- [world].
@@ -38,6 +38,18 @@ instructions :-
 	write("sus_ratio.                   -- to check what is the suspiciousness ratio for each person you earlier set"),nl,
 	write("                                with command inc_sus_ratio(<Person>)."),nl,
 nl.
+
+
+sus_ratio :-
+	write("Suspiciousness ratio for the suspects:"),nl,nl,
+	write_sus_ratio().
+
+write_sus_ratio :-
+	sus_ratio(Person, Ratio),
+	write(Person), write(" - "), write(Ratio),nl,
+	fail.
+
+write_sus_ratio.	
 
 holding :-
 	\+ holding(_),
