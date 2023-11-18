@@ -26,6 +26,7 @@ is_quest(servants_house).
 is_quest(forest).
 is_quest(wizard_house).
 is_quest(vault).
+is_quest(guard_house).
 
 is_locked(butler_chest).
 is_locked(gardener_chest).

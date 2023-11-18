@@ -88,8 +88,11 @@ give(mushrooms) :-
 	assert(gave_mushrooms(yes)),
 	write("You succesfully gave mushrooms to the wizard"),nl,
 	after_mushrooms(wizard, Desc),
-	print_string(Desc, wizard),!,nl.
+	assert(comes_from_wizard_to_talk(yes)),
+	print_string(Desc, wizard),
+	delete_mushrooms(Needed),!,nl.
 		
+
 give(mushrooms) :-
 	\+ i_am_at(wizard_house),
 	write("There isn't anyone at this place who would want that"),!,nl.
@@ -101,6 +104,14 @@ give(mushrooms) :-
 
 give(mushrooms) :-
 	write("You don't have enough mushrooms. Come here again once you have the right amount of them."),!,nl.
+
+delete_mushrooms(Needed) :-
+	Needed > 0,
+	retract(holding(mushroom)),
+	delete_mushrooms(Needed - 1),!.
+
+delete_mushrooms(_).
+
 
 take(_) :-
 	get_time(Time),
@@ -116,6 +127,7 @@ take(mushroom) :-
 	New_number is Number + 1,
 	retract(having_mushrooms(_)),
 	assert(having_mushrooms(New_number)),
+	assert(holding(mushroom)),
 	write("You successfully took mashroom. Now you have "), write(New_number), write(" mushrooms"),!,nl.
 
 take(mushroom) :-
@@ -796,7 +808,7 @@ approach_chest(Chest) :-
 	write("You can't go to "), write(Person), write("'s chest when servants house is locked."),!,nl.
 
 
-approach_chests(_).	
+approach_chest(_).	
 
 talk(_) :-
 	get_time(Time),
@@ -866,7 +878,46 @@ check_sus_talk(Person) :-
 	
 	unrelated_quest_desc(Person, Desc),
 	print_string(Desc, Person),!,nl.
+
+
+check_sus_talk(Person) :-
+	comes_from_guard_to_talk(yes),
 	
+	guard_sus(Person),
+	
+	retract(comes_from_guard_to_talk(yes)),
+	guard_sus_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.
+	
+
+check_sus_talk(Person) :-
+	comes_from_guard_to_talk(yes),
+		
+	\+ guard_sus(Person),
+
+	unrelated_quest_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.
+
+
+check_sus_talk(Person) :-
+	comes_from_wizard_to_talk(yes),
+	
+	wizard_sus(Person),
+	
+	retract(comes_from_wizard_to_talk(yes)),
+	wizard_sus_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.
+	
+
+check_sus_talk(Person) :-
+	comes_from_wizard_to_talk(yes),
+		
+	\+ wizard_sus(Person),
+
+	unrelated_quest_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.
+
+
 check_sus_talk(Person) :-
 	hold_vault_key_to_talk(yes),
 
@@ -1000,6 +1051,10 @@ after_enter(vault) :-
 	write("Try to find the other parts that are spread around the castle"),nl,nl,!.
 
 after_enter(vault).	
+
+after_enter(guard_house) :-
+	assert(comes_from_guard_to_talk(yes)),!.
+
 
 after_enter(_).
 

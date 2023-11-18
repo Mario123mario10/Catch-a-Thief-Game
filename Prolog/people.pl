@@ -1,5 +1,5 @@
 
-:- module(people, [first_say/2, after_mushrooms/2, before_mushrooms/2, end_talk/2, completed_item/2, vault_key_desc/2, pouch_desc/2, diamond_desc/2, unrelated_quest_desc/2]).
+:- module(people, [first_say/2, after_mushrooms/2, before_mushrooms/2, end_talk/2, completed_item/2, vault_key_desc/2, pouch_desc/2, diamond_desc/2, unrelated_quest_desc/2, guard_sus_desc/2, wizard_sus_desc/2]).
 
 
 first_say(king, ["You stand before King Alaric III, a unique figure in this day and age.", "<\n>", 
@@ -38,7 +38,8 @@ first_say(guard, ["You are standing in front of the king's loyal guard. His figu
 		  "He managed to escape me, and unfortunately, I did not see who he was; my eyesight is not as good as it used to be.'", "<\n>",
 		  "The guard finishes, expressing his helplessness.", "<\n>", "<\n>",
 		  "'Maybe he lost something while escaping from the vault. You better check it out.", "<\n>",
-		  "No crime is perfect, and this one is definitely not an exception.'"]).
+		  "No crime is perfect, and this one is definitely not an exception.'", "<\n>", "<\n>",
+		  "Now you can go to the ", "<guard_sus>", " and ask him what he was doing near the throne room."]).
 
 first_say(wizard, ["You stand before the court wizard of King Alaric III, an old man with observant eyes.", "<\n>",
 		   "He has a long beard and a distinctive black sorcerer's hat.", "<\n>",
@@ -100,15 +101,17 @@ after_mushrooms(wizard, ["When you give the wizard magic mushrooms from the ench
 			 "Everything around you begins to glow with magical light, and the wizard carefully studies the ingredients he has just obtained.", "<\n>", "<\n>",
 			 "'Deep in the forest, in the shade of the trees, these mushrooms are a source of great power,'", "<\n>",
 			 "the wizard says solemnly and freezes for a second. After a while, he wakes up as if from a trance.", "<\n>", "<\n>",
-			 "'Now, what I promised.' He shrugs and says,", "<\n>",
-			 "Some time ago, the ", "<wizard_sus>", " was at my tower.", "<\n>",
+			 "'Now, what I promised.' He shrugs and says,", "<\n>","<\n>",
+			 "'Some time ago, the ", "<wizard_sus>", " was at my tower.", "<\n>",
 			 "He asked me for a certain toy, which I gave to the prince for his birthday.", "<\n>",
 			 "I gave him a couple of crystals, when one of them breaks, the other one explodes with a loud bang", "<\n>",
 			 "and turns into a thick cloud of smoke. Naturally, this toy is completely harmless,' he explained.", "<\n>", "<\n>",
 			 "'The ", "<wizard_sus>", " was trying to excuse himself, saying he needed this toy for a certain prank.", "<\n>",
 			 "It was just innocent fun, he told me,' the wizard says mockingly.", "<\n>",
 			 "'It seemed quite suspicious, but it is above my pay grade,' the wizard says dismissingly.", "<\n>", "<\n>",
-			 "'I said what I knew. Now it is the time for you to leave my tower.' the wizard says, clearly implying that the conversation is over."]).
+			 "'I said what I knew. Now it is the time for you to leave my tower.' the wizard says, clearly implying that the conversation is over.","<\n>","<\n>",
+			 "You know that the guard was distracted during the theft, this could be the cause.","<\n>",
+			 "Now you can go to the ", "<wizard_sus>", " and find out why or whether he actually had something to do with it."]).
 
 
 
@@ -205,3 +208,39 @@ unrelated_quest_desc(cook, ["'It's not really about me, now is it?' said the ann
 
 
 unrelated_quest_desc(butler, ["'That is, of course, mighty interesting, sir! Is that all? If so, I must resume my duties.'"]).
+
+
+guard_sus_desc(gardener, ["'What did he say?' says the gardener with an expression of surprise.", "<\n>", "<\n>",
+			  "'Why was the guard watching me? Isn't a servant allowed to dream about his king's treasures?' He waits for a moment for your answer and then continues,", "<\n>", "<\n>",
+			  "'He chased me away after a while anyway. I didn't see anything interesting. Why would you bring it up?'"]).
+
+
+guard_sus_desc(cook, ["'I'm sorry if that looked suspicious,' the cook says, a little sheepishly.", "<\n>", "<\n>",
+		      "'But it was only because I was curious about what was going on. All these rumors about gold and diamonds in the vault had everyone thinking.", "<\n>",
+		      "I thought about how gold could enhance my dishes. I never had any intention of stealing; it's not my style.'"]).
+
+
+guard_sus_desc(butler, ["'I understand the guard is concerned and is trying to solve this case,' the butler says, trying to remain calm.", "<\n>", "<\n>",
+			"'I'm sure that on that day, I was moving around the castle as I always do.", "<\n>",
+			"If the guard claims to have seen me at the vault door, it could have been a chance encounter.", "<\n>",
+			"But no one saw me enter the vault or try to open the door, am I correct? If so, that's just speculation.'"]).
+
+
+wizard_sus_desc(gardener, ["'Oh, the crystals!' says the gardener with a look of embarrassment.", "<\n>", "<\n>",
+			   "'It was just an innocent joke on the guard. For so many years, he has been guarding our castle, and nothing ever happens here.", "<\n>",
+			   "I just wanted to give him some entertainment! ", "<\n>",
+			   "How could I have known that it would distract him from the vault just when the thief was waiting for an opportunity?'", "<\n>",
+			   "The gardener tries to convince me that it was all innocent fun, but his expression suggests that he realizes", "<\n>",
+			   "the seriousness of the situation and the erroneous mistake he made."]).
+
+
+wizard_sus_desc(cook, ["'I don't understand why the wizard pointed at me with that toy,' the cook says with disapproval in his voice.", "<\n>", "<\n>",
+		       "It was just a toy he gave me. It looked fun, so I used it. I had no idea it would cause such a riot in the yard.", "<\n>",
+		       "It wasn't my intention to distract the guard. I certainly had no intention of helping any criminal.'"]).
+
+wizard_sus_desc(butler, ["'It's true that I received this crystal toy from the wizard at my request,' the butler admits.", "<\n>", "<\n>",
+			 "'I had some misunderstanding with this guard, and I was planning to use this toy as a kind of joke or a way to vent my dissatisfaction.", "<\n>",
+			 "However, I had no idea that this toy could cause such turmoil and contribute to the theft.", "<\n>",
+			 "I am innocent, and I am ready to explain the entire incident to the king.'"]).
+
+
