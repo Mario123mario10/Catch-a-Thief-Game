@@ -15,7 +15,6 @@ having_mushrooms(0).
 i_am_at(hall).
 i_was_at(hall).
 
-i_am_at_inner_place(_).
 
 places_list([]).
 

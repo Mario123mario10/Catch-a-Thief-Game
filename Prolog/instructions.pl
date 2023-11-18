@@ -64,12 +64,17 @@ holding :-
 holding.
 
 give(_) :-
+	end_of_the_game(yes),
+	write("The game is over, you can't do anything anymore."),!,nl.
+
+give(_) :-
 	get_time(Time),
 	end_time(End_time),
 	floor(Time, Int_time),	
 	Check_time is End_time - Int_time,
 	Check_time =< 0,	
 	write("Your time is up, now you have to choose the thief."),!,nl.
+
 
 give(mushrooms) :-
 	i_am_at(wizard_house),
@@ -112,6 +117,11 @@ delete_mushrooms(Needed) :-
 
 delete_mushrooms(_).
 
+
+
+take(_) :-
+	end_of_the_game(yes),
+	write("The game is over, you can't do anything anymore."),!,nl.
 
 take(_) :-
 	get_time(Time),
@@ -248,6 +258,12 @@ add_holding_to_talk(diamond) :-
 add_holding_to_talk(pouch) :-
 	assert(hold_pouch_to_talk(yes)),!.
 
+
+drop(_) :-
+	end_of_the_game(yes),
+	write("The game is over, you can't do anything anymore."),!,nl.
+
+
 drop(_) :-
 	get_time(Time),
 	end_time(End_time),
@@ -282,6 +298,11 @@ drop_thing(_, _).
 
 
 search(_) :-
+	end_of_the_game(yes),
+	write("The game is over, you can't do anything anymore."),!,nl.
+
+
+search(_) :-
 	get_time(Time),
 	end_time(End_time),
 	floor(Time, Int_time),	
@@ -291,16 +312,27 @@ search(_) :-
 
 search(What) :-
         \+ is_locked(What),
+	i_am_at_inner_place(What),
         thing_at(Thing, What),
-        write('You found '), write(Thing), write("!"),!,nl.
+        write('You found '), write(Thing), write("!"), nl,
+	write("What is it doing here? Take it and talk to the person you thing is more suspicious now."),!,nl.
 
 search(What) :-
         is_locked(What),
         write(What), write(' is locked'),!,nl.
 
+search(What) :-
+	\+ i_am_at_inner_place(What),
+	write("You can't do it from here."),!,nl.
 
 search(What) :-
         write(What), write(' is empty'),nl.
+
+
+open(_) :-
+	end_of_the_game(yes),
+	write("The game is over, you can't do anything anymore."),!,nl.
+
 
 open(_) :-
 	get_time(Time),
@@ -313,9 +345,7 @@ open(_) :-
 open(What) :-
         is_locked(What),
         holding(keys),
-        retract(is_locked(What)),
-        write(What), write(' is open'),nl,
-        open_thing(What),!.
+	open_thing(What),!.
 
 open(What) :-
         \+is_locked(What),
@@ -328,16 +358,34 @@ open_thing(servants_house) :-
         retract(first_time(servants_house)),
 	all_desc_place(servants_house, Desc),
 	print_string(Desc, _),nl,
-	write("You see place with bedrooms for all workforces,"),nl,
- 	write("this is the place where cook, gardener and butler are normally sleeping."),nl,
-	write("Each of them has 1 chest. Maybe when you approach and search these chests you will discover something."),!,nl.
+ 	write("This is the place where cook, gardener and butler are normally sleeping."),nl,nl,
+	retract(is_locked(servants_house)),
+	notice_inner_places(servants_house),!.
 
-open_thing(What) :-
-        (=(What, cook_chest);=(What, butler_chest);=(What, gardener_chest)),
-        write("Your set of keys can open "), write(What), write("!"),!,nl.
+
+open_thing(cook_chest) :-
+	i_am_at_inner_place(cook_chest),
+	write("Your set of keys can open cook's chest!"),!,nl,
+        retract(is_locked(cook_chest)),
+        write("Cook's chest is open."),!,nl.
+
+open_thing(butler_chest) :-
+	i_am_at_inner_place(butler_chest),
+        write("Your set of keys can open butler's chest!"),!,nl,
+        retract(is_locked(butler_chest)),
+        write("Butler's chest is open."),!,nl.
+
+open_thing(gardener_chest) :-
+	i_am_at_inner_place(gardener_chest),
+        write("Your set of keys can open gardener's chest!"),!,nl,
+        retract(is_locked(gardener_chest)),
+        write("Gardener's chest is open."),!,nl.
+
+open_thing(_) :-
+	i_am_at(servants_house),
+	write("You can't do it from here."),!,nl.
 
 open_thing(_).
-
 
 set_time(Start_time) :-
 	End_time is Start_time + 1200,
@@ -371,29 +419,52 @@ check_time() :-
 check_if_write(Time) :-
 	Time < 900,
 	Time > 875,
-	write("You have about 15 minutes left."),!,nl,nl.
+	nl, write("You have about 15 minutes left."),!,nl,nl.
 
 check_if_write(Time) :-
 	Time < 600,
 	Time > 575,
-	write("You have about 10 minutes left."),!,nl,nl.
+	nl, write("You have about 10 minutes left."),!,nl,nl.
 
 check_if_write(Time) :-
 	Time < 300,
 	Time > 275,
-	write("You have about 5 minutes left."),!,nl,nl.
+	nl, write("You have about 5 minutes left."),!,nl,nl.
 
 check_if_write(Time) :-
 	Time < 60,
 	Time > 45,
-	write("You have about 1 minute left!"),!,nl,nl.
+	nl, write("You have about 1 minute left!"),!,nl,nl.
 
 check_if_write(Time) :-
 	Time < 10,
 	Time > 5,
-	write("You have about 10 seconds left!"),!,nl,nl.
+	nl, write("You have about 10 seconds left!"),!,nl,nl.
 
 check_if_write(_).
+
+
+
+go(_) :-
+	end_of_the_game(yes),
+	write("The game is over, you can't do anything anymore."),!,nl.
+
+go(_) :-	
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,
+	write("Your time is up, now you have to choose the thief."),nl,
+	time_up(no),	
+	assert(time_up(yes)),!.
+
+go(_) :-	
+	get_time(Time),
+	end_time(End_time),
+	floor(Time, Int_time),	
+	Check_time is End_time - Int_time,
+	Check_time =< 0,!.		
 
 go(Place) :-
 	i_am_at(Here),
@@ -432,18 +503,20 @@ go(Place) :-
         retract(i_was_at(_)),
         assert(i_was_at(Here)),
         !, look.
+	
+back() :-
+	end_of_the_game(yes),
+	write("The game is over, you can't do anything anymore."),!,nl.
 
-go(_) :-	
+back() :-
 	get_time(Time),
-	end_time(End_time),
-	floor(Time, Int_time),	
-	Check_time is End_time - Int_time,
-	Check_time =< 0,	
-	write("Your time is up, now you have to choose the thief."),nl,
-	time_up(no),	
-	assert(time_up(yes)).
+        end_time(End_time),
+        floor(Time, Int_time),
 
-go(_).	
+        Check_time is End_time - Int_time,
+	Check_time =< 0,	
+	write("Your time is up, now you have to choose the thief."),!,nl.
+
 
 back() :-
         i_am_at(Here),
@@ -463,14 +536,6 @@ back() :-
         assert(i_was_at(Here)),!, look.
 
 
-back() :-
-	get_time(Time),
-        end_time(End_time),
-        floor(Time, Int_time),
-
-        Check_time is End_time - Int_time,
-	Check_time =< 0,	
-	write("Your time is up, now you have to choose the thief."),nl.
 
 look :-
         i_am_at(Place),
@@ -724,9 +789,6 @@ notice_people(Place) :-
 
 
 
-/* These rules set up a loop to mention all the objects
-   in your vicinity. */
-
 notice_inner_places(servants_house) :-
 	\+ is_locked(servants_house),	
         write("You see certain places that you can approach, maybe you'll find something interesting there:"),nl,
@@ -747,6 +809,10 @@ print_inner_places(Place) :-
 
 print_inner_places(_).
 
+
+approach(_) :-
+	end_of_the_game(yes),
+	write("The game is over, you can't do anything anymore."),!,nl.
 
 approach(_) :-
 	get_time(Time),
@@ -779,7 +845,13 @@ approach(Inner_place) :-
 	i_am_at(Place),
 	inside_place(Place, Inner_place), 
 	write("You are near the "), write(Inner_place), write("."),nl,	
+	i_am_at_inner_place(_),	
 	retract(i_am_at_inner_place(_)),
+	assert(i_am_at_inner_place(Inner_place)),!.
+
+approach(Inner_place) :-
+	i_am_at(Place),
+	inside_place(Place, Inner_place),
 	assert(i_am_at_inner_place(Inner_place)),!.
 
 approach(Inner_place) :-
@@ -809,6 +881,12 @@ approach_chest(Chest) :-
 
 
 approach_chest(_).	
+
+
+
+talk(_) :-
+	end_of_the_game(yes),
+	write("The game is over, you can't do anything anymore."),!,nl.
 
 talk(_) :-
 	get_time(Time),
@@ -1048,7 +1126,7 @@ after_enter(vault) :-
 	assert(went_to_vault(yes)),
 	write("You see there is a handle, you could take."), nl,
 	write("It was probably the tool that the thief used during the theft, unfortunately it is incomplete."),nl,
-	write("Try to find the other parts that are spread around the castle"),nl,nl,!.
+	write("Try to find the other parts that are spread around the castle."),nl,nl,!.
 
 after_enter(vault).	
 
