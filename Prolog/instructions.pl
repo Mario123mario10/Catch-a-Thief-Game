@@ -932,6 +932,14 @@ next_talk(wizard) :-
 	end_talk(wizard, Desc),
 	print_string(Desc, wizard),!,nl.
 
+next_talk(guard) :-
+	end_talk(guard, Desc),
+	print_string(Desc, guard),!,nl.
+
+next_talk(king) :-
+	end_talk(king, Desc),
+	print_string(Desc, king),!,nl.
+
 next_talk(Person) :-
 	(=(Person, gardener); =(Person,cook); =(Person,butler)),
 	check_sus_talk(Person),!.

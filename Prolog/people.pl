@@ -120,7 +120,10 @@ before_mushrooms(wizard, ["'I'm still waiting for my mushrooms, I won't tell you
 
 end_talk(wizard, ["'You found who was guilty? No? I don't know anything else so go and leave me alone. I have many things to do.' said the wizard."]).
 
+end_talk(guard, ["You found who was guilty? I told you everything I knew, I can only wish you good luck."]).
 
+end_talk(king, ["Have you found the thief yet? I can't bear to lose such a precious thing as a diamond.", "<\n>",
+		"I hope you find the culprit. I will try to punish him severely."]). 
 
 completed_item(gardener, ["When you hand over the rake with the rake stick you found to the gardener, his expression becomes more concerned.", "<\n>",
 			  "Without a word, he takes the tool and examines it carefully, holding it strangely.", "<\n>",
