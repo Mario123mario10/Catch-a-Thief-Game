@@ -954,8 +954,59 @@ check_sus_talk(Person) :-
 
 	retract(took_third_part(yes)),
 	completed_item(Person, Desc),
-	print_string(Desc, Person),!,nl.
+	print_string(Desc, Person),nl.
  
+check_sus_talk(Person) :-
+	comes_from_guard_to_talk(yes),
+	
+	guard_sus(Person),
+	
+	retract(comes_from_guard_to_talk(yes)),
+	guard_sus_desc(Person, Desc),
+	print_string(Desc, Person),nl.
+	
+check_sus_talk(Person) :-
+	comes_from_wizard_to_talk(yes),
+	
+	wizard_sus(Person),
+	
+	retract(comes_from_wizard_to_talk(yes)),
+	wizard_sus_desc(Person, Desc),
+	print_string(Desc, Person),nl.
+	
+check_sus_talk(Person) :-
+	hold_vault_key_to_talk(yes),
+
+	is_vault_key(Key_place),
+	inside_place(Place, Key_place),
+	person(Place, Person),
+
+	retract(hold_vault_key_to_talk(yes)),
+	vault_key_desc(Person, Desc),
+	print_string(Desc, Person),nl.
+
+
+check_sus_talk(Person) :-
+	hold_pouch_to_talk(yes),
+	
+	is_pouch(Pouch_place),
+	inside_place(Place, Pouch_place),
+	person(Place, Person),
+
+	retract(hold_pouch_to_talk(yes)),
+	pouch_desc(Person, Desc),
+	print_string(Desc, Person),nl.
+
+
+check_sus_talk(Person) :-
+	hold_diamond_to_talk(yes),
+
+	has_diamond(Person),
+	
+	retract(hold_diamond_to_talk(yes)),
+	diamond_desc(Person, Desc),
+	print_string(Desc, Person),!,nl.
+	
 check_sus_talk(Person) :-
 	took_third_part(yes),
 	
@@ -966,15 +1017,6 @@ check_sus_talk(Person) :-
 	print_string(Desc, Person),!,nl.
 
 
-check_sus_talk(Person) :-
-	comes_from_guard_to_talk(yes),
-	
-	guard_sus(Person),
-	
-	retract(comes_from_guard_to_talk(yes)),
-	guard_sus_desc(Person, Desc),
-	print_string(Desc, Person),!,nl.
-	
 
 check_sus_talk(Person) :-
 	comes_from_guard_to_talk(yes),
@@ -985,15 +1027,6 @@ check_sus_talk(Person) :-
 	print_string(Desc, Person),!,nl.
 
 
-check_sus_talk(Person) :-
-	comes_from_wizard_to_talk(yes),
-	
-	wizard_sus(Person),
-	
-	retract(comes_from_wizard_to_talk(yes)),
-	wizard_sus_desc(Person, Desc),
-	print_string(Desc, Person),!,nl.
-	
 
 check_sus_talk(Person) :-
 	comes_from_wizard_to_talk(yes),
@@ -1004,16 +1037,6 @@ check_sus_talk(Person) :-
 	print_string(Desc, Person),!,nl.
 
 
-check_sus_talk(Person) :-
-	hold_vault_key_to_talk(yes),
-
-	is_vault_key(Key_place),
-	inside_place(Place, Key_place),
-	person(Place, Person),
-
-	retract(hold_vault_key_to_talk(yes)),
-	vault_key_desc(Person, Desc),
-	print_string(Desc, Person),!,nl.
 
 
 check_sus_talk(Person) :-
@@ -1026,16 +1049,6 @@ check_sus_talk(Person) :-
 	unrelated_quest_desc(Person, Desc),
 	print_string(Desc, Person),!,nl.
 
-check_sus_talk(Person) :-
-	hold_pouch_to_talk(yes),
-	
-	is_pouch(Pouch_place),
-	inside_place(Place, Pouch_place),
-	person(Place, Person),
-
-	retract(hold_pouch_to_talk(yes)),
-	pouch_desc(Person, Desc),
-	print_string(Desc, Person),!,nl.
 
 check_sus_talk(Person) :-
 	hold_pouch_to_talk(yes),
@@ -1047,14 +1060,6 @@ check_sus_talk(Person) :-
 	unrelated_quest_desc(Person, Desc),	
 	print_string(Desc, Person),!,nl.
 
-check_sus_talk(Person) :-
-	hold_diamond_to_talk(yes),
-
-	has_diamond(Person),
-	
-	retract(hold_diamond_to_talk(yes)),
-	diamond_desc(Person, Desc),
-	print_string(Desc, Person),!,nl.	
 
 
 check_sus_talk(Person) :-
