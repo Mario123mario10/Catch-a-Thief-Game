@@ -6,6 +6,7 @@ module Main where
 import System.IO (hFlush, stdout)
 import Instructions
 import Places
+import Characters
 
 introductionText = [
     "A long time ago, in a galaxy far, far away...",
@@ -29,8 +30,14 @@ introductionText = [
     ""
     ]
 
-initializeGame :: GameState
-initializeGame = GameState { currentRoom = Hall, visitedRooms = [Hall], examining = Nothing }
+initializeGame :: IO GameState
+initializeGame = do
+    let startingRoom = Hall
+    let initialVisitedRooms = [Hall]
+    
+    clues <- assignClues
+
+    return GameState { currentRoom = startingRoom, visitedRooms = initialVisitedRooms, examining = Nothing, clues = clues }
                   
 printIntroduction = printLines introductionText
 printInstructions = printLines instructionsText
@@ -80,7 +87,7 @@ main = do
     printIntroduction
     printInstructions
 
-    let gameState = initializeGame
+    gameState <- initializeGame
     look gameState
     gameLoop gameState
 

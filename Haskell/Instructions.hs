@@ -1,8 +1,10 @@
 module Instructions where
 
 import Places
+import Inventory
+import Characters
 
-data GameState = GameState { currentRoom :: Room, visitedRooms :: [Room], examining :: Maybe Place } deriving (Show)
+data GameState = GameState { currentRoom :: Room, visitedRooms :: [Room], examining :: Maybe Place, clues :: [(Character, [Clue])] } deriving (Show)
 
 instructionsText = [
     "Available commands are:",
