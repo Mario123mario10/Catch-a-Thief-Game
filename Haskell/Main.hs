@@ -4,6 +4,7 @@
 module Main where
 
 import System.IO (hFlush, stdout)
+import Instructions
 import Places
 
 introductionText = [
@@ -28,32 +29,8 @@ introductionText = [
     ""
     ]
 
-instructionsText = [
-    "Available commands are:",
-    "",
-    "instructions  -- to see these instructions.",
-    "debug         -- to see debug instructions.",
-    "look          -- to look around the room.",
-    "go to [Room]  -- to go to one of avaiable rooms.",
-    "quit          -- to end the game and quit.",
-    ""
-    ]
-
-debugInstructionsText = [
-    "Debug commands are:",
-    "",
-    "visited       -- to see all visited places",
-    ""
-    ]
-
-data GameState = GameState { currentRoom :: Room, visitedRooms :: [Room] }
-
 initializeGame :: GameState
-initializeGame = GameState { currentRoom = Hall, visitedRooms = [] }
-
--- print strings from list in separate lines
-printLines :: [String] -> IO ()
-printLines xs = putStr (unlines xs)
+initializeGame = GameState { currentRoom = Hall, visitedRooms = [Hall], examining = Nothing }
                   
 printIntroduction = printLines introductionText
 printInstructions = printLines instructionsText
@@ -61,32 +38,8 @@ printInstructions = printLines instructionsText
 readCommand :: IO String
 readCommand = do
     putStr "> "
-    hFlush stdout -- Flush the output buffer to immediately display the prompt
+    hFlush stdout
     getLine
-
-goTo :: String -> GameState -> IO GameState
-goTo roomStr gameState = do
-    let current = currentRoom gameState
-    let maybeRoom = stringToRoom roomStr
-    case maybeRoom of
-        Just destinationRoom -> do
-            newRoom <- moveToRoom current destinationRoom
-            let newGameState = gameState { currentRoom = newRoom }
-            if newRoom /= current
-                then do
-                    let roomDescription = getRoomDescription newRoom (visitedRooms gameState)
-                    let updatedVisitedRooms = if destinationRoom `elem` visitedRooms gameState
-                                                then visitedRooms gameState
-                                                else destinationRoom : visitedRooms gameState
-                    let updatedGameState = newGameState { visitedRooms = updatedVisitedRooms }
-                    printLines roomDescription
-                    printRoomsConnectedTo newRoom
-                    return updatedGameState
-                else do
-                    return newGameState
-        Nothing -> do
-            putStrLn "Invalid room name."
-            return gameState
     
 gameLoop :: GameState -> IO ()
 gameLoop gameState = do
@@ -99,16 +52,24 @@ gameLoop gameState = do
             printLines debugInstructionsText
             gameLoop gameState
         ["look"] -> do 
-            let current = currentRoom gameState
-            let roomDescription = getLongDescription current
-            printLines roomDescription
+            look gameState
             gameLoop gameState
+        ["examine", placeStr] -> do 
+            newGameState <- examine placeStr gameState
+            gameLoop newGameState
         ["go", "to", roomStr] -> do
             newGameState <- goTo roomStr gameState
             gameLoop newGameState
         ["visited"] -> do
             let visited = visitedRooms gameState
             putStrLn $ show visited
+            gameLoop gameState
+        ["whereami"] -> do
+            let current = currentRoom gameState
+            putStrLn $ show current
+            gameLoop gameState
+        ["gamestate"] -> do
+            putStrLn $ show gameState
             gameLoop gameState
         ["quit"] -> return ()
         _ -> do 
@@ -118,5 +79,8 @@ gameLoop gameState = do
 main = do
     printIntroduction
     printInstructions
-    gameLoop initializeGame
+
+    let gameState = initializeGame
+    look gameState
+    gameLoop gameState
 

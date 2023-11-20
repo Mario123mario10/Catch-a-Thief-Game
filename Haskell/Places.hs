@@ -50,46 +50,26 @@ areConnected room1 room2 = any (\(Door r1 r2) -> (r1 == room1 && r2 == room2) ||
 roomsConnectedToRoom :: Room -> [Room]
 roomsConnectedToRoom room = map (\(Door r1 r2) -> if r1 == room then r2 else r1) (filter (\(Door r1 r2) -> r1 == room || r2 == room) allDoors)
 
------------------------------------
--- Player Movement
------------------------------------
-
--- Function to print rooms connected to a specific room
-printRoomsConnectedTo :: Room -> IO ()
-printRoomsConnectedTo room = do
-    let connectedRooms = roomsConnectedToRoom room
-    putStrLn $ "From " ++ show room ++ " you can go to: " ++ show connectedRooms ++ "."
-
--- Function to move between rooms
-moveToRoom :: Room -> Room -> IO Room
-moveToRoom currentRoom destinationRoom =
-  if areConnected currentRoom destinationRoom
-    then do
-        putStrLn $ "You moved from " ++ show currentRoom ++ " to " ++ show destinationRoom ++ "."
-        return destinationRoom
-    else do
-        putStrLn $ "You can't move from " ++ show currentRoom ++ " to " ++ show destinationRoom ++ "."
-        return currentRoom
-
 -- Function to get short room descriptions
-getShortDescription :: Room -> [String]
-getShortDescription room = case room of
-    Vault -> ["Once the place where the diamond was stored, but now empty."]
-    Hall -> ["A grand, bustling chamber with a splendid throne at its center."]
-    Kitchen -> ["A bustling place filled with the king's dishes and the aroma of cooked meals."]
-    RoyalBedroom -> ["A room holding keys to every other room in the castle."]
-    Garden -> ["A vast garden filled with flourishing vegetables and vibrant flowers."]
-    GuardHouse -> ["A small chamber housing an array of weapons."]
-    WizardsTower -> ["An incredible space brimming with curious magical objects."]
-    ServantsHouse -> ["Bedrooms allocated for the castle's workforce."]
-    Forest -> ["A sprawling forest teeming with wild animals, plants, and mushrooms."]
-    Courtyard -> ["The bustling heart of the castle."]
-    Corridor -> ["A passage connecting the kitchen and royal bedroom, often frequented by the butler."]
+getShortRoomDescription :: Room -> [String]
+getShortRoomDescription room = case room of
+    Vault -> ["", "Once the place where the diamond was stored, but now empty." ]
+    Hall -> ["", "A grand, bustling chamber with a splendid throne at its center." ]
+    Kitchen -> ["", "A bustling place filled with the king's dishes and the aroma of cooked meals." ]
+    RoyalBedroom -> ["", "A room holding keys to every other room in the castle." ]
+    Garden -> ["", "A vast garden filled with flourishing vegetables and vibrant flowers." ]
+    GuardHouse -> ["", "A small chamber housing an array of weapons." ]
+    WizardsTower -> ["", "An incredible space brimming with curious magical objects." ]
+    ServantsHouse -> ["", "Bedrooms allocated for the castle's workforce." ]
+    Forest -> ["", "A sprawling forest teeming with wild animals, plants, and mushrooms."  ]
+    Courtyard -> ["", "The bustling heart of the castle."  ]
+    Corridor -> ["", "A passage connecting the kitchen and royal bedroom, often frequented by the butler."  ]
 
 -- Function to get longer room descriptions
-getLongDescription :: Room -> [String]
-getLongDescription room = case room of
+getLongRoomDescription :: Room -> [String]
+getLongRoomDescription room = case room of
     Garden -> [
+        "",
         "You are in the castle garden. This is the place where the king likes to stay in spring and early summer.",
         "",
         "A trusted gardener makes sure that this place is full of colorful flowers and nutritious vegetables",
@@ -100,6 +80,7 @@ getLongDescription room = case room of
         "Sometimes he fishes out amazing treasures…"
         ]
     WizardsTower -> [
+        "",
         "Here is the wizard’s house. It’s kind of like the kitchen… but different.",
         "",
         "The wizard prepares various elixirs, magic items here; he even modifies some plants and animals,",
@@ -115,24 +96,28 @@ getLongDescription room = case room of
         "One thing is for sure - you can find unusual plants and animals here. Maybe they have some special use, who knows?"
         ]
     Hall -> [
-        "You start in the main hall of the castle. You can get to several places from here. Many people move around here too.",
+        "",
+        "You are in the main hall of the castle. You can get to several places from here. Many people move around here too.",
         "",
         "Candle lanterns, even combined with thin beams of light from narrow windows, don’t make this place well lit.",
         "If you saw anyone in the distance, you could even mistake somebody for somebody, especially at night!"
         ]
     Kitchen -> [
+        "",
         "Welcome to the kitchen! The aroma of fresh herbs, cooked vegetables and flavorful meat dishes fills the air.",
         "",
         "Inside this vast room there is a fireplace with a grate, separate fireplace to cook soup,",
         "large oven for roasted dishes, and a bread oven. There are kitchen utensils hanging on the wall but one hook is empty…"
         ]
     GuardHouse -> [
+        "",
         "You are now in one of the castle guards’ rooms.",
         "",
         "It’s not very spacious, most of the space is taken by a bed and simple wooden wardrobe.",
         "Reportedly, he keeps some equipment in there. Stark and spartan style of the room suits the guard, without a doubt."
         ]
     RoyalBedroom -> [
+        "",
         "You are now in the royal bedroom. You see a spacious room full of expensive furniture and numerous paintings.",
         "",
         "There are huge mirrors and an ornate bed that is probably so expensive",
@@ -140,9 +125,11 @@ getLongDescription room = case room of
         "This is the place where the butler often stays, serving the king in every way possible."
         ]
     Courtyard -> [
+        "",
         "You are in the courtyard. This is the middle of the castle from where you can get to many places."
         ]
     Vault -> [
+        "",
         "This is a place of crime! King Alaric III keeps here his most precious treasures, passed down for many generations.",
         "",
         "What a great, imposing room it is! The walls are beautifully adorned, and the floor is made of polished marble.",
@@ -154,6 +141,7 @@ getLongDescription room = case room of
         "Hopefully that person gets caught and justice will be served. But, what are these bloodstains on the floor…"
         ]
     ServantsHouse -> [
+        "",
         "You entered the king’s servants room. It's small and cramped, with little privacy.",
         "",
         "The beds are simple and utilitarian, with straw mattresses and rough woolen blankets",
@@ -161,14 +149,88 @@ getLongDescription room = case room of
         "The room is dimly lit with candles, and the air is smoky and filled with the smell of cooking food coming from a nearby kitchen."
         ]
     Corridor -> [
+        "",
         "You are walking through the corridor.",
         "",
         "It is a dim passage of stone and and with the flickering glow of torches casting dancing shadows upon the walls.",
         "A red carpet silences the steps of guards and servants. The ceiling shows paintings of the kingdom’s history."
         ]
 
+-----------------------------------
+-- Castle Places
+-----------------------------------
+
+data Place = GardenPond | RoseBushes | KingSculpture | Mirror | Bed | Wardrobe | Oven | BagOfFlour | KitchenUnit | ButlerChest | CookChest | GardenerChest deriving (Show, Eq)
+
+-- Function to convert string to Place (case-insensitive)
+stringToPlace :: String -> Maybe Place
+stringToPlace str = case map toLower str of
+    "gardenpond" -> Just GardenPond
+    "pond" -> Just GardenPond
+    "mirror" -> Just Mirror
+    "oven" -> Just Oven
+    "rosebushes" -> Just RoseBushes
+    "bushes" -> Just RoseBushes
+    "bed" -> Just Bed
+    "bagofflour" -> Just BagOfFlour
+    "flour" -> Just BagOfFlour
+    "bag" -> Just BagOfFlour
+    "kingsculpture" -> Just KingSculpture
+    "sculpture" -> Just KingSculpture
+    "wardrobe" -> Just Wardrobe
+    "kitchenunit" -> Just KitchenUnit
+    "butlerchest" -> Just ButlerChest
+    "cookchest" -> Just CookChest
+    "gardenerchest" -> Just GardenerChest
+    _ -> Nothing
+
+-- Function returning each Place inside of Room
+insidePlace :: Room -> [Place]
+insidePlace Garden = [GardenPond, RoseBushes, KingSculpture]
+insidePlace RoyalBedroom = [Mirror, Bed, Wardrobe]
+insidePlace Kitchen = [Oven, BagOfFlour, KitchenUnit]
+insidePlace ServantsHouse = [ButlerChest, CookChest, GardenerChest]
+insidePlace _ = []
+
+-- Function checking if Room has Places
+areInnerPlaces :: Room -> Bool
+areInnerPlaces room = room `elem` [Kitchen, RoyalBedroom, Garden, ServantsHouse]
+
+-- Function to check if a Room contains a specific Place
+roomContainsPlace :: Room -> Place -> Bool
+roomContainsPlace room place = place `elem` insidePlace room
+
+getPlaceDescription :: Place -> [String]
+getPlaceDescription place = case place of
+    GardenPond -> ["", "A tranquil pond in the garden."]
+    Mirror -> ["", "An ornate mirror hanging on the wall."]
+    Oven -> ["", "A large oven for cooking dishes."]
+    RoseBushes -> ["", "Beautiful rose bushes in the garden."]
+    Bed -> ["", "An elegantly designed bed in the room."]
+    BagOfFlour -> ["", "A bag of flour used for cooking." ]
+    KingSculpture -> ["", "A sculpture of the king in the garden." ]
+    Wardrobe -> ["", "A wardrobe for clothes storage." ]
+    KitchenUnit -> ["", "A unit used for kitchen storage." ]
+    ButlerChest -> ["", "A chest belonging to the butler." ]
+    CookChest -> ["", "A chest belonging to the cook." ]
+    GardenerChest -> ["", "A chest belonging to the gardener." ]
+
+-----------------------------------
+-- Misc
+-----------------------------------
+
 -- Function to get short or long room descriptions based on visit status
 getRoomDescription :: Room -> [Room] -> [String]
-getRoomDescription current visited
-    | current `elem` visited = getShortDescription current
-    | otherwise = getLongDescription current
+getRoomDescription current visited =
+    let description = if current `elem` visited
+            then getShortRoomDescription current
+            else getLongRoomDescription current
+    
+        places = insidePlace current
+        descriptionWithPlaces = if null places
+            then description
+            else description ++ ["", "You can examine the following places: " ++ show places ++ "." ]
+        
+        connectedRooms = roomsConnectedToRoom current
+        descriptionWithRooms = descriptionWithPlaces ++ ["", "From " ++ show current ++ " you can go to: " ++ show connectedRooms ++ "." ]
+    in descriptionWithRooms
