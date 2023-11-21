@@ -72,27 +72,27 @@ getLongRoomDescription room = case room of
         "",
         "You are in the castle garden. This is the place where the king likes to stay in spring and early summer.",
         "",
-        "A trusted gardener makes sure that this place is full of colorful flowers and nutritious vegetables",
-        "that the chef uses for his flavorful dishes.",
+        "A trusted gardener makes sure that this place is full of colorful flowers and nutritious vegetables that the chef uses for his flavorful dishes.",
         "",
         "There is a small pond in the center of the garden. One can get to its other side quite easily, as well as to the bottom.",
+        "",
         "Inhabitants of the castle enjoy throwing things into the pond from time to time, causing the gardener to be obliged to clean there.",
+        "",
         "Sometimes he fishes out amazing treasures…"
         ]
     WizardsTower -> [
         "",
         "Here is the wizard’s house. It’s kind of like the kitchen… but different.",
         "",
-        "The wizard prepares various elixirs, magic items here; he even modifies some plants and animals,",
-        "so that they have miraculous features.",
+        "The wizard prepares various elixirs, magic items here; he even modifies some plants and animals, so that they have miraculous features.",
         "",
-        "Hence, there is a fireplace, which allows him to cook elixirs, a small workshop to generate items,",
-        "collected animal parts and plants and a couple dozen books everywhere. Of course, a wand lies on the table."
+        "Hence, there is a fireplace, which allows him to cook elixirs, a small workshop to generate items, collected animal parts and plants and a couple dozen books everywhere. Of course, a wand lies on the table."
         ]
     Forest -> [
         "Shhh… did you hear that sound? It was kind of… magical. This forest is like none other.",
         "",
         "Some say you can hear ghost voices here, others say that this is a place where you can meet a werewolf.",
+        "",
         "One thing is for sure - you can find unusual plants and animals here. Maybe they have some special use, who knows?"
         ]
     Hall -> [
@@ -100,28 +100,29 @@ getLongRoomDescription room = case room of
         "You are in the main hall of the castle. You can get to several places from here. Many people move around here too.",
         "",
         "Candle lanterns, even combined with thin beams of light from narrow windows, don’t make this place well lit.",
+        "",
         "If you saw anyone in the distance, you could even mistake somebody for somebody, especially at night!"
         ]
     Kitchen -> [
         "",
         "Welcome to the kitchen! The aroma of fresh herbs, cooked vegetables and flavorful meat dishes fills the air.",
         "",
-        "Inside this vast room there is a fireplace with a grate, separate fireplace to cook soup,",
-        "large oven for roasted dishes, and a bread oven. There are kitchen utensils hanging on the wall but one hook is empty…"
+        "Inside this vast room there is a fireplace with a grate, separate fireplace to cook soup, large oven for roasted dishes, and a bread oven. There are kitchen utensils hanging on the wall but one hook is empty…"
         ]
     GuardHouse -> [
         "",
         "You are now in one of the castle guards’ rooms.",
         "",
         "It’s not very spacious, most of the space is taken by a bed and simple wooden wardrobe.",
+        "",
         "Reportedly, he keeps some equipment in there. Stark and spartan style of the room suits the guard, without a doubt."
         ]
     RoyalBedroom -> [
         "",
         "You are now in the royal bedroom. You see a spacious room full of expensive furniture and numerous paintings.",
         "",
-        "There are huge mirrors and an ornate bed that is probably so expensive",
-        "that no servant could afford it even if he worked all his life for it.",
+        "There are huge mirrors and an ornate bed that is probably so expensive that no servant could afford it even if he worked all his life for it.",
+        "",
         "This is the place where the butler often stays, serving the king in every way possible."
         ]
     Courtyard -> [
@@ -133,19 +134,20 @@ getLongRoomDescription room = case room of
         "This is a place of crime! King Alaric III keeps here his most precious treasures, passed down for many generations.",
         "",
         "What a great, imposing room it is! The walls are beautifully adorned, and the floor is made of polished marble.",
-        "Plenty of gold bars, gold coins, sparkling jewels, silver artifacts, jewelry, antique weapons,",
-        "pieces of art and many other valuable (or not, like a wooden shaft near the entrance) items lie and stand in the room.",
-        "The most important one, the apple of king’s eye, ‘the diamond that adorned the crown of his ancestors for generations’,",
-        "always kept in the center of the room, has been stolen by some petty, lousy thief. Oh, what a tragedy…",
+        "Plenty of gold bars, gold coins, sparkling jewels, silver artifacts, jewelry, antique weapons, pieces of art and many other valuable (or not, like a wooden shaft near the entrance) items lie and stand in the room.",
+        "",
+        "The most important one, the apple of king’s eye, ‘the diamond that adorned the crown of his ancestors for generations’, always kept in the center of the room, has been stolen by some petty, lousy thief. Oh, what a tragedy…",
+        "",
         "Large, heavy-duty door did not help, since the thief must have had the key, as they were open after the incident.",
+        "",
         "Hopefully that person gets caught and justice will be served. But, what are these bloodstains on the floor…"
         ]
     ServantsHouse -> [
         "",
         "You entered the king’s servants room. It's small and cramped, with little privacy.",
         "",
-        "The beds are simple and utilitarian, with straw mattresses and rough woolen blankets",
-        "and in front of the beds are servants’ wooden chests with personal belongings.",
+        "The beds are simple and utilitarian, with straw mattresses and rough woolen blankets and in front of the beds are servants’ wooden chests with personal belongings.",
+        "",
         "The room is dimly lit with candles, and the air is smoky and filled with the smell of cooking food coming from a nearby kitchen."
         ]
     Corridor -> [
@@ -153,6 +155,7 @@ getLongRoomDescription room = case room of
         "You are walking through the corridor.",
         "",
         "It is a dim passage of stone and and with the flickering glow of torches casting dancing shadows upon the walls.",
+        "",
         "A red carpet silences the steps of guards and servants. The ceiling shows paintings of the kingdom’s history."
         ]
 
@@ -160,60 +163,90 @@ getLongRoomDescription room = case room of
 -- Castle Places
 -----------------------------------
 
-data Place = GardenPond | RoseBushes | KingSculpture | Mirror | Bed | Wardrobe | Oven | BagOfFlour | KitchenUnit | ButlerChest | CookChest | GardenerChest deriving (Show, Eq)
+data Place = VaultDoor | GardenPond | RoseBushes | KingSculpture | DirtMound | Mirror | Bed | Wardrobe | NightTable | Oven | BagOfFlour | KitchenUnit | ButlerChest | CookChest | GardenerChest | Lakeshore | OldTree | HiddenClearing | MushroomPatch | WildlifeNest deriving (Show, Eq)
+
+allPlaces :: [Place]
+allPlaces = [VaultDoor, GardenPond, RoseBushes, KingSculpture, Mirror, Bed, Wardrobe, NightTable, Oven, BagOfFlour, KitchenUnit, ButlerChest, CookChest, GardenerChest, Lakeshore, OldTree, HiddenClearing, MushroomPatch, WildlifeNest]
 
 -- Function to convert string to Place (case-insensitive)
 stringToPlace :: String -> Maybe Place
 stringToPlace str = case map toLower str of
+    "vaultdoor" -> Just VaultDoor
+    "door" -> Just VaultDoor
     "gardenpond" -> Just GardenPond
     "pond" -> Just GardenPond
-    "mirror" -> Just Mirror
-    "oven" -> Just Oven
     "rosebushes" -> Just RoseBushes
     "bushes" -> Just RoseBushes
+    "kingsculpture" -> Just KingSculpture
+    "sculpture" -> Just KingSculpture
+    "dirtmound" -> Just DirtMound
+    "dirt" -> Just DirtMound
+    "mound" -> Just DirtMound
+    "mirror" -> Just Mirror
     "bed" -> Just Bed
+    "wardrobe" -> Just Wardrobe
+    "nighttable" -> Just NightTable
+    "table" -> Just NightTable
+    "oven" -> Just Oven
     "bagofflour" -> Just BagOfFlour
     "flour" -> Just BagOfFlour
     "bag" -> Just BagOfFlour
-    "kingsculpture" -> Just KingSculpture
-    "sculpture" -> Just KingSculpture
-    "wardrobe" -> Just Wardrobe
     "kitchenunit" -> Just KitchenUnit
     "butlerchest" -> Just ButlerChest
     "cookchest" -> Just CookChest
     "gardenerchest" -> Just GardenerChest
+    "lakeshore" -> Just Lakeshore
+    "shore" -> Just Lakeshore
+    "lake" -> Just Lakeshore
+    "oldtree" -> Just OldTree
+    "tree" -> Just OldTree
+    "hiddenclearing" -> Just HiddenClearing
+    "clearing" -> Just HiddenClearing
+    "mushroompatch" -> Just MushroomPatch
+    "patch" -> Just MushroomPatch
+    "wildlifenest" -> Just WildlifeNest
+    "nest" -> Just WildlifeNest
     _ -> Nothing
 
 -- Function returning each Place inside of Room
-insidePlace :: Room -> [Place]
-insidePlace Garden = [GardenPond, RoseBushes, KingSculpture]
-insidePlace RoyalBedroom = [Mirror, Bed, Wardrobe]
-insidePlace Kitchen = [Oven, BagOfFlour, KitchenUnit]
-insidePlace ServantsHouse = [ButlerChest, CookChest, GardenerChest]
-insidePlace _ = []
+insideRoom :: Room -> [Place]
+insideRoom Vault = [VaultDoor]
+insideRoom Garden = [GardenPond, RoseBushes, KingSculpture]
+insideRoom RoyalBedroom = [Mirror, Bed, Wardrobe, NightTable]
+insideRoom Kitchen = [Oven, BagOfFlour, KitchenUnit]
+insideRoom ServantsHouse = [ButlerChest, CookChest, GardenerChest, DirtMound]
+insideRoom Forest = [Lakeshore, OldTree, HiddenClearing, MushroomPatch, WildlifeNest]
+insideRoom _ = []
 
 -- Function checking if Room has Places
 areInnerPlaces :: Room -> Bool
-areInnerPlaces room = room `elem` [Kitchen, RoyalBedroom, Garden, ServantsHouse]
+areInnerPlaces room = room `elem` [Vault, Garden, RoyalBedroom, Kitchen, ServantsHouse, Forest]
 
 -- Function to check if a Room contains a specific Place
 roomContainsPlace :: Room -> Place -> Bool
-roomContainsPlace room place = place `elem` insidePlace room
+roomContainsPlace room place = place `elem` insideRoom room
 
 getPlaceDescription :: Place -> [String]
 getPlaceDescription place = case place of
+    VaultDoor -> ["", "The heavy vault door seems too heavy for one person to open. It looks like someone used some kind of tool to move the door."]    
     GardenPond -> ["", "A tranquil pond in the garden."]
-    Mirror -> ["", "An ornate mirror hanging on the wall."]
-    Oven -> ["", "A large oven for cooking dishes."]
     RoseBushes -> ["", "Beautiful rose bushes in the garden."]
-    Bed -> ["", "An elegantly designed bed in the room."]
-    BagOfFlour -> ["", "A bag of flour used for cooking." ]
     KingSculpture -> ["", "A sculpture of the king in the garden." ]
+    Mirror -> ["", "An ornate mirror hanging on the wall."]
+    Bed -> ["", "An elegantly designed bed in the room."]
     Wardrobe -> ["", "A wardrobe for clothes storage." ]
+    NightTable -> ["", "Approaching the night table, you notice the butler watching you closely."]
+    Oven -> ["", "A large oven for cooking dishes."]
+    BagOfFlour -> ["", "A bag of flour used for cooking." ]
     KitchenUnit -> ["", "A unit used for kitchen storage." ]
     ButlerChest -> ["", "A chest belonging to the butler." ]
     CookChest -> ["", "A chest belonging to the cook." ]
     GardenerChest -> ["", "A chest belonging to the gardener." ]
+    Lakeshore -> ["", "The serene shore of a tranquil lake."]
+    OldTree -> ["", "An ancient, towering tree with sprawling branches."]
+    HiddenClearing -> ["", "A secluded clearing, hidden from sight."]
+    MushroomPatch -> ["", "A patch of mushrooms, some with vibrant colors."]
+    WildlifeNest -> ["", "A nest, possibly home to some wildlife."]
 
 -----------------------------------
 -- Misc
@@ -226,7 +259,7 @@ getRoomDescription current visited =
             then getShortRoomDescription current
             else getLongRoomDescription current
     
-        places = insidePlace current
+        places = insideRoom current
         descriptionWithPlaces = if null places
             then description
             else description ++ ["", "You can examine the following places: " ++ show places ++ "." ]

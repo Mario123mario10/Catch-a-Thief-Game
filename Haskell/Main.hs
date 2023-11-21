@@ -4,9 +4,12 @@
 module Main where
 
 import System.IO (hFlush, stdout)
+import Printing
 import Instructions
 import Places
 import Characters
+import Inventory
+import World
 
 introductionText = [
     "A long time ago, in a galaxy far, far away...",
@@ -30,17 +33,18 @@ introductionText = [
     ""
     ]
 
+printIntroduction = printLinesWithoutSplit introductionText
+printInstructions = printLinesWithoutSplit instructionsText
+
 initializeGame :: IO GameState
 initializeGame = do
     let startingRoom = Hall
     let initialVisitedRooms = [Hall]
     
     clues <- assignClues
+    items <- assignItems clues
 
-    return GameState { currentRoom = startingRoom, visitedRooms = initialVisitedRooms, examining = Nothing, clues = clues }
-                  
-printIntroduction = printLines introductionText
-printInstructions = printLines instructionsText
+    return GameState { currentRoom = startingRoom, visitedRooms = initialVisitedRooms, examining = Nothing, clues = clues, items = items, inventory = [], evidence = [] }
 
 readCommand :: IO String
 readCommand = do
@@ -55,14 +59,21 @@ gameLoop gameState = do
         ["instructions"] -> do 
             printInstructions
             gameLoop gameState
-        ["debug"] -> do 
+        ["dev"] -> do 
             printLines debugInstructionsText
             gameLoop gameState
         ["look"] -> do 
             look gameState
             gameLoop gameState
+        ["inventory"] -> do 
+            let currentInventory = inventory gameState
+            printLines $ getInventoryDescription currentInventory
+            gameLoop gameState
         ["examine", placeStr] -> do 
             newGameState <- examine placeStr gameState
+            gameLoop newGameState
+        ["take", itemStr] -> do
+            newGameState <- takeItem itemStr gameState
             gameLoop newGameState
         ["go", "to", roomStr] -> do
             newGameState <- goTo roomStr gameState
