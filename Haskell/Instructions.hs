@@ -6,30 +6,43 @@ import Inventory
 import Characters
 import World
 
-data GameState = GameState { currentRoom :: Room, visitedRooms :: [Room], examining :: Maybe Place, clues :: [(Character, [Clue])], items :: [(Place, (Item, Int))], inventory :: [(Item, Int)], evidence :: [(Clue, Maybe Character)] } deriving (Show)
+data GameState = GameState { 
+    currentRoom :: Room, 
+    visitedRooms :: [Room], 
+    examining :: Maybe Place, 
+    talking :: Maybe Character, 
+    clues :: [(Character, [Clue])], 
+    items :: [(Place, (Item, Int))], 
+    inventory :: [(Item, Int)], 
+    evidence :: [(Clue, Maybe Character)],
+    gaveMushrooms :: Bool
+    } deriving (Show)
 
 instructionsText = [
     "Available commands are:",
     "",
-    "instructions    -- to see these instructions.",
-    "look            -- to look around the room.",
-    "inventory       -- to see what's currently in inventory.",
+    "instructions        -- to see these instructions.",
+    "look                -- to look around the room.",
+    "inventory           -- to see what's currently in inventory.",
+    "talk to [Character] -- to see what's currently in inventory.",
     "",
-    "examine [Place] -- to examine specific place in a room.",
-    "take [Item]     -- to take avaiable item to inventory.",
-    "go to [Room]    -- to go to one of avaiable rooms.",
+    "examine [Place]     -- to examine specific place in a room.",
+    "take [Item]         -- to take avaiable item to inventory.",
+    "go to [Room]        -- to go to one of avaiable rooms.",
     "",
-    "quit            -- to end the game and quit.",
-    "dev             -- to see debug instructions.",
+    "quit                -- to end the game and quit.",
+    "dev                 -- to see debug instructions.",
     ""
     ]
 
 debugInstructionsText = [
     "Debug commands are:",
     "",
-    "whereami        -- to see current location",
-    "visited         -- to see all visited places",
-    "gamestate       -- to see game state info",
+    "whereami            -- to see current location",
+    "visited             -- to see all visited places",
+    "clues               -- to see characters and their clues",
+    "items               -- to see all places and their items",
+    "gamestate           -- to see game state info",
     ""
     ]
 
@@ -125,3 +138,26 @@ takeItem itemStr gameState = do
         Nothing -> do
             putStrLn "You must first examine a Place."
             return gameState
+
+talkTo :: String -> GameState -> IO ()
+talkTo charStr gameState = do
+    let maybeCharacter = stringToCharacter charStr
+    case maybeCharacter of
+        Just character -> do
+            let current = currentRoom gameState
+            case getCharacterInRoom current of
+                Just char -> do
+                    if character == char
+                        then do
+                            let currentClues = clues gameState
+                            let currentGaveMushrooms = gaveMushrooms gameState
+                            let text = getCharacterText currentClues character currentGaveMushrooms
+                            printLines text  
+                            return ()
+                        else do 
+                            putStrLn "You can't talk to him right now."
+                            return ()
+                Nothing -> return ()
+        Nothing -> do
+            putStrLn "Invalid character."
+            return ()  

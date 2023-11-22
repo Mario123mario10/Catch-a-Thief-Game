@@ -1,6 +1,7 @@
 module Places where
 
 import Data.Char (toLower, isSpace)
+import Characters
 
 -----------------------------------
 -- Castle Layout
@@ -18,6 +19,7 @@ stringToRoom str = case map toLower str of
     "vault" -> Just Vault
     "kitchen" -> Just Kitchen
     "royalbedroom" -> Just RoyalBedroom
+    "bedroom" -> Just RoyalBedroom
     "garden" -> Just Garden
     "servantshouse" -> Just ServantsHouse
     "wizardstower" -> Just WizardsTower
@@ -49,6 +51,16 @@ areConnected room1 room2 = any (\(Door r1 r2) -> (r1 == room1 && r2 == room2) ||
 -- Function to get rooms connected to a specific room
 roomsConnectedToRoom :: Room -> [Room]
 roomsConnectedToRoom room = map (\(Door r1 r2) -> if r1 == room then r2 else r1) (filter (\(Door r1 r2) -> r1 == room || r2 == room) allDoors)
+
+getCharacterInRoom :: Room -> Maybe Character
+getCharacterInRoom room = case room of
+    Hall -> Just King
+    GuardHouse -> Just Guard
+    Kitchen -> Just Cook
+    RoyalBedroom -> Just Butler
+    Garden -> Just Gardener
+    WizardsTower -> Just Wizard
+    _ -> Nothing
 
 -- Function to get short room descriptions
 getShortRoomDescription :: Room -> [String]
@@ -258,11 +270,16 @@ getRoomDescription current visited =
     let description = if current `elem` visited
             then getShortRoomDescription current
             else getLongRoomDescription current
+
+        descriptionWithCharacters = 
+            case getCharacterInRoom current of
+                Just char -> description ++ ["", "Here you can talk to " ++ show char ++ "."]
+                Nothing -> description
     
         places = insideRoom current
         descriptionWithPlaces = if null places
-            then description
-            else description ++ ["", "You can examine the following places: " ++ show places ++ "." ]
+            then descriptionWithCharacters
+            else descriptionWithCharacters ++ ["", "You can examine the following places: " ++ show places ++ "." ]
         
         connectedRooms = roomsConnectedToRoom current
         descriptionWithRooms = descriptionWithPlaces ++ ["", "From " ++ show current ++ " you can go to: " ++ show connectedRooms ++ "." ]

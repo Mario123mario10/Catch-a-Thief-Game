@@ -44,7 +44,17 @@ initializeGame = do
     clues <- assignClues
     items <- assignItems clues
 
-    return GameState { currentRoom = startingRoom, visitedRooms = initialVisitedRooms, examining = Nothing, clues = clues, items = items, inventory = [], evidence = [] }
+    return GameState { 
+        currentRoom = startingRoom, 
+        visitedRooms = initialVisitedRooms, 
+        examining = Nothing,
+        talking = Nothing,
+        clues = clues, 
+        items = items, 
+        inventory = [], 
+        evidence = [], 
+        gaveMushrooms = False
+        }
 
 readCommand :: IO String
 readCommand = do
@@ -60,7 +70,7 @@ gameLoop gameState = do
             printInstructions
             gameLoop gameState
         ["dev"] -> do 
-            printLines debugInstructionsText
+            printLinesWithoutSplit debugInstructionsText
             gameLoop gameState
         ["look"] -> do 
             look gameState
@@ -72,6 +82,9 @@ gameLoop gameState = do
         ["examine", placeStr] -> do 
             newGameState <- examine placeStr gameState
             gameLoop newGameState
+        ["talk", "to", charStr] -> do 
+            talkTo charStr gameState
+            gameLoop gameState
         ["take", itemStr] -> do
             newGameState <- takeItem itemStr gameState
             gameLoop newGameState
@@ -84,6 +97,14 @@ gameLoop gameState = do
             gameLoop gameState
         ["whereami"] -> do
             let current = currentRoom gameState
+            putStrLn $ show current
+            gameLoop gameState
+        ["clues"] -> do
+            let current = clues gameState
+            putStrLn $ show current
+            gameLoop gameState
+        ["items"] -> do
+            let current = items gameState
             putStrLn $ show current
             gameLoop gameState
         ["gamestate"] -> do

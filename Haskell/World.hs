@@ -97,3 +97,10 @@ removeItemFromPlace placesAndItems place item =
                         else Just $ map (\(p, (i, c)) -> if p == place && i == item then (p, (i, c - 1)) else (p, (i, c - 1))) placesAndItems
                 else Nothing  -- Returning Nothing if the item found doesn't match the specified item
         Nothing -> Nothing  -- Returning Nothing if the place is not found in the list
+
+addItemBasedClue :: [(Clue, Maybe Character)] -> Item -> [(Clue, Maybe Character)]
+addItemBasedClue evidence item = case item of
+    VaultKey -> evidence ++ [(StolenVaultKey, Nothing)]
+    Diamond -> evidence ++ [(StolenDiamond, Nothing)]
+    CoinPouch -> evidence ++ [(StolenCoins, Nothing)]
+    _ -> evidence
