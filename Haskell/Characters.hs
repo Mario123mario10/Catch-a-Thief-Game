@@ -20,11 +20,15 @@ stringToCharacter charStr = case map toLower charStr of
     "butler" -> Just Butler
     _ -> Nothing
 
--- check if clue is pointing at character
 isCharacterGuilty :: [(Character, [Clue])] -> Character -> Clue -> Bool
 isCharacterGuilty clues character clue = case find (\(char, charClues) -> char == character && clue `elem` charClues) clues of
     Just (_, _) -> True
     Nothing -> False
+
+whoIsGuilty :: [(Character, [Clue])] -> Clue -> Character
+whoIsGuilty ((character, clues) : rest) clue
+    | clue `elem` clues = character
+    | otherwise = whoIsGuilty rest clue
 
 getCharacterText :: [(Character, [Clue])] -> Character -> Bool -> [String]
 getCharacterText clues character gaveMushrooms = case character of

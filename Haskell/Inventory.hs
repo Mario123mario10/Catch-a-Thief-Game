@@ -1,12 +1,13 @@
 module Inventory where
 
 import Data.Char (toLower, isSpace)
+import Data.List
 
 -----------------------------------
 -- Items
 -----------------------------------
 
-data Item = ToolHandle | ToolPart | VaultKey | ButlersKeys | Diamond | CoinPouch | Mushroom | Dirt deriving (Eq, Show)
+data Item = Ladle | Rake | FeatherDuster | ToolHandle | ToolPart | VaultKey | ButlersKeys | Diamond | CoinPouch | Mushroom | Dirt deriving (Eq, Show)
 
 stringToItem :: String -> Maybe Item
 stringToItem str = case map toLower str of
@@ -29,6 +30,9 @@ stringToItem str = case map toLower str of
 getItemDescription :: Item -> [String]
 getItemDescription item = 
     case item of
+        Ladle -> ["", "Kitchen utensil used by Cook for serving soups and sauces."]
+        Rake -> ["", "Gardening tool with tines used by Gardener for collecting leaves or debris."]
+        FeatherDuster -> ["", "Cleaning tool made of feathers used by Butler to remove dust."]
         ToolHandle -> ["", "Broken part of a tool used to open the heavy vault door. There is blood on the broken part"]
         ToolPart -> ["", "Part of a tool used to open the heavy vault door"]
         VaultKey -> ["", "Key that opens the vault door"]
@@ -64,6 +68,12 @@ removeItemFromInventory inventory itemToRemove@(item, countToRemove)
             | otherwise -> Nothing
         Nothing -> Nothing
 
+hasRequiredItemsForTool :: [(Item, Int)] -> Bool
+hasRequiredItemsForTool inventory =
+    let toolHandleFound = any (\(item, count) -> item == ToolHandle && count >= 1) inventory
+        toolPartsFound = any (\(item, count) -> item == ToolPart && count >= 2) inventory
+    in
+        toolHandleFound && toolPartsFound
 
 -----------------------------------
 -- Clues
@@ -73,6 +83,18 @@ data Clue = Tool | StolenVaultKey | StolenDiamond | GuardsClue | WizardsClue | S
 
 allClues :: [Clue]
 allClues = [Tool, StolenVaultKey, StolenDiamond, GuardsClue, WizardsClue, StolenCoins, BloodStains]
+
+instance Ord Clue where
+    compare clue1 clue2 = compare (clueToInt clue1) (clueToInt clue2)
+        where
+            clueToInt :: Clue -> Int
+            clueToInt Tool = 1
+            clueToInt StolenVaultKey = 2
+            clueToInt StolenDiamond = 3
+            clueToInt GuardsClue = 4
+            clueToInt WizardsClue = 5
+            clueToInt StolenCoins = 6
+            clueToInt BloodStains = 7
 
 stringToClue :: String -> Maybe Clue
 stringToClue str = case map toLower str of

@@ -4,6 +4,9 @@
 module Main where
 
 import System.IO (hFlush, stdout)
+import Data.Map (Map)
+import qualified Data.Map as Map
+
 import Printing
 import Instructions
 import Places
@@ -52,7 +55,7 @@ initializeGame = do
         clues = clues, 
         items = items, 
         inventory = [], 
-        evidence = [], 
+        evidence = Map.empty, 
         gaveMushrooms = False
         }
 
@@ -79,12 +82,19 @@ gameLoop gameState = do
             let currentInventory = inventory gameState
             printLines $ getInventoryDescription currentInventory
             gameLoop gameState
+        ["evidence"] -> do 
+            let currentEvidence = evidence gameState
+            printLines $ getEvidenceDescription currentEvidence
+            gameLoop gameState
+        ["talk", "to", charStr] -> do 
+            newGameState <- talkTo charStr gameState
+            gameLoop newGameState
+        ["ask", "about", clueStr] -> do 
+            newGameState <- askAbout clueStr gameState
+            gameLoop newGameState
         ["examine", placeStr] -> do 
             newGameState <- examine placeStr gameState
             gameLoop newGameState
-        ["talk", "to", charStr] -> do 
-            talkTo charStr gameState
-            gameLoop gameState
         ["take", itemStr] -> do
             newGameState <- takeItem itemStr gameState
             gameLoop newGameState
@@ -109,6 +119,13 @@ gameLoop gameState = do
             gameLoop gameState
         ["gamestate"] -> do
             putStrLn $ show gameState
+            gameLoop gameState
+        ["spawn", itemStr] -> do
+            newGameState <- spawnItem itemStr gameState
+            gameLoop newGameState
+        ["checktool"] -> do
+            let currentInventory = inventory gameState
+            putStrLn $ show $ hasRequiredItemsForTool currentInventory
             gameLoop gameState
         ["quit"] -> return ()
         _ -> do 

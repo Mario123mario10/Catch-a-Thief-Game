@@ -4,6 +4,8 @@ import System.Random
 import Data.List.Split
 import Data.List
 import Data.Maybe
+import Data.Map (Map)
+import qualified Data.Map as Map
 
 import Characters
 import Inventory
@@ -98,9 +100,25 @@ removeItemFromPlace placesAndItems place item =
                 else Nothing  -- Returning Nothing if the item found doesn't match the specified item
         Nothing -> Nothing  -- Returning Nothing if the place is not found in the list
 
-addItemBasedClue :: [(Clue, Maybe Character)] -> Item -> [(Clue, Maybe Character)]
-addItemBasedClue evidence item = case item of
-    VaultKey -> evidence ++ [(StolenVaultKey, Nothing)]
-    Diamond -> evidence ++ [(StolenDiamond, Nothing)]
-    CoinPouch -> evidence ++ [(StolenCoins, Nothing)]
-    _ -> evidence
+-- Function to add/update a clue with its associated maybe character in the evidence map
+addEvidence :: Map.Map Clue (Maybe Character) -> Clue -> Maybe Character -> Map.Map Clue (Maybe Character)
+addEvidence evidence clue maybeCharacter =
+    case Map.lookup clue evidence of
+        Just maybeChar ->
+            case maybeChar of
+                Just _ -> evidence -- Clue exists with a character, return the original evidence unchanged
+                Nothing -> Map.insert clue maybeCharacter evidence -- Clue exists with 'Nothing', update it
+        Nothing -> Map.insert clue maybeCharacter evidence -- Clue doesn't exist, add it with the given value
+
+specifyClue :: Map.Map Clue (Maybe Character) -> [(Character, [Clue])] -> Clue -> Map.Map Clue (Maybe Character)
+specifyClue evidence clues clue = 
+    let character = whoIsGuilty clues clue
+    in addEvidence evidence clue (Just character)
+
+getEvidenceDescription :: Map.Map Clue (Maybe Character) -> [String]
+getEvidenceDescription evidenceMap =
+    [ case maybeChar of
+        Just character -> show clue ++ " - " ++ show character
+        Nothing -> show clue ++ " - Unknown suspect"
+    | (clue, maybeChar) <- Map.toList evidenceMap
+    ]

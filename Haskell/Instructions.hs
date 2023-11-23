@@ -1,5 +1,8 @@
 module Instructions where
 
+import Data.Map (Map)
+import qualified Data.Map as Map
+
 import Printing
 import Places
 import Inventory
@@ -14,7 +17,7 @@ data GameState = GameState {
     clues :: [(Character, [Clue])], 
     items :: [(Place, (Item, Int))], 
     inventory :: [(Item, Int)], 
-    evidence :: [(Clue, Maybe Character)],
+    evidence :: Map.Map Clue (Maybe Character),
     gaveMushrooms :: Bool
     } deriving (Show)
 
@@ -24,8 +27,10 @@ instructionsText = [
     "instructions        -- to see these instructions.",
     "look                -- to look around the room.",
     "inventory           -- to see what's currently in inventory.",
-    "talk to [Character] -- to see what's currently in inventory.",
+    "evidence            -- to see all evidence we know about.",
     "",
+    "talk to [Character] -- to start conversation with character.",
+    "ask about [Clue]    -- to ask about clue.",
     "examine [Place]     -- to examine specific place in a room.",
     "take [Item]         -- to take avaiable item to inventory.",
     "go to [Room]        -- to go to one of avaiable rooms.",
@@ -43,6 +48,8 @@ debugInstructionsText = [
     "clues               -- to see characters and their clues",
     "items               -- to see all places and their items",
     "gamestate           -- to see game state info",
+    "spawn [Item]        -- to spawn item into inventory",
+    "checktool           -- to check if tool can be created",
     ""
     ]
 
@@ -65,7 +72,7 @@ goTo roomStr gameState = do
                                                 then visitedRooms gameState
                                                 else destinationRoom : visitedRooms gameState
 
-                    let newGameState = gameState { currentRoom = destinationRoom, visitedRooms = updatedVisitedRooms, examining = Nothing }
+                    let newGameState = gameState { currentRoom = destinationRoom, visitedRooms = updatedVisitedRooms, examining = Nothing, talking = Nothing }
                     let roomDescription = getRoomDescription destinationRoom (visitedRooms gameState)
                     printLines roomDescription
                     return newGameState
@@ -124,11 +131,44 @@ takeItem itemStr gameState = do
                             putStrLn $ "\nYou took " ++ show item ++ "."
                             printLines $ getItemDescription item
 
+                            -- update inventory
                             let currentInventory = inventory gameState
-                            let updatedinventory = addItemToInventory currentInventory (item, 1)
+                            let newInventory = addItemToInventory currentInventory (item, 1)
 
-                            let newGameState = gameState { items = updatedItems, inventory = updatedinventory }
-                            return newGameState
+                            -- update evidence
+                            let currentClues = clues gameState
+                            let currentEvidence = evidence gameState
+                            let newEvidence = case item of
+                                    ToolHandle -> addEvidence currentEvidence BloodStains Nothing
+                                    VaultKey -> addEvidence currentEvidence StolenVaultKey Nothing
+                                    Diamond -> addEvidence currentEvidence StolenDiamond Nothing
+                                    CoinPouch -> addEvidence currentEvidence StolenCoins Nothing
+                                    _ -> currentEvidence
+
+                            -- check if created a tool
+                            if hasRequiredItemsForTool newInventory
+                                then do
+                                    let removedHandle = case removeItemFromInventory newInventory (ToolHandle, 1) of
+                                            Just updatedInv -> updatedInv
+                                            Nothing -> newInventory
+                                    let removedParts = case removeItemFromInventory removedHandle (ToolPart, 2) of
+                                            Just updatedInv -> updatedInv
+                                            Nothing -> newInventory
+
+                                    let tool = case whoIsGuilty currentClues Tool of
+                                            Gardener -> Rake
+                                            Cook -> Ladle
+                                            Butler -> FeatherDuster
+                                    let addedTool = addItemToInventory removedParts (tool, 1)
+
+                                    putStrLn $ "\nFrom tool parts you successfuly crafted " ++ show tool ++ "."
+                                    printLines $ getItemDescription tool
+
+                                    let updatedEvidence = addEvidence newEvidence Tool Nothing
+
+                                    return gameState { items = updatedItems, inventory = addedTool, evidence = updatedEvidence }
+                                else 
+                                    return gameState { items = updatedItems, inventory = newInventory, evidence = newEvidence }
                         Nothing -> do
                             putStrLn $ "\nYou can't take " ++ show item ++ " from here."
                             return gameState
@@ -139,7 +179,22 @@ takeItem itemStr gameState = do
             putStrLn "You must first examine a Place."
             return gameState
 
-talkTo :: String -> GameState -> IO ()
+spawnItem :: String -> GameState -> IO GameState
+spawnItem itemStr gameState = do
+    case stringToItem itemStr of
+        Just item -> do
+            putStrLn $ "\nYou took " ++ show item ++ "."
+            printLines $ getItemDescription item
+
+            let currentInventory = inventory gameState
+                newInventory = addItemToInventory currentInventory (item, 1)
+                updatedGameState = gameState { inventory = newInventory }
+            return updatedGameState
+        Nothing -> do
+            putStrLn "Invalid item name."
+            return gameState
+
+talkTo :: String -> GameState -> IO GameState
 talkTo charStr gameState = do
     let maybeCharacter = stringToCharacter charStr
     case maybeCharacter of
@@ -152,12 +207,59 @@ talkTo charStr gameState = do
                             let currentClues = clues gameState
                             let currentGaveMushrooms = gaveMushrooms gameState
                             let text = getCharacterText currentClues character currentGaveMushrooms
-                            printLines text  
-                            return ()
+                            printLines text
+
+                            -- update evidence
+                            let currentClues = clues gameState
+                            let currentEvidence = evidence gameState
+                            let updatedEvidence = case character of
+                                    Guard -> specifyClue currentEvidence currentClues GuardsClue
+                                    Wizard -> 
+                                        if currentGaveMushrooms == True
+                                            then
+                                                specifyClue currentEvidence currentClues WizardsClue
+                                            else
+                                                currentEvidence
+                                    _ -> currentEvidence
+ 
+                            return gameState {talking = Just character, evidence = updatedEvidence}
                         else do 
                             putStrLn "You can't talk to him right now."
-                            return ()
-                Nothing -> return ()
+                            return gameState
+                Nothing -> return gameState
         Nothing -> do
             putStrLn "Invalid character."
-            return ()  
+            return gameState
+
+askAbout :: String -> GameState -> IO GameState
+askAbout clueStr gameState = do
+    let maybeClue = stringToClue clueStr
+    case maybeClue of
+        Just clue -> do
+            let maybeCharacter = talking gameState
+            case maybeCharacter of
+                Just character -> do
+                    let currentEvidence = evidence gameState
+                    if Map.member clue currentEvidence
+                        then do
+                            let currentClues = clues gameState
+                            let text = getClueCharacterText currentClues character clue
+                            printLines text
+
+                            -- update evidence
+                            let updatedEvidence = if isCharacterGuilty currentClues character clue
+                                    then
+                                        specifyClue currentEvidence currentClues clue
+                                    else
+                                        currentEvidence
+                            
+                            return gameState {evidence = updatedEvidence}
+                        else do
+                            putStrLn "What are you talking about?"
+                            return gameState
+                Nothing -> do
+                    putStrLn "Who are you talking to? You must first talk to a Character."
+                    return gameState
+        Nothing -> do
+            putStrLn "Invalid clue."
+            return gameState

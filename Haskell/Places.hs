@@ -191,6 +191,8 @@ stringToPlace str = case map toLower str of
     "bushes" -> Just RoseBushes
     "kingsculpture" -> Just KingSculpture
     "sculpture" -> Just KingSculpture
+    "kingsstatue" -> Just KingSculpture
+    "statue" -> Just KingSculpture
     "dirtmound" -> Just DirtMound
     "dirt" -> Just DirtMound
     "mound" -> Just DirtMound
