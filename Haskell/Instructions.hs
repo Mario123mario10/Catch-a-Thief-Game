@@ -409,9 +409,9 @@ accuseCharacter charStr gameState =
             let currentClues = clues gameState
             if isCharacterTheThief currentClues character
                 then do
-                    printLines ["", "You win"]
+                    printLines ["", "You win! \128077"]
                     return True
                 else do
-                    printLines ["", "You loose"]
+                    printLines ["", "You lose! \128546"]
                     return True
         Nothing -> return False
