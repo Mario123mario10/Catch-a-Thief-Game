@@ -15,6 +15,7 @@ stringToItem str = case map toLower str of
     "handle" -> Just ToolHandle
     "toolpart" -> Just ToolPart
     "part" -> Just ToolPart
+    "parts" -> Just ToolPart
     "vaultkey" -> Just VaultKey
     "key" -> Just VaultKey
     "butlerskeys" -> Just ButlersKeys
@@ -23,6 +24,7 @@ stringToItem str = case map toLower str of
     "coinpouch" -> Just CoinPouch
     "pouch" -> Just CoinPouch
     "mushroom" -> Just Mushroom
+    "mushrooms" -> Just Mushroom
     "dirt" -> Just Dirt
     "soil" -> Just Dirt
     _ -> Nothing
@@ -44,12 +46,17 @@ getItemDescription item =
 
 formatItem :: (Item, Int) -> String
 formatItem (item, count) =
-    let itemCountStr = if count > 1 then "s" else "" in
+    let itemCountStr = if count > 1 && item /= Dirt then "s" else "" in
         show item ++ itemCountStr ++ ": " ++ show count
 
 getInventoryDescription :: [(Item, Int)] -> [String]
 getInventoryDescription [] = []
 getInventoryDescription inventory = map formatItem inventory
+
+isItemInInventory :: [(Item, Int)] -> Item -> Bool
+isItemInInventory inventory itemToFind = case find (\(item, _) -> item == itemToFind) inventory of
+    Just _ -> True
+    Nothing -> False
 
 addItemToInventory :: [(Item, Int)] -> (Item, Int) -> [(Item, Int)]
 addItemToInventory inventory newItem@(item, count) =
@@ -85,16 +92,7 @@ allClues :: [Clue]
 allClues = [Tool, StolenVaultKey, StolenDiamond, GuardsClue, WizardsClue, StolenCoins, BloodStains]
 
 instance Ord Clue where
-    compare clue1 clue2 = compare (clueToInt clue1) (clueToInt clue2)
-        where
-            clueToInt :: Clue -> Int
-            clueToInt Tool = 1
-            clueToInt StolenVaultKey = 2
-            clueToInt StolenDiamond = 3
-            clueToInt GuardsClue = 4
-            clueToInt WizardsClue = 5
-            clueToInt StolenCoins = 6
-            clueToInt BloodStains = 7
+    compare clue1 clue2 = compare (show clue1) (show clue2)
 
 stringToClue :: String -> Maybe Clue
 stringToClue str = case map toLower str of

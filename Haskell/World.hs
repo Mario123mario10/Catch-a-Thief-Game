@@ -89,16 +89,14 @@ isItemInPlace :: [(Place, (Item, Int))] -> Place -> Item -> Bool
 isItemInPlace placesWithItems place item =
     any (\(p, (i, _)) -> p == place && i == item) placesWithItems
 
-removeItemFromPlace :: [(Place, (Item, Int))] -> Place -> Item -> Maybe [(Place, (Item, Int))]
-removeItemFromPlace placesAndItems place item =
-    case lookup place placesAndItems of
-        Just (itemName, itemCount) ->
-            if itemName == item
-                then if itemCount == 1
-                        then Just $ filter (\(p, _) -> p /= place) placesAndItems
-                        else Just $ map (\(p, (i, c)) -> if p == place && i == item then (p, (i, c - 1)) else (p, (i, c - 1))) placesAndItems
-                else Nothing  -- Returning Nothing if the item found doesn't match the specified item
-        Nothing -> Nothing  -- Returning Nothing if the place is not found in the list
+removeItemFromPlace :: [(Place, (Item, Int))] -> Place -> Item -> (Maybe (Item, Int), [(Place, (Item, Int))])
+removeItemFromPlace items place item =
+    let matchingItem = find (\(p, (i, _)) -> p == place && i == item) items
+    in case matchingItem of
+        Just foundItem ->
+            let updatedItems = filter (\(p, _) -> p /= place || p == place && fst (snd foundItem) /= item) items
+            in (Just (snd foundItem), updatedItems)
+        Nothing -> (Nothing, items)
 
 -- Function to add/update a clue with its associated maybe character in the evidence map
 addEvidence :: Map.Map Clue (Maybe Character) -> Clue -> Maybe Character -> Map.Map Clue (Maybe Character)

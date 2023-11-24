@@ -1,7 +1,8 @@
 module Characters where
 
 import Data.Char (toLower, isSpace)
-import Data.List (find)
+import Data.List
+import Data.Function (on)
 
 import Inventory
 
@@ -19,6 +20,16 @@ stringToCharacter charStr = case map toLower charStr of
     "cook" -> Just Cook
     "butler" -> Just Butler
     _ -> Nothing
+
+countClues :: [(Character, [Clue])] -> [(Character, Int)]
+countClues = map (\(char, clues) -> (char, length clues))
+
+isCharacterTheThief :: [(Character, [Clue])] -> Character -> Bool
+isCharacterTheThief charactersWithClues character =
+    let characterClueCounts = countClues charactersWithClues
+        maxClueCount = maximumBy (compare `on` snd) characterClueCounts
+        characterCount = length $ filter (\(char, count) -> char == character && (snd maxClueCount) == count) characterClueCounts
+    in characterCount > 0
 
 isCharacterGuilty :: [(Character, [Clue])] -> Character -> Clue -> Bool
 isCharacterGuilty clues character clue = case find (\(char, charClues) -> char == character && clue `elem` charClues) clues of
@@ -64,7 +75,7 @@ getCharacterText clues character gaveMushrooms = case character of
                 "",
                 "'Hello, soldier,' says the wizard with a look of sneer. 'It appears that you have a reason to visit my humble chambers. I understand that you have come to ask me about the king's jewel. As for my possible role in this matter, allow me to explain... I have no desire nor time to play vault busting. Stealing gold and diamonds from monarchs would just be boring. Besides, I have no use for these kinds of riches.'",
                 "",
-                "However, the wizard continues, 'I was in my tower when I heard that noise in the courtyard. I know exactly who was responsible, and I know what was used to perform this. In fact, I gave him that item in return for a favor. I'm willing to share this information with you, but I won't do it for free. You must collect X mushrooms from the magical forest surrounding the castle, and then I will be willing to share my knowledge.' The wizard expresses his tiredness in his tone of voice."
+                "However, the wizard continues, 'I was in my tower when I heard that noise in the courtyard. I know exactly who was responsible, and I know what was used to perform this. In fact, I gave him that item in return for a favor. I'm willing to share this information with you, but I won't do it for free. You must collect 10 mushrooms from the magical forest surrounding the castle, and then I will be willing to share my knowledge.' The wizard expresses his tiredness in his tone of voice."
             ]
             else 
                 case find (\(_, charClues) -> WizardsClue `elem` charClues) clues of
@@ -254,3 +265,16 @@ getClueCharacterText clues character clue = case character of
                 "'That is, of course, mighty interesting, sir! Is that all? If so, I must resume to my duties.'"
                 ]
     _ -> ["", "'I don't know much about it. Did you found a thief?'"]
+
+
+giveMushroomsToWizard :: [(Item, Int)] -> IO ([(Item, Int)], Bool)
+giveMushroomsToWizard inventory = 
+    let maybeUpdatedInventory = removeItemFromInventory inventory (Mushroom, 10)
+    in
+        case maybeUpdatedInventory of
+            Just updatedInventory -> do
+                putStrLn "You gave Wizard 10 mushrooms."
+                return (updatedInventory, True)
+            Nothing -> do
+                putStrLn "'You don't have enough mushrooms! Come back when you have them.'"
+                return (inventory, False)

@@ -55,8 +55,15 @@ initializeGame = do
         clues = clues, 
         items = items, 
         inventory = [], 
-        evidence = Map.empty, 
-        gaveMushrooms = False
+        evidence = Map.empty,
+        isButlerDistracted = False,
+        gaveMushrooms = False,
+        isServantsHouseLocked = True,
+        arePlacesLocked = Map.fromList
+            [ (GardenerChest, True)
+            , (CookChest, True)
+            , (ButlerChest, True)
+            ]
         }
 
 readCommand :: IO String
@@ -92,14 +99,23 @@ gameLoop gameState = do
         ["ask", "about", clueStr] -> do 
             newGameState <- askAbout clueStr gameState
             gameLoop newGameState
+        ["give", itemStr] -> do 
+            newGameState <- giveItem itemStr gameState
+            gameLoop newGameState
         ["examine", placeStr] -> do 
             newGameState <- examine placeStr gameState
             gameLoop newGameState
         ["take", itemStr] -> do
             newGameState <- takeItem itemStr gameState
             gameLoop newGameState
+        ["drop", itemStr] -> do
+            newGameState <- dropItem itemStr gameState
+            gameLoop newGameState
         ["go", "to", roomStr] -> do
             newGameState <- goTo roomStr gameState
+            gameLoop newGameState
+        ["unlock", roomOrPlaceStr] -> do
+            newGameState <- unlockRoomOrPlace roomOrPlaceStr gameState
             gameLoop newGameState
         ["visited"] -> do
             let visited = visitedRooms gameState
@@ -127,6 +143,14 @@ gameLoop gameState = do
             let currentInventory = inventory gameState
             putStrLn $ show $ hasRequiredItemsForTool currentInventory
             gameLoop gameState
+        ["tp", roomStr] -> do
+            newGameState <- tp roomStr gameState
+            gameLoop newGameState
+        ["accuse", charStr] -> do
+            validAccusation <- accuseCharacter charStr gameState
+            if validAccusation
+                then return ()
+                else gameLoop gameState
         ["quit"] -> return ()
         _ -> do 
             printLines ["Unknown command.", ""]

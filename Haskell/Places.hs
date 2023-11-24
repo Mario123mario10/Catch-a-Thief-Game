@@ -1,6 +1,9 @@
 module Places where
 
 import Data.Char (toLower, isSpace)
+import Data.Map (Map)
+import qualified Data.Map as Map
+
 import Characters
 
 -----------------------------------
@@ -19,10 +22,17 @@ stringToRoom str = case map toLower str of
     "vault" -> Just Vault
     "kitchen" -> Just Kitchen
     "royalbedroom" -> Just RoyalBedroom
+    "butlerroom" -> Just RoyalBedroom
     "bedroom" -> Just RoyalBedroom
     "garden" -> Just Garden
     "servantshouse" -> Just ServantsHouse
+    "servantsroom" -> Just ServantsHouse
+    "servanthouse" -> Just ServantsHouse
+    "servantroom" -> Just ServantsHouse
     "wizardstower" -> Just WizardsTower
+    "wizardshome" -> Just WizardsTower
+    "wizardtower" -> Just WizardsTower
+    "wizardhome" -> Just WizardsTower
     "forest" -> Just Forest
     _ -> Nothing
 
@@ -177,6 +187,9 @@ getLongRoomDescription room = case room of
 
 data Place = VaultDoor | GardenPond | RoseBushes | KingSculpture | DirtMound | Mirror | Bed | Wardrobe | NightTable | Oven | BagOfFlour | KitchenUnit | ButlerChest | CookChest | GardenerChest | Lakeshore | OldTree | HiddenClearing | MushroomPatch | WildlifeNest deriving (Show, Eq)
 
+instance Ord Place where
+    compare a b = compare (show a) (show b)
+
 allPlaces :: [Place]
 allPlaces = [VaultDoor, GardenPond, RoseBushes, KingSculpture, Mirror, Bed, Wardrobe, NightTable, Oven, BagOfFlour, KitchenUnit, ButlerChest, CookChest, GardenerChest, Lakeshore, OldTree, HiddenClearing, MushroomPatch, WildlifeNest]
 
@@ -190,8 +203,10 @@ stringToPlace str = case map toLower str of
     "rosebushes" -> Just RoseBushes
     "bushes" -> Just RoseBushes
     "kingsculpture" -> Just KingSculpture
+    "kingculpture" -> Just KingSculpture
     "sculpture" -> Just KingSculpture
     "kingsstatue" -> Just KingSculpture
+    "kingstatue" -> Just KingSculpture
     "statue" -> Just KingSculpture
     "dirtmound" -> Just DirtMound
     "dirt" -> Just DirtMound
@@ -224,13 +239,28 @@ stringToPlace str = case map toLower str of
 
 -- Function returning each Place inside of Room
 insideRoom :: Room -> [Place]
-insideRoom Vault = [VaultDoor]
-insideRoom Garden = [GardenPond, RoseBushes, KingSculpture]
-insideRoom RoyalBedroom = [Mirror, Bed, Wardrobe, NightTable]
-insideRoom Kitchen = [Oven, BagOfFlour, KitchenUnit]
-insideRoom ServantsHouse = [ButlerChest, CookChest, GardenerChest, DirtMound]
-insideRoom Forest = [Lakeshore, OldTree, HiddenClearing, MushroomPatch, WildlifeNest]
-insideRoom _ = []
+insideRoom room = case room of
+    Vault -> [VaultDoor]
+    Garden -> [GardenPond, RoseBushes, KingSculpture]
+    RoyalBedroom -> [Mirror, Bed, Wardrobe, NightTable]
+    Kitchen -> [Oven, BagOfFlour, KitchenUnit]
+    ServantsHouse -> [ButlerChest, CookChest, GardenerChest, DirtMound]
+    Forest -> [Lakeshore, OldTree, HiddenClearing, MushroomPatch, WildlifeNest]
+    _ -> []
+
+isPlaceinsideRoom :: Room -> Place -> Bool -> Bool
+isPlaceinsideRoom room place isServantsHouseLocked = 
+    if room == ServantsHouse && isServantsHouseLocked
+        then
+            False
+        else
+            place `elem` insideRoom room
+
+isPlaceLocked :: Map.Map Place Bool -> Place -> Bool
+isPlaceLocked arePlacesLocked place =
+    case Map.lookup place arePlacesLocked of
+        Just unlocked -> unlocked
+        Nothing -> False
 
 -- Function checking if Room has Places
 areInnerPlaces :: Room -> Bool
@@ -267,22 +297,36 @@ getPlaceDescription place = case place of
 -----------------------------------
 
 -- Function to get short or long room descriptions based on visit status
-getRoomDescription :: Room -> [Room] -> [String]
-getRoomDescription current visited =
-    let description = if current `elem` visited
-            then getShortRoomDescription current
-            else getLongRoomDescription current
-
-        descriptionWithCharacters = 
-            case getCharacterInRoom current of
-                Just char -> description ++ ["", "Here you can talk to " ++ show char ++ "."]
-                Nothing -> description
-    
-        places = insideRoom current
-        descriptionWithPlaces = if null places
-            then descriptionWithCharacters
-            else descriptionWithCharacters ++ ["", "You can examine the following places: " ++ show places ++ "." ]
+getRoomDescription :: Room -> [Room] -> Bool -> [String]
+getRoomDescription current visited isServantsHouseLocked =
+    if current == ServantsHouse && isServantsHouseLocked == True
+        then
+            ["", "You are welcomed by a locked door. You won't get inside without a key. Royal Chamberlains used to carry keys for every lock on a single keychain."]
+        else    
+            let description = if current `elem` visited
+                    then getShortRoomDescription current
+                    else getLongRoomDescription current
         
-        connectedRooms = roomsConnectedToRoom current
-        descriptionWithRooms = descriptionWithPlaces ++ ["", "From " ++ show current ++ " you can go to: " ++ show connectedRooms ++ "." ]
-    in descriptionWithRooms
+                descriptionWithCharacters = 
+                    case getCharacterInRoom current of
+                        Just char -> description ++ ["", "Here you can talk to " ++ show char ++ "."]
+                        Nothing -> description
+            
+                places = insideRoom current
+                descriptionWithPlaces = if null places
+                    then descriptionWithCharacters
+                    else descriptionWithCharacters ++ ["", "You can examine the following places: " ++ show places ++ "." ]
+                
+                connectedRooms = roomsConnectedToRoom current
+                descriptionWithRooms = descriptionWithPlaces ++ ["", "From " ++ show current ++ " you can go to: " ++ show connectedRooms ++ "." ]
+            in descriptionWithRooms
+
+updateVisitedRooms :: Room -> [Room] -> Bool -> [Room]
+updateVisitedRooms current visited isServantsHouseLocked = 
+    if current == ServantsHouse && isServantsHouseLocked == True
+        then
+            visited
+        else
+            if current `elem` visited
+                then visited
+                else current : visited
