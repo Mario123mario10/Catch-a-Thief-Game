@@ -4,6 +4,7 @@ import Data.List
 import Data.Maybe
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Time.Clock
 
 import Printing
 import Places
@@ -12,8 +13,10 @@ import Characters
 import World
 
 data GameState = GameState { 
+    startTime :: UTCTime,
     currentRoom :: Room, 
     visitedRooms :: [Room], 
+    roomHistory :: [Room],
     examining :: Maybe Place, 
     talking :: Maybe Character, 
     clues :: [(Character, [Clue])], 
@@ -30,6 +33,7 @@ instructionsText = [
     "Available commands are:",
     "",
     "instructions        -- to see these instructions.",
+    "time                -- to see remaining time.",
     "look                -- to look around the room.",
     "inventory           -- to see what's currently in inventory.",
     "evidence            -- to see all evidence we know about.",
