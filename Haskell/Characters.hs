@@ -71,7 +71,7 @@ getCharacterText clues character gaveMushrooms = case character of
         if not gaveMushrooms
             then [
                 "",
-                "You stand before the court wizard of King Alaric III, an old man with observant eyes. He has a long beard and a distinctive black sorcerer's hat. ((Opcjonalnie)) You see a fresh wound on his cheek. He is well known throughout the kingdom, both for his astonishing sorcery and his arrogance, as well as his incredible wisdom. At first glance, it is clear that even the king himself would not dare to go against him.",
+                "You stand before the court wizard of King Alaric III, an old man with observant eyes. He has a long beard and a distinctive black sorcerer's hat. He is well known throughout the kingdom, both for his astonishing sorcery and his arrogance, as well as his incredible wisdom. At first glance, it is clear that even the king himself would not dare to go against him.",
                 "",
                 "'Hello, soldier,' says the wizard with a look of sneer. 'It appears that you have a reason to visit my humble chambers. I understand that you have come to ask me about the king's jewel. As for my possible role in this matter, allow me to explain... I have no desire nor time to play vault busting. Stealing gold and diamonds from monarchs would just be boring. Besides, I have no use for these kinds of riches.'",
                 "",

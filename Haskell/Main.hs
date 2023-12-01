@@ -131,6 +131,9 @@ gameLoop gameState = do
                 ["go", "to", roomStr] -> do
                     newGameState <- goTo roomStr gameState
                     gameLoop newGameState
+                ["back"] -> do
+                    newGameState <- back gameState
+                    gameLoop newGameState
                 ["unlock", roomOrPlaceStr] -> do
                     newGameState <- unlockRoomOrPlace roomOrPlaceStr gameState
                     gameLoop newGameState

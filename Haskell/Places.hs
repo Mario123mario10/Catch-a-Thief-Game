@@ -72,6 +72,13 @@ getCharacterInRoom room = case room of
     WizardsTower -> Just Wizard
     _ -> Nothing
 
+addToRoomHistroy :: [Room] -> Room -> [Room]
+addToRoomHistroy history room = [room] ++ history
+
+popFromRoomHistory :: [Room] -> Maybe (Room, [Room])
+popFromRoomHistory [] = Nothing
+popFromRoomHistory (x:xs) = Just (x, xs)
+
 -- Function to get short room descriptions
 getShortRoomDescription :: Room -> [String]
 getShortRoomDescription room = case room of

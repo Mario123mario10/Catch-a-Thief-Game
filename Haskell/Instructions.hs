@@ -45,6 +45,7 @@ instructionsText = [
     "take [Item]         -- to take avaiable item to inventory.",
     "drop [Item]         -- to drop an item.",
     "go to [Room]        -- to go to one of avaiable rooms.",
+    "back                -- to go to last room.",
     "unlock [Room/Place] -- to unlock locked room/place with keys",
     "accuse [Character]  -- to character and if correct win the game",
     "",
@@ -92,7 +93,7 @@ tp roomStr gameState = do
     case maybeRoom of
         Just destinationRoom -> do
             newGameState <- moveToRoom destinationRoom gameState
-            return newGameState
+            return newGameState {roomHistory = addToRoomHistroy (roomHistory newGameState) current}
         Nothing -> do
             putStrLn "Invalid room name."
             return gameState
@@ -106,12 +107,23 @@ goTo roomStr gameState = do
             if areConnected current destinationRoom
                 then do
                     newGameState <- moveToRoom destinationRoom gameState
-                    return newGameState
+                    return newGameState {roomHistory = addToRoomHistroy (roomHistory newGameState) current}
                 else do
                     putStrLn $ "You can't move from " ++ show current ++ " to " ++ show destinationRoom ++ "."
                     return gameState
         Nothing -> do
             putStrLn "Invalid room name."
+            return gameState
+
+back :: GameState -> IO GameState
+back gameState = do
+    let history = roomHistory gameState
+    case popFromRoomHistory history of
+        Just (destinationRoom, updatedHistroy) -> do
+            newGameState <- moveToRoom destinationRoom gameState
+            return newGameState {roomHistory = updatedHistroy}
+        Nothing -> do
+            putStrLn "No room history."
             return gameState
 
 look :: GameState -> IO ()
