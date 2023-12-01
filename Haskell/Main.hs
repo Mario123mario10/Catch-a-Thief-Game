@@ -96,7 +96,7 @@ gameLoop gameState = do
                     printLinesWithoutSplit debugInstructionsText
                     gameLoop gameState
                 ["look"] -> do 
-                    look gameState
+                    printLines $ look gameState
                     gameLoop gameState
                 ["inventory"] -> do 
                     let currentInventory = inventory gameState
@@ -107,31 +107,40 @@ gameLoop gameState = do
                     printLines $ getEvidenceDescription currentEvidence
                     gameLoop gameState
                 ["talk", "to", charStr] -> do 
-                    newGameState <- talkTo charStr gameState
+                    let (text, newGameState) = talkTo charStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["ask", "about", clueStr] -> do 
-                    newGameState <- askAbout clueStr gameState
+                    let (text, newGameState) = askAbout clueStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["give", itemStr] -> do 
-                    newGameState <- giveItem itemStr gameState
+                    let (text, newGameState) = giveItem itemStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["examine", placeStr] -> do 
-                    newGameState <- examine placeStr gameState
+                    let (text, newGameState) = examine placeStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["take", itemStr] -> do
-                    newGameState <- takeItem itemStr gameState
+                    let (text, newGameState) = takeItem itemStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["drop", itemStr] -> do
-                    newGameState <- dropItem itemStr gameState
+                    let (text, newGameState) = dropItem itemStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["go", "to", roomStr] -> do
-                    newGameState <- goTo roomStr gameState
+                    let (text, newGameState) = goTo roomStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["back"] -> do
-                    newGameState <- back gameState
+                    let (text, newGameState) = back gameState
+                    printLines text
                     gameLoop newGameState
                 ["unlock", roomOrPlaceStr] -> do
-                    newGameState <- unlockRoomOrPlace roomOrPlaceStr gameState
+                    let (text, newGameState) = unlockRoomOrPlace roomOrPlaceStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["visited"] -> do
                     let visited = visitedRooms gameState
@@ -153,17 +162,20 @@ gameLoop gameState = do
                     putStrLn $ show gameState
                     gameLoop gameState
                 ["spawn", itemStr] -> do
-                    newGameState <- spawnItem itemStr gameState
+                    let (text, newGameState) = spawnItem itemStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["checktool"] -> do
                     let currentInventory = inventory gameState
                     putStrLn $ show $ hasRequiredItemsForTool currentInventory
                     gameLoop gameState
                 ["tp", roomStr] -> do
-                    newGameState <- tp roomStr gameState
+                    let (text, newGameState) = tp roomStr gameState
+                    printLines text
                     gameLoop newGameState
                 ["accuse", charStr] -> do
-                    validAccusation <- accuseCharacter charStr gameState
+                    let (text, validAccusation) = accuseCharacter charStr gameState
+                    printLines text
                     if validAccusation
                         then return ()
                         else gameLoop gameState
@@ -175,7 +187,8 @@ gameLoop gameState = do
             printLines ["You have ran out of time.", "You must accuse someone", ""]
             case words cmd of
                 ["accuse", charStr] -> do
-                    validAccusation <- accuseCharacter charStr gameState
+                    let (text, validAccusation) = accuseCharacter charStr gameState
+                    printLines text
                     if validAccusation
                         then return ()
                         else gameLoop gameState
@@ -190,6 +203,7 @@ main = do
     printInstructions
 
     gameState <- initializeGame
-    look gameState
+    let text = look gameState
+    printLines text
     gameLoop gameState
 

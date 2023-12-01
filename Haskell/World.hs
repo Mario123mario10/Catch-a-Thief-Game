@@ -11,7 +11,6 @@ import Characters
 import Inventory
 import Places
 
--- Function to shuffle a list
 shuffle :: [a] -> IO [a]
 shuffle xs = do
     gen <- newStdGen
@@ -23,7 +22,6 @@ shuffle xs = do
             (first, (x : rest)) = splitAt index l
          in x : shuffle' (first ++ rest) newGen
 
--- Function to assign clues to characters
 assignClues :: IO [(Character, [Clue])]
 assignClues = do
     let clues = allClues
@@ -43,7 +41,6 @@ assignMushrooms = do
         adjustedMushrooms = map (\m -> round (fromIntegral m * ratio)) mushrooms
         totalAdjusted = sum adjustedMushrooms
 
-        -- Adjust the count of mushrooms to reach the intended total of 10
         diff = 10 - totalAdjusted
         lastAdjusted = if diff /= 0 then take diff (cycle [1 | diff > 0]) else []
         finalMushrooms = zipWith (+) adjustedMushrooms (lastAdjusted ++ repeat 0)
@@ -90,35 +87,6 @@ assignItems characterClues = do
     toolPartPlaces <- assignToolParts emptyPlaces
 
     return $ assignedPlaces ++ toolPartPlaces
-
--- Check if an item is in a specific place within the list
-isItemInPlace :: [(Place, (Item, Int))] -> Place -> Item -> Bool
-isItemInPlace placesWithItems place item =
-    any (\(p, (i, _)) -> p == place && i == item) placesWithItems
-
-removeItemFromPlace :: [(Place, (Item, Int))] -> Place -> Item -> (Maybe (Item, Int), [(Place, (Item, Int))])
-removeItemFromPlace items place item =
-    let matchingItem = find (\(p, (i, _)) -> p == place && i == item) items
-    in case matchingItem of
-        Just foundItem ->
-            let updatedItems = filter (\(p, _) -> p /= place || p == place && fst (snd foundItem) /= item) items
-            in (Just (snd foundItem), updatedItems)
-        Nothing -> (Nothing, items)
-
--- Function to add/update a clue with its associated maybe character in the evidence map
-addEvidence :: Map.Map Clue (Maybe Character) -> Clue -> Maybe Character -> Map.Map Clue (Maybe Character)
-addEvidence evidence clue maybeCharacter =
-    case Map.lookup clue evidence of
-        Just maybeChar ->
-            case maybeChar of
-                Just _ -> evidence -- Clue exists with a character, return the original evidence unchanged
-                Nothing -> Map.insert clue maybeCharacter evidence -- Clue exists with 'Nothing', update it
-        Nothing -> Map.insert clue maybeCharacter evidence -- Clue doesn't exist, add it with the given value
-
-specifyClue :: Map.Map Clue (Maybe Character) -> [(Character, [Clue])] -> Clue -> Map.Map Clue (Maybe Character)
-specifyClue evidence clues clue = 
-    let character = whoIsGuilty clues clue
-    in addEvidence evidence clue (Just character)
 
 getEvidenceDescription :: Map.Map Clue (Maybe Character) -> [String]
 getEvidenceDescription evidenceMap =
