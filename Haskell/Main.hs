@@ -16,25 +16,21 @@ import Inventory
 import World
 
 introductionText = [
-    "A long time ago, in a galaxy far, far away...",
     "",
-    "It is a period of civil war. Rebel",
-    "spaceships, striking from a hidden",
-    "base, have won their first victory",
-    "against the evil Galactic Empire.",
+    "====================================================",
+    "    Mystery of a missing Diamond",
+    "====================================================",
     "",
-    "During the battle, Rebel spies managed",
-    "to steal secret plans to the Empire's",
-    "ultimate weapon, the Death Star, an",
-    "armored space station with enough",
-    "power to destroy an entire planet.",
+    "As a detective, you've been entrusted with",
+    "solving the mystery of a missing diamond.",
+    "To crack the case, you'll need to uncover",
+    "scattered evidence hidden throughout the castle.",
     "",
-    "Pursued by the Empire's sinister agents,",
-    "Princess Leia races home aboard her",
-    "starship, custodian of the stolen plans",
-    "that can save her people and restore",
-    "freedom to the galaxy....",
-    ""
+    "Gather three pieces of evidence against",
+    "a suspect to uncover the thief's identity.",
+    "Use the command 'accuse [Character]'",
+    "to make your accusation.",
+    "A correct accusation leads to victory!"
     ]
 
 printIntroduction = printLinesWithoutSplit introductionText
@@ -82,10 +78,10 @@ gameLoop gameState = do
     let timePassed = diffUTCTime currentTime $ startTime gameState
         timePassedInSeconds = round $ realToFrac timePassed :: Int 
 
+    cmd <- readCommand
+
     let maxGameTime = 25 * 60
     let timeRemaining = maxGameTime - timePassedInSeconds
-
-    cmd <- readCommand
 
     if timeRemaining >= 0
         then do

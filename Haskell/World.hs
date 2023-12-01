@@ -41,7 +41,14 @@ assignMushrooms = do
     let totalMushrooms = sum mushrooms
         ratio = if totalMushrooms > 0 then fromIntegral 10 / fromIntegral totalMushrooms else 0
         adjustedMushrooms = map (\m -> round (fromIntegral m * ratio)) mushrooms
-        combined = zip locations adjustedMushrooms
+        totalAdjusted = sum adjustedMushrooms
+
+        -- Adjust the count of mushrooms to reach the intended total of 10
+        diff = 10 - totalAdjusted
+        lastAdjusted = if diff /= 0 then take diff (cycle [1 | diff > 0]) else []
+        finalMushrooms = zipWith (+) adjustedMushrooms (lastAdjusted ++ repeat 0)
+
+        combined = zip locations finalMushrooms
     return $ map (\(place, count) -> if count == 0 then Nothing else Just (place, (Mushroom, count))) combined
 
 assignToolParts :: [Place] -> IO [(Place, (Item, Int))]

@@ -264,17 +264,4 @@ getClueCharacterText clues character clue = case character of
                 "",
                 "'That is, of course, mighty interesting, sir! Is that all? If so, I must resume to my duties.'"
                 ]
-    _ -> ["", "'I don't know much about it. Did you found a thief?'"]
-
-
-giveMushroomsToWizard :: [(Item, Int)] -> IO ([(Item, Int)], Bool)
-giveMushroomsToWizard inventory = 
-    let maybeUpdatedInventory = removeItemFromInventory inventory (Mushroom, 10)
-    in
-        case maybeUpdatedInventory of
-            Just updatedInventory -> do
-                putStrLn "You gave Wizard 10 mushrooms."
-                return (updatedInventory, True)
-            Nothing -> do
-                putStrLn "'You don't have enough mushrooms! Come back when you have them.'"
-                return (inventory, False)
+    _ -> ["", "'I don't know much about it. Did you find the thief?'"]

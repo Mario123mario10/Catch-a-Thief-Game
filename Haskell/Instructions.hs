@@ -50,7 +50,7 @@ instructionsText = [
     "accuse [Character]  -- to character and if correct win the game",
     "",
     "quit                -- to end the game and quit.",
-    "dev                 -- to see debug instructions.",
+    "dev                 -- to see debug instructions (cheat).",
     ""
     ]
 
@@ -134,110 +134,125 @@ look gameState = do
     printLines roomDescription
 
 examine :: String -> GameState -> IO GameState
-examine placeStr gameState = do
-    let current = currentRoom gameState
-    let servantsHouseLocked = isServantsHouseLocked gameState
-    let maybePlace = stringToPlace placeStr
-    case maybePlace of
-        Just place -> do
-            if isPlaceinsideRoom current place servantsHouseLocked
-                then if isPlaceLocked (arePlacesLocked gameState) place 
-                    then do
-                        putStrLn $ show place ++ " is locked."
-                        return gameState
-                    else do
-                        let description = getPlaceDescription place
-                        printLines description
+examine placeStr gameState = case stringToPlace placeStr of
+    Just place ->
+        let current = currentRoom gameState
+            servantsHouseLocked = isServantsHouseLocked gameState
+        in if isPlaceinsideRoom current place servantsHouseLocked
+            then examineValidPlace place gameState
+            else putStrLn ("You can't examine " ++ show place ++ " right now.") >> return gameState
+    Nothing ->
+        putStrLn "Invalid place name." >> return gameState
 
-                        let examiningMsg = ["", "You are examining " ++ show place ++ "."]
-                        let updatedexaminingMsg = case examining gameState of
-                                Just oldPlace -> ["You stopped examining " ++ show oldPlace ++ "."] ++ examiningMsg
-                                Nothing -> examiningMsg
-                        printLines updatedexaminingMsg
+examineValidPlace :: Place -> GameState -> IO GameState
+examineValidPlace place gameState =
+    if isPlaceLocked (arePlacesLocked gameState) place
+        then putStrLn (show place ++ " is locked.") >> return gameState
+        else do
+            let description = getPlaceDescription place
+            printLines description
 
-                        let newGameState = gameState {examining = Just place}
+            let examiningMsg = ["", "You are examining " ++ show place ++ "."]
+                updatedexaminingMsg = case examining gameState of
+                    Just oldPlace -> ["You stopped examining " ++ show oldPlace ++ "."] ++ examiningMsg
+                    Nothing -> examiningMsg
+            printLines updatedexaminingMsg
 
-                        let itemsInPlace = filter (\(p, _) -> p == place) (items gameState)
-                        case itemsInPlace of
-                            [] -> return newGameState
-                            _ -> do
-                                let itemDescriptions = map (formatItem . snd) itemsInPlace
-                                printLines itemDescriptions
-                                return newGameState
-                else do
-                    putStrLn $ "You can't examine " ++ show place ++ " right now."
-                    return gameState
-        Nothing -> do
-            putStrLn "Invalid place name."
-            return gameState
+            let newGameState = gameState { examining = Just place }
+                itemsInPlace = filter (\(p, _) -> p == place) (items gameState)
+            case itemsInPlace of
+                [] -> return newGameState
+                _ -> do
+                    let itemDescriptions = map (formatItem . snd) itemsInPlace
+                    printLines itemDescriptions
+                    return newGameState
 
 takeItem :: String -> GameState -> IO GameState
 takeItem itemStr gameState = do
     let maybePlace = examining gameState
     case maybePlace of
         Just place -> do
-            let itemsList = items gameState
-            let maybeItem = stringToItem itemStr
-            case maybeItem of
-                Just item -> do
-                    if item == ButlersKeys && place == NightTable && (isButlerDistracted gameState) == False
-                        then do
-                            putStrLn $ "\nYou can't take " ++ show item ++ " while Butler is watching carefully."
-                            return gameState
-                        else do
-                            let (maybeItemCount, updatedItems) = removeItemFromPlace itemsList place item
-                            case maybeItemCount of
-                                Just (_, count) -> do
-                                    putStrLn $ "\nYou took " ++ show count ++ " " ++ show item ++ "."
-                                    printLines $ getItemDescription item
-
-                                    -- update inventory
-                                    let currentInventory = inventory gameState
-                                    let newInventory = addItemToInventory currentInventory (item, count)
-
-                                    -- update evidence
-                                    let currentClues = clues gameState
-                                    let currentEvidence = evidence gameState
-                                    let newEvidence = case item of
-                                            ToolHandle -> addEvidence currentEvidence BloodStains Nothing
-                                            VaultKey -> addEvidence currentEvidence StolenVaultKey Nothing
-                                            Diamond -> addEvidence currentEvidence StolenDiamond Nothing
-                                            CoinPouch -> addEvidence currentEvidence StolenCoins Nothing
-                                            _ -> currentEvidence
-
-                                    -- check if created a tool
-                                    if hasRequiredItemsForTool newInventory
-                                        then do
-                                            let removedHandle = case removeItemFromInventory newInventory (ToolHandle, 1) of
-                                                    Just updatedInv -> updatedInv
-                                                    Nothing -> newInventory
-                                            let removedParts = case removeItemFromInventory removedHandle (ToolPart, 2) of
-                                                    Just updatedInv -> updatedInv
-                                                    Nothing -> newInventory
-
-                                            let tool = case whoIsGuilty currentClues Tool of
-                                                    Gardener -> Rake
-                                                    Cook -> Ladle
-                                                    Butler -> FeatherDuster
-                                            let addedTool = addItemToInventory removedParts (tool, 1)
-
-                                            putStrLn $ "\nFrom tool parts you successfuly crafted " ++ show tool ++ "."
-                                            printLines $ getItemDescription tool
-
-                                            let updatedEvidence = addEvidence newEvidence Tool Nothing
-
-                                            return gameState { items = updatedItems, inventory = addedTool, evidence = updatedEvidence }
-                                        else 
-                                            return gameState { items = updatedItems, inventory = newInventory, evidence = newEvidence }
-                                Nothing -> do
-                                    putStrLn $ "\nYou can't take " ++ show item ++ " from here."
-                                    return gameState
-                Nothing -> do
-                    putStrLn "Invalid item name."
-                    return gameState
+            newGameState <- takeItemFromValidPlace place itemStr gameState
+            return newGameState
         Nothing -> do
             putStrLn "You must first examine a Place."
             return gameState
+
+takeItemFromValidPlace :: Place -> String -> GameState -> IO GameState
+takeItemFromValidPlace place itemStr gameState = do
+    let maybeItem = stringToItem itemStr
+    case maybeItem of
+        Just item -> do
+            newGameState <- takeValidItem place item gameState
+            return newGameState
+        Nothing -> do
+            putStrLn "Invalid item name."
+            return gameState
+
+takeValidItem :: Place -> Item -> GameState -> IO GameState
+takeValidItem place item gameState =
+    if cannotTakeItem item place gameState
+        then cannotTakeItemMessage item >> return gameState
+        else handleItemTake item place gameState
+
+cannotTakeItem :: Item -> Place -> GameState -> Bool
+cannotTakeItem item place gameState =
+    item == ButlersKeys && place == NightTable && not (isButlerDistracted gameState)
+
+cannotTakeItemMessage :: Item -> IO ()
+cannotTakeItemMessage item = putStrLn $ "\nYou can't take " ++ show item ++ " while the Butler is watching carefully."
+
+handleItemTake :: Item -> Place -> GameState -> IO GameState
+handleItemTake item place gameState =
+    let (maybeItemCount, updatedItems) = removeItemFromPlace (items gameState) place item
+    in case maybeItemCount of
+        Just (_, count) -> do
+            putStrLn $ "\nYou took " ++ show count ++ " " ++ show item ++ "."
+            printLines $ getItemDescription item
+            let (updatedGameState, craftedItem) = updateGameStateWithItem item count gameState
+            case craftedItem of
+                Just crafted -> putStrLn $ "\nYou crafted " ++ show crafted ++ " using 2 toolparts and 1 toolhandle."
+                Nothing -> return ()
+            return updatedGameState { items = updatedItems }
+        Nothing -> do 
+            putStrLn $ "\nYou can't take " ++ show item ++ " from here."
+            return gameState
+
+updateEvidenceWithItem :: Item -> Map.Map Clue (Maybe Character) -> Map.Map Clue (Maybe Character)
+updateEvidenceWithItem item currentEvidence = case item of
+    ToolHandle -> addEvidence currentEvidence BloodStains Nothing
+    VaultKey -> addEvidence currentEvidence StolenVaultKey Nothing
+    Diamond -> addEvidence currentEvidence StolenDiamond Nothing
+    CoinPouch -> addEvidence currentEvidence StolenCoins Nothing
+    _ -> currentEvidence 
+
+craftTool :: Item -> [(Item, Int)] -> Map.Map Clue (Maybe Character) -> GameState -> (GameState, Maybe Item)
+craftTool item currentInventory currentEvidence gameState =
+    let currentClues = clues gameState
+        removedHandle = fromMaybe currentInventory (removeItemFromInventory currentInventory (ToolHandle, 1))
+        removedParts = fromMaybe removedHandle (removeItemFromInventory removedHandle (ToolPart, 2))
+        tool = case whoIsGuilty currentClues Tool of
+            Gardener -> Rake
+            Cook -> Ladle
+            Butler -> FeatherDuster
+        addedTool = addItemToInventory removedParts (tool, 1)
+        updatedEvidence = addEvidence currentEvidence Tool Nothing
+        craftedItem = if hasRequiredItemsForTool currentInventory
+                        then Just tool
+                        else Nothing
+        updatedGameState = if hasRequiredItemsForTool currentInventory
+                                then gameState { inventory = addedTool, evidence = updatedEvidence }
+                                else gameState { inventory = currentInventory, evidence = currentEvidence }
+    in (updatedGameState, craftedItem)
+
+updateGameStateWithItem :: Item -> Int -> GameState -> (GameState, Maybe Item)
+updateGameStateWithItem item count gameState =
+    let currentInventory = inventory gameState
+        newInventory = addItemToInventory currentInventory (item, count)
+        newEvidence = updateEvidenceWithItem item (evidence gameState)
+        (updatedGameState, craftedItem) = craftTool item newInventory newEvidence gameState
+    in (updatedGameState, craftedItem)
+    
 
 spawnItem :: String -> GameState -> IO GameState
 spawnItem itemStr gameState = do
@@ -255,179 +270,242 @@ spawnItem itemStr gameState = do
             return gameState
 
 talkTo :: String -> GameState -> IO GameState
-talkTo charStr gameState = do
-    let maybeCharacter = stringToCharacter charStr
-    case maybeCharacter of
-        Just character -> do
-            let current = currentRoom gameState
-            case getCharacterInRoom current of
-                Just char -> do
-                    if character == char
-                        then do
-                            let currentClues = clues gameState
-                            let currentGaveMushrooms = gaveMushrooms gameState
-                            let text = getCharacterText currentClues character currentGaveMushrooms
-                            printLines text
+talkTo charStr gameState =
+    case stringToCharacter charStr of
+        Just character -> handleCharacterTalk character gameState
+        Nothing -> do
+            putStrLn "Invalid character name."
+            return gameState
 
-                            -- update evidence
-                            let currentClues = clues gameState
-                            let currentEvidence = evidence gameState
-                            let updatedEvidence = case character of
-                                    Guard -> specifyClue currentEvidence currentClues GuardsClue
-                                    Wizard -> 
-                                        if currentGaveMushrooms == True
-                                            then
-                                                specifyClue currentEvidence currentClues WizardsClue
-                                            else
-                                                currentEvidence
-                                    _ -> currentEvidence
- 
-                            return gameState {talking = Just character, evidence = updatedEvidence}
-                        else do 
-                            putStrLn "You can't talk to him right now."
-                            return gameState
-                Nothing -> return gameState
+handleCharacterTalk :: Character -> GameState -> IO GameState
+handleCharacterTalk character gameState =
+    case getCharacterInRoom (currentRoom gameState) of
+        Just char ->
+            if character == char
+                then talkWithCharacter character gameState
+                else do
+                    putStrLn "You can't talk to him right now."
+                    return gameState
+        Nothing -> do
+                putStrLn "You can't talk to him right now."
+                return gameState
+
+talkWithCharacter :: Character -> GameState -> IO GameState
+talkWithCharacter character gameState = do
+    let currentClues = clues gameState
+    let currentGaveMushrooms = gaveMushrooms gameState
+    let text = getCharacterText currentClues character currentGaveMushrooms
+    printLines text
+
+    let updatedEvidence = updateEvidenceWithCharacter character currentGaveMushrooms (evidence gameState) (clues gameState)
+    return gameState { talking = Just character, evidence = updatedEvidence }
+
+updateEvidenceWithCharacter :: Character -> Bool -> Map Clue (Maybe Character) -> [(Character, [Clue])] -> Map Clue (Maybe Character)
+updateEvidenceWithCharacter character currentGaveMushrooms currentEvidence currentClues =
+    case character of
+        Guard -> specifyClue currentEvidence currentClues GuardsClue
+        Wizard ->
+            if currentGaveMushrooms
+                then specifyClue currentEvidence currentClues WizardsClue
+                else currentEvidence
+        _ -> currentEvidence
+
+askAbout :: String -> GameState -> IO GameState
+askAbout clueStr gameState =
+    case stringToClue clueStr of
+        Just clue -> handleClue clue gameState
+        Nothing -> do
+            putStrLn "Invalid evidence."
+            return gameState
+
+handleClue :: Clue -> GameState -> IO GameState
+handleClue clue gameState =
+    case talking gameState of
+        Just character -> handleCharacterWithClue clue character gameState
         Nothing -> do
             putStrLn "Invalid character."
             return gameState
 
-askAbout :: String -> GameState -> IO GameState
-askAbout clueStr gameState = do
-    let maybeClue = stringToClue clueStr
-    case maybeClue of
-        Just clue -> do
-            let maybeCharacter = talking gameState
-            case maybeCharacter of
-                Just character -> do
-                    let currentEvidence = evidence gameState
-                    if Map.member clue currentEvidence
-                        then do
-                            let currentClues = clues gameState
-                            let text = getClueCharacterText currentClues character clue
-                            printLines text
-
-                            -- update evidence
-                            let updatedEvidence = if isCharacterGuilty currentClues character clue
-                                    then
-                                        specifyClue currentEvidence currentClues clue
-                                    else
-                                        currentEvidence
-                            
-                            return gameState {evidence = updatedEvidence}
-                        else do
-                            putStrLn "What are you talking about?"
-                            return gameState
-                Nothing -> do
-                    putStrLn "Who are you talking to? You must first talk to a Character."
-                    return gameState
-        Nothing -> do
-            putStrLn "Invalid clue."
+handleCharacterWithClue :: Clue -> Character -> GameState -> IO GameState
+handleCharacterWithClue clue character gameState =
+    if Map.member clue (evidence gameState)
+        then handleExistingClue clue character gameState
+        else do
+            putStrLn "What are you talking about?"
             return gameState
+
+handleExistingClue :: Clue -> Character -> GameState -> IO GameState
+handleExistingClue clue character gameState = do
+    let currentClues = clues gameState
+    let text = getClueCharacterText currentClues character clue
+    printLines text
+
+    let updatedEvidence = if isCharacterGuilty currentClues character clue
+                            then specifyClue (evidence gameState) currentClues clue
+                            else evidence gameState
+
+    return gameState { evidence = updatedEvidence }
 
 giveItem :: String -> GameState -> IO GameState
 giveItem itemStr gameState =
     case stringToItem itemStr of
-        Just item -> do
-            let maybeCharacter = talking gameState
-            case maybeCharacter of
-                Just character -> do
-                    let currentInventory = inventory gameState
-                    if item == Mushroom && character == Wizard
-                        then do
-                            (updatedInventory, wizardGotMushrooms) <- giveMushroomsToWizard currentInventory
-                            if wizardGotMushrooms
-                                then do
-                                    let newGameState = gameState {inventory = updatedInventory, gaveMushrooms = wizardGotMushrooms} 
-                                    updatedGameState <- talkTo "wizard" newGameState
-                                    return updatedGameState
-                                else do
-                                    return gameState
-                        else do
-                            case find (\(i, _) -> i == item) currentInventory of
-                                Just _ -> do
-                                    putStrLn "'I don't need it. Stop bothering me!'"
-                                Nothing -> do
-                                    putStrLn "You don't have this item."
-                            return gameState
-                Nothing -> do
-                    putStrLn "Who are you talking to? You must first talk to a Character."
-                    return gameState
+        Just item -> handleGivenItem item gameState
+        Nothing -> handleInvalidItem gameState
+
+handleGivenItem :: Item -> GameState -> IO GameState
+handleGivenItem item gameState =
+    case talking gameState of
+        Just character -> handleGivenCharacter item character gameState
         Nothing -> do
-            putStrLn "Invalid item name."
+            putStrLn "Who are you talking to? You must first talk to a Character before you can give him anything."
+            return gameState
+
+handleGivenCharacter :: Item -> Character -> GameState -> IO GameState
+handleGivenCharacter item character gameState
+    | item == Mushroom && character == Wizard = giveMushroomsToWizard gameState
+    | otherwise = handleOtherItem item gameState
+
+giveMushrooms :: [(Item, Int)] -> IO ([(Item, Int)], Bool)
+giveMushrooms inventory = 
+    let maybeUpdatedInventory = removeItemFromInventory inventory (Mushroom, 10)
+    in
+        case maybeUpdatedInventory of
+            Just updatedInventory -> do
+                putStrLn "You gave Wizard 10 mushrooms."
+                return (updatedInventory, True)
+            Nothing -> do
+                putStrLn "'You don't have enough mushrooms! Come back when you have them.'"
+                return (inventory, False)
+
+giveMushroomsToWizard :: GameState -> IO GameState
+giveMushroomsToWizard gameState = do
+    let currentInventory = inventory gameState
+    case find (\(i, _) -> i == Mushroom) currentInventory of
+        Just _ -> do
+            (updatedInventory, wizardGotMushrooms) <- giveMushrooms currentInventory
+            if wizardGotMushrooms
+                then do
+                    let newGameState = gameState { inventory = updatedInventory, gaveMushrooms = wizardGotMushrooms }
+                    updatedGameState <- talkTo "wizard" newGameState
+                    return updatedGameState
+                else return gameState
+        Nothing -> do
+            putStrLn "'I don't need it. Stop bothering me!'"
+            return gameState
+
+handleOtherItem :: Item -> GameState -> IO GameState
+handleOtherItem item gameState = do
+    let currentInventory = inventory gameState
+    case find (\(i, _) -> i == item) currentInventory of
+        Just _ -> do
+            putStrLn "'I don't need it. Stop bothering me!'"
+            return gameState
+        Nothing -> do
+            putStrLn "You don't have this item."
             return gameState
 
 unlockRoomOrPlace :: String -> GameState -> IO GameState
 unlockRoomOrPlace roomOrPlaceStr gameState = do
     let current = currentRoom gameState
-    let servantsHouseLocked = isServantsHouseLocked gameState
-
     let currentInventory = inventory gameState
+
     if isItemInInventory currentInventory ButlersKeys
-        then do
-            case stringToRoom roomOrPlaceStr of
-                Just room ->
-                    if current == Courtyard
-                        then do
-                            putStrLn "\nYou unlocked ServantsHouse."
-                            return gameState {isServantsHouseLocked = False}
-                        else if current == ServantsHouse
-                            then do
-                                putStrLn "\nYou unlocked ServantsHouse."
-                                let newGameState = gameState {visitedRooms = (visitedRooms gameState) ++ [current], isServantsHouseLocked = False}
-                                look newGameState
-                                return newGameState
-                            else do
-                                putStrLn "\nYou can't unlock anything from here."
-                                return gameState
-                Nothing ->
-                    case stringToPlace roomOrPlaceStr of
-                        Just place ->
-                            if (elem place [GardenerChest, CookChest, ButlerChest]) && (isPlaceinsideRoom current place servantsHouseLocked)
-                                then do
-                                    putStrLn $ "\nYou unlocked " ++ show place ++ "."
-                                    return gameState { arePlacesLocked = Map.insert place False (arePlacesLocked gameState) }
-                                else do
-                                        putStrLn $ "\nYou can't unlock " ++ show place ++ " from here."
-                                        return gameState
-                        Nothing -> do
-                            putStrLn "Invalid input. Neither room nor a place."
-                            return gameState
+        then unlockWithKeys roomOrPlaceStr current gameState
         else do
-            putStrLn "You don't have any keys."
+            putStrLn "\nYou don't have any keys you could use."
             return gameState
+
+unlockWithKeys :: String -> Room -> GameState -> IO GameState
+unlockWithKeys roomOrPlaceStr current gameState =
+    case stringToRoom roomOrPlaceStr of
+        Just room ->
+            if current == Courtyard
+                then unlockRoom "ServantsHouse" gameState
+                else if current == ServantsHouse
+                    then unlockServantsHouse gameState
+                    else do
+                        putStrLn "\nYou can't unlock anything from here."
+                        return gameState
+        Nothing ->
+            case stringToPlace roomOrPlaceStr of
+                Just place ->
+                    if elem place [GardenerChest, CookChest, ButlerChest] && isPlaceinsideRoom current place (isServantsHouseLocked gameState)
+                        then unlockPlace place gameState
+                        else do
+                            putStrLn $ "\nYou can't unlock " ++ show place ++ " from here."
+                            return gameState
+                Nothing -> do
+                    putStrLn "Invalid input. Neither room nor a place."
+                    return gameState
+
+unlockRoom :: String -> GameState -> IO GameState
+unlockRoom roomName gameState = do
+    putStrLn $ "\nYou unlocked " ++ roomName ++ "."
+    return $ gameState { isServantsHouseLocked = False }
+
+unlockServantsHouse :: GameState -> IO GameState
+unlockServantsHouse gameState = do
+    putStrLn "\nYou unlocked ServantsHouse."
+    let newGameState = gameState { visitedRooms = visitedRooms gameState ++ [currentRoom gameState]
+                                , isServantsHouseLocked = False }
+    look newGameState
+    return newGameState
+
+unlockPlace :: Place -> GameState -> IO GameState
+unlockPlace place gameState = do
+    putStrLn $ "\nYou unlocked " ++ show place ++ "."
+    let updatedPlacesLocked = Map.insert place False (arePlacesLocked gameState)
+    return $ gameState { arePlacesLocked = updatedPlacesLocked }
 
 dropItem :: String -> GameState -> IO GameState
 dropItem itemStr gameState = do
     let current = currentRoom gameState
     case stringToItem itemStr of
-        Just item -> do
+        Just item ->
             let currentInventory = inventory gameState
-            if item == Dirt && current == RoyalBedroom
-                then 
-                    case removeItemFromInventory (inventory gameState) (Dirt, 1) of
-                        Just updatedInventory -> do
-                            printLines ["", "You unnoticedly drop some dirt on the floor.", "'Someone spread dirt all over the floor', you yell to the Butler. 'Clean it up before king notices"]
-                            return gameState {inventory = updatedInventory, isButlerDistracted = True}
-                        Nothing -> do
-                            putStrLn $ "You don't have " ++ show item ++ " in inventory."
-                            return gameState
-                else do
-                    putStrLn "I don't see a reason to drop anything here!"
-                    return gameState
+            in if item == Dirt && current == RoyalBedroom
+                then handleDroppingDirt gameState currentInventory
+                else handleInvalidDrop gameState
+        Nothing -> handleInvalidItem gameState
+
+handleDroppingDirt :: GameState -> [(Item, Int)] -> IO GameState
+handleDroppingDirt gameState currentInventory =
+    case removeItemFromInventory currentInventory (Dirt, 1) of
+        Just updatedInventory -> do
+            printLines ["", "You unnoticedly drop some dirt on the floor.", "'Someone spread dirt all over the floor', you yell to the Butler. 'Clean it up before king notices'"]
+            return gameState { inventory = updatedInventory, isButlerDistracted = True }
         Nothing -> do
-            putStrLn "Invalid item name."
+            putStrLn $ "You don't have Dirt in inventory."
             return gameState
+
+handleInvalidDrop :: GameState -> IO GameState
+handleInvalidDrop gameState = do
+    putStrLn "I don't see a reason to drop anything here!"
+    return gameState
+
+handleInvalidItem :: GameState -> IO GameState
+handleInvalidItem gameState = do
+    putStrLn "Invalid item name."
+    return gameState
 
 accuseCharacter :: String -> GameState -> IO Bool
 accuseCharacter charStr gameState =
     case stringToCharacter charStr of
-        Just character -> do
-            let currentClues = clues gameState
-            if isCharacterTheThief currentClues character
-                then do
-                    printLines ["", "You win! \128077"]
-                    return True
-                else do
-                    printLines ["", "You lose! \128546"]
-                    return True
+        Just character -> handleAccusation gameState character
         Nothing -> return False
+
+handleAccusation :: GameState -> Character -> IO Bool
+handleAccusation gameState character =
+    if isCharacterTheThief (clues gameState) character
+        then handleWin
+        else handleLose
+
+handleWin :: IO Bool
+handleWin = do
+    printLines ["", "You win! \128077"]
+    return True
+
+handleLose :: IO Bool
+handleLose = do
+    printLines ["", "You lose! \128546"]
+    return True

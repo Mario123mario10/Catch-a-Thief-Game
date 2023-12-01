@@ -18,11 +18,19 @@ stringToRoom str = case map toLower str of
     "hall" -> Just Hall
     "corridor" -> Just Corridor
     "guardhouse" -> Just GuardHouse
+    "guardshouse" -> Just GuardHouse
+    "guardroom" -> Just GuardHouse
+    "guardsroom" -> Just GuardHouse
     "courtyard" -> Just Courtyard
+    "yard" -> Just Courtyard
     "vault" -> Just Vault
     "kitchen" -> Just Kitchen
+    "cookroom" -> Just Kitchen
+    "cooksroom" -> Just Kitchen
+    "cookery" -> Just Kitchen
     "royalbedroom" -> Just RoyalBedroom
     "butlerroom" -> Just RoyalBedroom
+    "butlersroom" -> Just RoyalBedroom
     "bedroom" -> Just RoyalBedroom
     "garden" -> Just Garden
     "servantshouse" -> Just ServantsHouse
@@ -31,8 +39,10 @@ stringToRoom str = case map toLower str of
     "servantroom" -> Just ServantsHouse
     "wizardstower" -> Just WizardsTower
     "wizardshome" -> Just WizardsTower
+    "wizardsroom" -> Just WizardsTower
     "wizardtower" -> Just WizardsTower
     "wizardhome" -> Just WizardsTower
+    "wizardroom" -> Just WizardsTower
     "forest" -> Just Forest
     _ -> Nothing
 
@@ -209,6 +219,9 @@ stringToPlace str = case map toLower str of
     "pond" -> Just GardenPond
     "rosebushes" -> Just RoseBushes
     "bushes" -> Just RoseBushes
+    "bush" -> Just RoseBushes
+    "roses" -> Just RoseBushes
+    "rose" -> Just RoseBushes
     "kingsculpture" -> Just KingSculpture
     "kingculpture" -> Just KingSculpture
     "sculpture" -> Just KingSculpture
@@ -248,10 +261,10 @@ stringToPlace str = case map toLower str of
 insideRoom :: Room -> [Place]
 insideRoom room = case room of
     Vault -> [VaultDoor]
-    Garden -> [GardenPond, RoseBushes, KingSculpture]
+    Garden -> [GardenPond, RoseBushes, KingSculpture, DirtMound]
     RoyalBedroom -> [Mirror, Bed, Wardrobe, NightTable]
     Kitchen -> [Oven, BagOfFlour, KitchenUnit]
-    ServantsHouse -> [ButlerChest, CookChest, GardenerChest, DirtMound]
+    ServantsHouse -> [ButlerChest, CookChest, GardenerChest]
     Forest -> [Lakeshore, OldTree, HiddenClearing, MushroomPatch, WildlifeNest]
     _ -> []
 
@@ -283,6 +296,7 @@ getPlaceDescription place = case place of
     GardenPond -> ["", "A tranquil pond in the garden."]
     RoseBushes -> ["", "Beautiful rose bushes in the garden."]
     KingSculpture -> ["", "A sculpture of the king in the garden." ]
+    DirtMound -> ["", "A pile of dirt in the garden." ]
     Mirror -> ["", "An ornate mirror hanging on the wall."]
     Bed -> ["", "An elegantly designed bed in the room."]
     Wardrobe -> ["", "A wardrobe for clothes storage." ]

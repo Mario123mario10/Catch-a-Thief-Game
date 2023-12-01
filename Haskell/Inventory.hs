@@ -97,6 +97,10 @@ instance Ord Clue where
 stringToClue :: String -> Maybe Clue
 stringToClue str = case map toLower str of
     "tool" -> Just Tool
+    "ladle" -> Just Tool
+    "rake" -> Just Tool
+    "featherduster" -> Just Tool
+    "duster" -> Just Tool
     "stolenvaultkey" -> Just StolenVaultKey
     "vaultkey" -> Just StolenVaultKey
     "key" -> Just StolenVaultKey
@@ -107,6 +111,7 @@ stringToClue str = case map toLower str of
     "stolencoins" -> Just StolenCoins
     "coins" -> Just StolenCoins
     "pouch" -> Just StolenCoins
+    "coinpouch" -> Just StolenCoins
     "bloodstains" -> Just BloodStains
     "blood" -> Just BloodStains
     "stains" -> Just BloodStains
