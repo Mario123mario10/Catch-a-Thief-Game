@@ -172,7 +172,7 @@ takeItemFromValidPlace place itemStr gameState =
 takeValidItem :: Place -> Item -> GameState -> ([String], GameState)
 takeValidItem place item gameState =
     if cannotTakeItem item place gameState
-        then (["", "You can't take " ++ show item ++ " while the Butler is watching carefully."], gameState)
+        then (["", "You can't take " ++ show item ++ " while the Butler is watching carefully. You should distract this fanatic cleaner somehow."], gameState)
         else handleItemTake item place gameState
 
 cannotTakeItem :: Item -> Place -> GameState -> Bool
@@ -316,13 +316,13 @@ handleClue clue gameState =
         Just character ->
             handleCharacterWithClue clue character gameState
         Nothing ->
-            (["Invalid character."], gameState)
+            (["Who are you talking to? You must first talk to a Character before you can ask him about anything."], gameState)
 
 handleCharacterWithClue :: Clue -> Character -> GameState -> ([String], GameState)
 handleCharacterWithClue clue character gameState =
     if Map.member clue (evidence gameState)
         then handleExistingClue clue character gameState
-        else (["What are you talking about?"], gameState)
+        else (["'You are asking wrong person, that's for sure!' said the " ++ show character ++ "."], gameState)
 
 handleExistingClue :: Clue -> Character -> GameState -> ([String], GameState)
 handleExistingClue clue character gameState =
@@ -370,9 +370,9 @@ giveMushroomsToWizard gameState =
                     let newGameState = gameState { inventory = updatedInventory, gaveMushrooms = wizardGotMushrooms }
                         (text2, updatedGameState) = talkTo "wizard" newGameState
                     in (text1 ++ text2, updatedGameState)
-                else ([""], gameState)
+                else (["'It's not enaugh! Come back when you have 10 mushrooms.'"], gameState)
         Nothing ->
-            (["'I don't need it. Stop bothering me!'"], gameState)
+            (["'You want to give me nothing?! Come back when you have 10 mushrooms.'"], gameState)
 
 handleOtherItem :: Item -> GameState -> ([String], GameState)
 handleOtherItem item gameState =
@@ -400,31 +400,31 @@ unlockWithKeys roomOrPlaceStr current gameState =
                 then unlockRoom "ServantsHouse" gameState
                 else if current == ServantsHouse
                     then unlockServantsHouse gameState
-                    else (["\nYou can't unlock anything from here."], gameState)
+                    else (["You can't unlock anything from here."], gameState)
         Nothing ->
             case stringToPlace roomOrPlaceStr of
                 Just place ->
                     if elem place [GardenerChest, CookChest, ButlerChest] && isPlaceinsideRoom current place (isServantsHouseLocked gameState)
                         then unlockPlace place gameState
-                        else (["\nYou can't unlock " ++ show place ++ " from here."], gameState)
+                        else (["You can't unlock " ++ show place ++ " from here."], gameState)
                 Nothing ->
                     (["Invalid input. Neither room nor a place."], gameState)
 
 unlockRoom :: String -> GameState -> ([String], GameState)
 unlockRoom roomName gameState =
-    (["\nYou unlocked " ++ roomName ++ "."], gameState { isServantsHouseLocked = False })
+    (["You unlocked " ++ roomName ++ "."], gameState { isServantsHouseLocked = False })
 
 unlockServantsHouse :: GameState -> ([String], GameState)
 unlockServantsHouse gameState =
     let newGameState = gameState { visitedRooms = visitedRooms gameState ++ [currentRoom gameState]
                                 , isServantsHouseLocked = False }
         text = look newGameState
-    in (["\nYou unlocked ServantsHouse."] ++ text, newGameState)
+    in (["You unlocked ServantsHouse."] ++ text, newGameState)
 
 unlockPlace :: Place -> GameState -> ([String], GameState)
 unlockPlace place gameState =
     let updatedPlacesLocked = Map.insert place False (arePlacesLocked gameState)
-    in (["\nYou unlocked " ++ show place ++ "."], gameState { arePlacesLocked = updatedPlacesLocked })
+    in (["You unlocked " ++ show place ++ "."], gameState { arePlacesLocked = updatedPlacesLocked })
 
 dropItem :: String -> GameState -> ([String], GameState)
 dropItem itemStr gameState =
@@ -441,7 +441,7 @@ handleDroppingDirt :: GameState -> [(Item, Int)] -> ([String], GameState)
 handleDroppingDirt gameState currentInventory =
     case removeItemFromInventory currentInventory (Dirt, 1) of
         Just updatedInventory ->
-            ( ["", "You unnoticedly drop some dirt on the floor.", "'Someone spread dirt all over the floor', you yell to the Butler. 'Clean it up before king notices'"]
+            ( ["", "You unnoticedly drop some dirt on the floor.", "'Someone spread dirt all over the floor', you yell to the Butler. 'Clean it up before king notices!'"]
             , gameState { inventory = updatedInventory, isButlerDistracted = True }
             )
         Nothing ->

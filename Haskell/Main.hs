@@ -4,6 +4,7 @@
 module Main where
 
 import System.IO (hFlush, stdout)
+import Data.Char (toLower, isSpace)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Time.Clock
@@ -71,26 +72,28 @@ readCommand = do
     putStr "> "
     hFlush stdout
     getLine
+
+maxGameTime = 25 * 60
     
 gameLoop :: GameState -> IO ()
 gameLoop gameState = do
     currentTime <- getCurrentTime
     let timePassed = diffUTCTime currentTime $ startTime gameState
         timePassedInSeconds = round $ realToFrac timePassed :: Int 
-
-    cmd <- readCommand
-
-    let maxGameTime = 25 * 60
-    let timeRemaining = maxGameTime - timePassedInSeconds
+        timeRemaining = maxGameTime - timePassedInSeconds
 
     if timeRemaining >= 0
         then do
+            cmd <- readCommand
             case words cmd of
                 ["instructions"] -> do 
                     printInstructions
                     gameLoop gameState
                 ["time"] -> do
-                    printLines ["", ("Time remaining: " ++ show  timeRemaining ++ ".")]
+                    let timePassed = diffUTCTime currentTime $ startTime gameState
+                        timePassedInSeconds = round $ realToFrac timePassed :: Int 
+                        timeRemaining = maxGameTime - timePassedInSeconds
+                    printLines ["", ("Time remaining: " ++ show  timeRemaining ++ " seconds.")]
                     gameLoop gameState
                 ["dev"] -> do 
                     printLinesWithoutSplit debugInstructionsText
@@ -175,9 +178,17 @@ gameLoop gameState = do
                     gameLoop newGameState
                 ["accuse", charStr] -> do
                     let (text, validAccusation) = accuseCharacter charStr gameState
-                    printLines text
                     if validAccusation
-                        then return ()
+                        then do
+                            printLines ["Are you sure? (Y/N)"]
+                            sureStr <- readCommand
+                            if map toLower sureStr `elem` ["y", "yes", "sure"]
+                                then do
+                                    printLines text
+                                    return ()
+                                else do
+                                    printLines ["Take your time!"]
+                                    gameLoop gameState
                         else gameLoop gameState
                 ["quit"] -> return ()
                 _ -> do 
@@ -185,12 +196,21 @@ gameLoop gameState = do
                     gameLoop gameState
         else do
             printLines ["You have ran out of time.", "You must accuse someone", ""]
+            cmd <- readCommand
             case words cmd of
                 ["accuse", charStr] -> do
                     let (text, validAccusation) = accuseCharacter charStr gameState
-                    printLines text
                     if validAccusation
-                        then return ()
+                        then do
+                            printLines ["Are you sure? (Y/N)"]
+                            sureStr <- readCommand
+                            if map toLower sureStr `elem` ["y", "yes", "sure"]
+                                then do
+                                    printLines text
+                                    return ()
+                                else do
+                                    printLines ["Accuse someone else then"]
+                                    gameLoop gameState
                         else gameLoop gameState
                 _ -> do
                     gameLoop gameState

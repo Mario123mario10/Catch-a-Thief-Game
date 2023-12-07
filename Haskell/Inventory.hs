@@ -42,7 +42,7 @@ getItemDescription item =
         Diamond -> ["", "Precious gem, possibly from the vault"]
         CoinPouch -> ["", "Pouch containing coins believed to be from the vault"]
         Mushroom -> ["", "Magical mushroom"]
-        Dirt -> ["", "Ordinary dirt"]
+        Dirt -> ["", "Ordinary dirt. You can make quite a mess with this."]
 
 formatItem :: (Item, Int) -> String
 formatItem (item, count) =
