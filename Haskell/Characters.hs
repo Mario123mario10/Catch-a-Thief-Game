@@ -92,16 +92,16 @@ getCharacterText clues character gaveMushrooms = case character of
                     Nothing -> ["", "I have no clue! (The game is busted)"]
     Gardener -> 
         let optionalText = case isCharacterGuilty clues Gardener BloodStains of 
-                True -> " There is a fresh wound on his left cheek; he cut himself with something."
+                True -> " There is a fresh wound on his forearm, as if something cut him."
                 False -> ""
         in
             [
             "",
-            "You stand before an unassuming, delicately built butler, seemingly one of the quieter figures at the court throughout the years. His pale face seems to blend into the background, and his eyes, filled with a mysterious glow, scan the surroundings. The butler wears a modest uniform that betrays his low status at court, yet it's carefully ironed and clean." ++ optionalText,
+            "While wandering through the royal garden, you come across a gardener. He is a middle-aged man with hard hands and dark spots on his clothes." ++ optionalText ++ " His gaze shows signs of hard work and devotion to the royal garden.",
             "",
-            "The butler stands still and awaits a signal. After a while, he opens his mouth and speaks calmly. 'What brings you here, noble lord?'",
+            "Surprised by your presence, the gardener puts down his tools and approaches you. 'What kind of surprise is this?' he asks, leaning on his spade. 'The garden is currently closed for visitors; you shouldn't be here without the king's permission.'",
             "",
-            "'Theft? It must have happened while I was busy bringing books to the library,' he confesses with a hint of sadness in his voice. 'I had no idea what was happening in the courtyard or the commotion at the vault. It's really strange. I can assure you that I had nothing to do with it. I worked most of the day, unfortunately, there is no one to testify about it.'"
+            "Then he continues with a little concern, 'To tell you the truth, I don't know anything about any robbery. I've been working here since dawn, and I treat these plants like my own children. I haven't noticed anything suspicious. It must be some kind of mistake. Maybe the diamond will come back on its own; things like that happen. And besides, we all lose things sometimes. If you have any questions, we can discuss them with the king. But let me get back to my work.' The gardener seems nervous and a bit concerned about the situation."
             ]
     Cook -> 
         let optionalText = case isCharacterGuilty clues Cook BloodStains of 

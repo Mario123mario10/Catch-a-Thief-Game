@@ -107,7 +107,10 @@ stringToClue str = case map toLower str of
     "stolendiamond" -> Just StolenDiamond
     "diamond" -> Just StolenDiamond
     "guardsclue" -> Just GuardsClue
+    "guardclue" -> Just GuardsClue
     "wizardsclue" -> Just WizardsClue
+    "wizardclue" -> Just WizardsClue
+    "crystals" -> Just WizardsClue
     "stolencoins" -> Just StolenCoins
     "coins" -> Just StolenCoins
     "pouch" -> Just StolenCoins
