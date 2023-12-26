@@ -1,6 +1,7 @@
 Object subclass: Place [
     | description locked items placeLocation |
 
+    "Dictionary with subclasses keys and singleton instance as value"
     instances := Dictionary new.
 
     Place class >> new [

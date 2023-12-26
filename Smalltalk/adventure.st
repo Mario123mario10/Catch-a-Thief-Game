@@ -94,22 +94,23 @@ Object subclass: GameState [
             ].
 
             initMove ifFalse: [ 
-                message add: ''.
-                message add: 'You moved from ', previousLocation getName, ' to ', currentLocation getName, '.'.
-                message add: ''.
+                message add: ''; add: 'You moved from ', previousLocation getName, ' to ', currentLocation getName, '.'; add: ''.
             ].
-           
-            message add: currentLocation visit.
-            message add: ''.
-            message add: 'From ', currentLocation getName, ' you can go to ', currentLocation getConnectedLocations toString, '.'.
-            message add: ''.
+
+            message add: currentLocation visit; add: ''.
+        
+            currentLocation getCharacter ifNotNil: [
+                message add: 'Here you can talk to ', currentLocation getCharacter getName, '.'; add: ''.
+            ].
+
+            message add: 'From ', currentLocation getName, ' you can go to ', currentLocation getConnectedLocations toString, '.'; add: ''.
 
         ]
+
         ifFalse: [
-            message add: ''.
-            message add: 'You can’t move from ', currentLocation getName, ' to ', newLocation, '.'.
-            message add: ''.
+            message add: ''; add: 'You can’t move from ', currentLocation getName, ' to ', newLocation, '.'; add: ''.
         ].
+
         ^message.
     ]
 

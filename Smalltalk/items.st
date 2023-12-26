@@ -1,11 +1,14 @@
 Object subclass: Item [
+
+    "Dictionary with subclasses keys and singleton instance as value"
     instances := Dictionary new.
+    
     Item class >> new [
         | i |
         i := super new.
         ^i
     ]
-    
+
     "Parent class method to get singleton instance of a subclass"
     Item class >> getInstance [ 
         | instance |

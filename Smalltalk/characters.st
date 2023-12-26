@@ -206,7 +206,7 @@ definitely not an exception.’'
 
 GameCharacter subclass: Wizard [
     | gotMushrooms afterPaymentText |
-    Wizard class >> /new [ 
+    Wizard class >> new [ 
         self error: 'Use getInstance class method'
     ]
 
@@ -232,8 +232,33 @@ perform this. In fact, I gave him that item in return for a favor. I’m willing
 to share this information with you, but I won’t do it for free. You must 
 collect 10 mushrooms from the magical forest surrounding the castle, and then I 
 will be willing to share my knowledge.’ The wizard expresses his tiredness in 
-his tone of voice.'
+his tone of voice.'.
+
         afterPaymentText := 
+'When you gave the wizard magic mushrooms from the enchanted forest, his eyes
+light up with momentary delight. He gently takes them from your hand and places
+them on the table next to him, then reaches for his wand and uses his finger to
+carve out the runes on one of the mushrooms. Everything around you begins to
+glow with magical light, and the wizard carefully studies the ingredients he
+has just obtained.
+
+’Deep in the forest, in the shade of the trees, these mushrooms are a source of
+great power,’ the wizard says solemnly and freezes for a second. After a while,
+he wakes up as if from a trance. ’Now, what I promised.’ He shrugs and says,
+’Some time ago, the  ++ show char ++  was at my tower. He asked me for a
+certain toy, which I gave to the prince for his birthday. I gave him a couple
+of crystals, when one of them breaks, the other one explodes with a loud bang
+and turns into a thick cloud of smoke. Naturally, this toy is completely
+harmless,’ he explained.
+
+’The  ++ show char ++  was trying to excuse himself, saying he needed this toy
+for a certain prank. It was just innocent fun, he told me,’ the wizard says
+mockingly. ’It seemed quite suspicious, but it is above my pay grade,’ the
+wizard says dismissingly.
+
+’I said what I knew. Now it is the time for you to leave my tower,’ the wizard
+says, clearly implying that the conversation is over.'
+
     ]
     giveMushrooms [
         gotMushrooms := true.
@@ -242,4 +267,15 @@ his tone of voice.'
     hasMushrooms [
         ^gotMushrooms
     ]
+
+    getCharacterText [ 
+        gotMushrooms 
+            ifFalse: [
+                ^characterText
+            ]
+            ifTrue: [
+                ^afterPaymentText
+            ]
+    ]
+
 ] 
