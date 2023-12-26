@@ -1,6 +1,8 @@
 Object subclass: Place [
     | description locked items placeLocation |
 
+    instances := Dictionary new.
+
     Place class >> new [
         | p |
         p := super new.
@@ -11,6 +13,20 @@ Object subclass: Place [
     Place class >> getAllPlaces [
         ^(OrderedCollection new addAll: (Place subclasses))
     ] 
+
+    "Parent class method to get singleton instance of a subclass"
+    Place class >> getInstance [ 
+        | instance |
+        (instances includesKey: self) ifFalse: [
+            instance := super new.
+            instances at: self put: instance.
+        ]
+        ifTrue: [ instance := instances at: self].
+        [ instance init ]
+            on: Exception
+            do: [ :ex | "Do nothing if init does not exist in subclass" ].
+        ^instance
+    ]
 
     init [
         locked := false.
@@ -39,10 +55,7 @@ Object subclass: Place [
 Place subclass: VaultDoor [
    
     VaultDoor class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -55,10 +68,7 @@ someone used some kind of tool to move the door.'
 Place subclass: GardenPond [
     
     GardenPond class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -69,10 +79,7 @@ Place subclass: GardenPond [
 Place subclass: RoseBushes [
     
     RoseBushes class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -83,10 +90,7 @@ Place subclass: RoseBushes [
 Place subclass: KingSculpture [
     
     KingSculpture class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -97,10 +101,7 @@ Place subclass: KingSculpture [
 Place subclass: DirtMound [
     
     DirtMound class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -111,10 +112,7 @@ Place subclass: DirtMound [
 Place subclass: Mirror [
     
     Mirror class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -125,10 +123,7 @@ Place subclass: Mirror [
 Place subclass: Bed [
     
     Bed class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -139,10 +134,7 @@ Place subclass: Bed [
 Place subclass: Wardrobe [
     
     Wardrobe class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -153,10 +145,7 @@ Place subclass: Wardrobe [
 Place subclass: NightTable [
     
     NightTable class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -167,10 +156,7 @@ Place subclass: NightTable [
 Place subclass: Oven [
     
     Oven class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -181,10 +167,7 @@ Place subclass: Oven [
 Place subclass: BagOfFlour [
     
     BagOfFlour class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -195,10 +178,7 @@ Place subclass: BagOfFlour [
 Place subclass: KitchenUnit [
     
     KitchenUnit class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -209,10 +189,7 @@ Place subclass: KitchenUnit [
 Place subclass: ButlerChest [
     
     ButlerChest class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -223,10 +200,7 @@ Place subclass: ButlerChest [
 Place subclass: CookChest [
     
     CookChest class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -237,10 +211,7 @@ Place subclass: CookChest [
 Place subclass: GardenerChest [
     
     GardenerChest class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -251,10 +222,7 @@ Place subclass: GardenerChest [
 Place subclass: Lakeshore [
     
     Lakeshore class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -265,10 +233,7 @@ Place subclass: Lakeshore [
 Place subclass: OldTree [
     
     OldTree class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -279,10 +244,7 @@ Place subclass: OldTree [
 Place subclass: HiddenClearing [
     
     HiddenClearing class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -293,10 +255,7 @@ Place subclass: HiddenClearing [
 Place subclass: MushroomPatch [
     
     MushroomPatch class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -307,10 +266,7 @@ Place subclass: MushroomPatch [
 Place subclass: WildlifeNest [
     
     WildlifeNest class >> new [
-        | p |
-        p := super new.
-        p init.
-        ^p
+        self error: 'Use getInstance class method'
     ]
 
     init [

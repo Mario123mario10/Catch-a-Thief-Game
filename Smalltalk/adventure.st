@@ -89,7 +89,7 @@ Object subclass: GameState [
             ].
             visited ifFalse: [
                 classSymbol := Smalltalk at: newLocation asSymbol.
-                currentLocation := classSymbol new.
+                currentLocation := classSymbol getInstance.
                 visitedLocations add: currentLocation.
             ].
 
@@ -124,13 +124,11 @@ Object subclass: GameState [
         GameCharacter subclasses do: [:sub |
             sub name asString = character
                 ifTrue: [
-                    (currentLocation getCharacter) getName = character
-                        ifTrue: [
-                            message add: (currentLocation getCharacter getCharacterText).
-                        ]
-                        ifFalse: [
-                            message add: 'You can’t talk to him right now'.
-                        ].
+                    (currentLocation getCharacter) ifNotNil: [ :characterObj |
+                        (characterObj getName = character)
+                            ifTrue: [message add: (characterObj getCharacterText)]
+                            ifFalse: [message add: 'You can’t talk to him right now']
+                    ] ifNil: [message add: 'You can’t talk to him right now'].
                     message add: ''.
                     ^message.
                 ]
@@ -141,9 +139,10 @@ Object subclass: GameState [
     ]
 
     examine: place [
+        | message |
         message := OrderedCollection new.
         message add: ''.
-        currentPlace examine.
+        " currentPlace examine. "
     ]
 ]
 
@@ -288,20 +287,6 @@ dev                 -- to see debug instructions (cheat)
                 self printLines: message.
                 isUnknown := false
             ].
-
-
-            (cmd startsWith: 'Hall') ifTrue: [
-                | message newLocation king |
-                message := OrderedCollection new.
-                king := (Smalltalk at: 'Hall' asSymbol) new.
-                message add: king getLongDescription.
-                self printLines: message.
-                king getConnectedLocations do: [ :location | 
-                    Transcript show: location; cr.
-                ].
-                isUnknown := false
-            ].
-
 
             isUnknown ifTrue: [
                 self printLines: #('' 'Unknown command.' '')

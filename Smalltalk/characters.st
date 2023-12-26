@@ -4,6 +4,16 @@ Object subclass: GameCharacter [
     " | characterText characterLocation clues | "
     | characterText characterLocation |
 
+    "Dictionary with subclasses keys and singleton instance as value"
+    instances := Dictionary new.
+
+    GameCharacter class >> new [ 
+        | gc |
+        gc := super new.
+        gc init.
+        ^gc
+    ]
+
     GameCharacter class >> getSuspects [
         | suspects |
         suspects := OrderedCollection new.
@@ -11,11 +21,19 @@ Object subclass: GameCharacter [
         ^suspects.
     ]
 
-    GameCharacter class >> new [ 
-        | gc |
-        gc := super new.
-        gc init.
-        ^gc
+
+    "Parent class method to get singleton instance of a subclass"
+    GameCharacter class >> getInstance [ 
+        | instance |
+        (instances includesKey: self) ifFalse: [
+            instance := super new.
+            instances at: self put: instance.
+        ]
+        ifTrue: [ instance := instances at: self ].
+        [ instance init ]
+            on: Exception
+            do: [ :ex | "Do nothing if init does not exist in subclass" ].
+        ^instance
     ]
 
     init [
@@ -33,10 +51,7 @@ Object subclass: GameCharacter [
  
 GameCharacter subclass: King [
     King class >> new [ 
-        | gc |
-        gc := super new.
-        gc init.
-        ^gc
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -76,10 +91,7 @@ allow that. He’s in a guard room right now.’'
 
 GameCharacter subclass: Gardener [
     Gardener class >> new [ 
-        | gc |
-        gc := super new.
-        gc init.
-        ^gc
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -107,10 +119,7 @@ work.’ The gardener seems nervous and a bit concerned about the situation.'
 
 GameCharacter subclass: Cook [
     Cook class >> new [ 
-        | gc |
-        gc := super new.
-        gc init.
-        ^gc
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -138,10 +147,7 @@ People are trying to work here!’ he says, irritated.'
 
 GameCharacter subclass: Butler [
     Butler class >> new [ 
-        | gc |
-        gc := super new.
-        gc init.
-        ^gc
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -165,10 +171,7 @@ unfortunately, there is no one to testify about it.’'
 
 GameCharacter subclass: Guard [
     Guard class >> new [ 
-        | gc |
-        gc := super new.
-        gc init.
-        ^gc
+        self error: 'Use getInstance class method'
     ]
 
     init [
@@ -204,10 +207,7 @@ definitely not an exception.’'
 GameCharacter subclass: Wizard [
     | gotMushrooms afterPaymentText |
     Wizard class >> /new [ 
-        | gc |
-        gc := super new.
-        gc init.
-        ^gc
+        self error: 'Use getInstance class method'
     ]
 
     init [

@@ -1,11 +1,29 @@
 Object subclass: Location [
+
     | visited shortDescription longDescription connectedLocations character places |
+
+    "Dictionary with subclasses keys and singleton instance as value"
+    instances := Dictionary new.
 
     Location class >> new [
         | l |
         l := super new.
         l init.
         ^l
+    ]
+     
+    "Parent class method to get singleton instance of a subclass"
+    Location class >> getInstance [ 
+        | instance |
+        (instances includesKey: self) ifFalse: [
+            instance := super new.
+            instances at: self put: instance.
+        ]
+        ifTrue: [ instance := instances at: self ].
+        [ instance init ]
+            on: Exception
+            do: [ :ex | "Do nothing if init does not exist in subclass" ].
+        ^instance
     ]
 
     init [
@@ -50,7 +68,7 @@ Location subclass: Vault [
     init [
         super init.
         connectedLocations add: 'Hall'.
-        self addPlace: VaultDoor new.
+        self addPlace: VaultDoor getInstance.
         shortDescription := 'Once the place where the diamond was stored, but now empty.'.
         longDescription := 
 'This is a place of crime! King Alaric III keeps here his most precious
@@ -74,10 +92,7 @@ these bloodstains on the floor…'.
     ]
 
     Vault class >> new [
-        | v |
-        v := super new.
-        v init.
-        ^v
+        self error: 'Use getInstance class method'
     ]
 ]
 
@@ -85,7 +100,7 @@ Location subclass: Hall [
     init [
         super init.
         connectedLocations add: 'Corridor'; add: 'GuardHouse'; add: 'Courtyard'; add: 'Vault'.
-        self setCharacter: King new.
+        self setCharacter: King getInstance.
         shortDescription := 'A grand, bustling chamber with a splendid throne at its center.'.
         longDescription := 
 'You are in the main hall of the castle. You can get to several places from
@@ -99,19 +114,16 @@ somebody, especially at night!'.
     ]
 
     Hall class >> new [
-        | h |
-        h := super new.
-        h init.
-        ^h
+        self error: 'Use getInstance class method'
     ]
 ]
 
 Location subclass: Kitchen [
     init [
         super init.
-        self setCharacter: Cook new.
+        self setCharacter: Cook getInstance.
         connectedLocations add: 'Corridor'.
-        self addPlace: Oven new; addPlace: BagOfFlour new; addPlace: KitchenUnit new.
+        self addPlace: Oven getInstance; addPlace: BagOfFlour getInstance; addPlace: KitchenUnit getInstance.
         shortDescription := 'A bustling place filled with the king’s dishes and the aroma of cooked meals.'.
         longDescription := 
 'Welcome to the kitchen! The aroma of fresh herbs, cooked vegetables and
@@ -124,19 +136,16 @@ utensils hanging on the wall but one hook is empty…'.
     ]
 
     Kitchen class >> new [
-        | k |
-        k := super new.
-        k init.
-        ^k
+        self error: 'Use getInstance class method'
     ]
 ]
 
 Location subclass: RoyalBedroom [
     init [
         super init.
-        self setCharacter: Butler new.
+        self setCharacter: Butler getInstance.
         connectedLocations add: 'Corridor'.
-        self addPlace: Mirror new; addPlace: Bed new; addPlace: Wardrobe new; addPlace: NightTable new.
+        self addPlace: Mirror getInstance; addPlace: Bed getInstance; addPlace: Wardrobe getInstance; addPlace: NightTable getInstance.
         shortDescription := 'A room holding keys to every other room in the castle.'.
         longDescription := 
 'You are now in the royal bedroom. You see a spacious room full of expensive
@@ -151,10 +160,7 @@ possible.'.
     ]
 
     RoyalBedroom class >> new [
-        | rb |
-        rb := super new.
-        rb init.
-        ^rb
+        self error: 'Use getInstance class method'
     ]
 ]
 
@@ -170,10 +176,7 @@ get to many places.'.
     ]
 
     Courtyard class >> new [
-        | c |
-        c := super new.
-        c init.
-        ^c
+        self error: 'Use getInstance class method'
     ]
 ]
 
@@ -199,11 +202,8 @@ Sometimes he fishes out amazing treasures…'.
 
     ]
 
-    Courtyard class >> new [
-        | c |
-        c := super new.
-        c init.
-        ^c
+    Garden class >> new [
+        self error: 'Use getInstance class method'
     ]
 ]
 
@@ -225,17 +225,14 @@ paintings of the kingdom’s history.'.
     ]
 
     Corridor class >> new [
-        | c |
-        c := super new.
-        c init.
-        ^c
+        self error: 'Use getInstance class method'
     ]
 ]
 
 Location subclass: GuardHouse [
     init [
         super init.
-        self setCharacter: Guard new.
+        self setCharacter: Guard getInstance.
         connectedLocations add: 'Hall'.
         shortDescription := 'A small chamber housing an array of weapons.'.
         longDescription := 
@@ -250,17 +247,14 @@ room suits the guard, without a doubt.'.
     ]
 
     GuardHouse class >> new [
-        | gh |
-        gh := super new.
-        gh init.
-        ^gh
+        self error: 'Use getInstance class method'
     ]
 ] 
 
 Location subclass: WizardsTower [
     init [
         super init.
-        self setCharacter: Wizard new.
+        self setCharacter: Wizard getInstance.
         connectedLocations add: 'Courtyard'.
         shortDescription := 'An incredible space brimming with curious magical objects.'.
         longDescription := 
@@ -276,10 +270,7 @@ everywhere. Of course, a wand lies on the table.'.
     ]
 
     WizardsTower class >> new [
-        | wt |
-        wt := super new.
-        wt init.
-        ^wt
+        self error: 'Use getInstance class method'
     ]
 ] 
 
@@ -287,7 +278,7 @@ Location subclass: Forest [
     init [
         super init.
         connectedLocations add: 'Courtyard'.
-        self addPlace: Lakeshore new; addPlace: OldTree new; addPlace: HiddenClearing new; addPlace: MushroomPatch new; addPlace: WildlifeNest new.
+        self addPlace: Lakeshore getInstance; addPlace: OldTree getInstance; addPlace: HiddenClearing getInstance; addPlace: MushroomPatch getInstance; addPlace: WildlifeNest getInstance.
         shortDescription := 'A sprawling forest teeming with wild animals, plants, and mushrooms.'.
         longDescription := 
 'Shhh… did you hear that sound? It was kind of… magical. This forest is like
@@ -302,10 +293,7 @@ they have some special use, who knows?'.
     ]
 
     Forest class >> new [
-        | f |
-        f := super new.
-        f init.
-        ^f
+        self error: 'Use getInstance class method'
     ]
 ] 
 
@@ -313,7 +301,7 @@ Location subclass: ServantsHouse [
     init [
         super init.
         connectedLocations add: 'Courtyard'.
-        self addPlace: ButlerChest new; addPlace: CookChest new; addPlace: GardenerChest new.
+        self addPlace: ButlerChest getInstance; addPlace: CookChest getInstance; addPlace: GardenerChest getInstance.
         shortDescription := 'Bedrooms allocated for the castle’s workforce.'.
         longDescription := 
 'You entered the king’s servants room. It’s small and cramped, with little
@@ -329,9 +317,6 @@ smell of cooking food coming from a nearby kitchen.'.
     ]
 
     ServantsHouse class >> new [
-        | sh |
-        sh := super new.
-        sh init.
-        ^sh
+        self error: 'Use getInstance class method'
     ]
 ] 
