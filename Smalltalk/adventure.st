@@ -29,12 +29,13 @@ Collection extend [
     shuffle [
         | n k r |
         n := self size.
-        r := Random new seed: (Time now asSeconds * 1000).
         [ n > 1 ] whileTrue: [
+            r := Random new seed: (Time now asSeconds * 1000).
             k := r between: 1 and: n.
             self swap: n with: k.
             n := n - 1
-        ]
+        ].
+        ^self
     ]
 ].
 
@@ -53,9 +54,11 @@ Object subclass: GameState [
     init [
         currentLocation := nil.
         visitedLocations := Set new.
+        
     ]
 
-    start [
+    start [        
+        Clue assignClues.
         ^self goTo: 'Hall' isInitMove: true.
     ]
 
@@ -205,18 +208,14 @@ dev                 -- to see debug instructions (cheat)
     ]
 
     init [
+        FileStream fileIn: 'clues.st'.
         FileStream fileIn: 'characters.st'.
         FileStream fileIn: 'locations.st'.
-        FileStream fileIn: 'clues.st'.
         FileStream fileIn: 'places.st'.
         FileStream fileIn: 'items.st'.
         instructions := OrderedCollection new.
         instructions add: instructionsText.
         isGameOver := false
-    ]
-
-    assignClues [
-
     ]
 
     "Print strings from array in separate lines."
@@ -267,6 +266,26 @@ dev                 -- to see debug instructions (cheat)
 
             cmd = 'quit' ifTrue: [
                 isGameOver := true.
+                isUnknown := false
+            ].
+            
+            cmd = 'diamond' ifTrue: [
+                | diamond  suspect |
+                diamond := StolenDiamond getInstance.
+                suspect := diamond getSuspect.
+                diamond identityHash printOn: Transcript.
+                Transcript show: ''; cr.
+                Transcript show: suspect getCharacterText; cr.
+                isUnknown := false
+            ].
+ 
+            cmd = 'tool' ifTrue: [
+                | diamond  suspect |
+                diamond := Tool getInstance.
+                suspect := diamond getSuspect.
+                diamond identityHash printOn: Transcript.
+                Transcript show: ''; cr.
+                Transcript show: suspect getCharacterText; cr.
                 isUnknown := false
             ].
 

@@ -1,4 +1,4 @@
-"Characters"
+"TODO: extract Suspect from GameCharacter"
 
 Object subclass: GameCharacter [
     " | characterText characterLocation clues | "
@@ -6,6 +6,7 @@ Object subclass: GameCharacter [
 
     "Dictionary with subclasses keys and singleton instance as value"
     instances := Dictionary new.
+    suspects := nil.
 
     GameCharacter class >> new [ 
         | gc |
@@ -15,9 +16,10 @@ Object subclass: GameCharacter [
     ]
 
     GameCharacter class >> getSuspects [
-        | suspects |
-        suspects := OrderedCollection new.
-        suspects add: Gardener; add: Cook; add: Butler.
+        suspects ifNil: [
+            suspects := OrderedCollection new.
+            suspects add: Gardener getInstance; add: Cook getInstance; add: Butler getInstance.
+        ].
         ^suspects.
     ]
 
