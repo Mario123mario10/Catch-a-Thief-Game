@@ -51,6 +51,17 @@ Object subclass: Location [
     getConnectedLocations [ ^connectedLocations ]
     getPlaces [ ^places ]
     getCharacter [ ^character ]
+    placesToString [
+        | string |
+        string := ''.
+        places do: [:each | string := string, each getName, ', '].
+        string := string trimSeparators.
+        places isEmpty ifFalse: [
+            string := string allButLast
+        ].
+        ^string
+    ]
+
 
     setVisited [ visited := true ]
     setCharacter: gameCharacter [
@@ -184,6 +195,7 @@ Location subclass: Garden [
     init [
         super init.      
         connectedLocations add: 'Courtyard'.
+        self addPlace: GardenPond getInstance; addPlace: RoseBushes getInstance; addPlace: KingSculpture getInstance; addPlace: DirtMound getInstance.
         shortDescription := 'A vast garden filled with flourishing vegetables and vibrant flowers.'.
         longDescription := 
 'You are in the castle garden. This is the place where the king likes to stay

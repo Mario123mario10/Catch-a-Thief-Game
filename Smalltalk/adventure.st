@@ -11,20 +11,6 @@ Responsibilities:
 Collaborators:
 * ..."
 
-
-Set extend [
-    toString [
-        | string |
-        string := ''.
-        self do: [:each | string := string, each asString, ', '].
-        string := string trimSeparators.
-        self isEmpty ifFalse: [
-            string := string allButLast
-        ].
-        ^string
-    ]
-].
-
 Collection extend [
     shuffle [
         | n k r |
@@ -36,6 +22,17 @@ Collection extend [
             n := n - 1
         ].
         ^self
+    ]
+
+    toString [
+        | string |
+        string := ''.
+        self do: [:each | string := string, each asString, ', '].
+        string := string trimSeparators.
+        self isEmpty ifFalse: [
+            string := string allButLast
+        ].
+        ^string
     ]
 ].
 
@@ -101,12 +98,16 @@ Object subclass: GameState [
             initMove ifFalse: [ 
                 message add: ''; add: 'You moved from ', previousLocation getName, ' to ', currentLocation getName, '.'; add: ''.
             ].
-
+            
             message add: currentLocation visit; add: ''.
         
             currentLocation getCharacter ifNotNil: [
                 message add: 'Here you can talk to ', currentLocation getCharacter getName, '.'; add: ''.
             ].
+
+            (currentLocation getPlaces notEmpty) ifTrue: [
+                message add: 'You can examine following places: ', currentLocation placesToString, '.'; add: ''.
+            ]. 
 
             message add: 'From ', currentLocation getName, ' you can go to ', currentLocation getConnectedLocations toString, '.'; add: ''.
 
@@ -367,7 +368,7 @@ dev                 -- to see debug instructions (cheat)
                 message add: ''; add: chain; add: ''.
 
                 self printLines: message.
-                
+
                 isUnknown := false
             ].
 

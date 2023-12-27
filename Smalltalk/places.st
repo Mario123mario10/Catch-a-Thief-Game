@@ -71,7 +71,6 @@ Object subclass: Place [
     getItem [ ^item ]
     getName [ ^self class name asString ]
 
-
     setPlaceLocation: location [ placeLocation := location ]
     setItem: gameItem withAmount: amount [
         item := gameItem.
