@@ -1,5 +1,5 @@
 Object subclass: Place [
-    | description locked items placeLocation |
+    | description locked item placeLocation |
 
     "Dictionary with subclasses keys and singleton instance as value"
     instances := Dictionary new.
@@ -29,16 +29,55 @@ Object subclass: Place [
         ^instance
     ]
 
+    Place class >> assignItems [
+        | keySuspect coinsSuspect diamondSuspect |
+        DirtMound getInstance setItem: (Dirt getInstance) withAmount: 100.
+        VaultDoor getInstance setItem: (ToolHandle getInstance) withAmount: 1.
+        NightTable getInstance setItem: (ButlersKeys getInstance) withAmount: 1.
+
+        keySuspect := StolenVaultKey getInstance getSuspect.
+        (keySuspect isMemberOf: Gardener) 
+            ifTrue: [GardenPond getInstance setItem: (VaultKey getInstance) withAmount: 1].
+        (keySuspect isMemberOf: Cook) 
+            ifTrue: [Oven getInstance setItem: (VaultKey getInstance) withAmount: 1].
+        (keySuspect isMemberOf: Butler) 
+            ifTrue: [Mirror getInstance setItem: (VaultKey getInstance) withAmount: 1].
+    
+        coinsSuspect := StolenCoins getInstance getSuspect.
+        (coinsSuspect isMemberOf: Gardener) 
+            ifTrue: [RoseBushes getInstance setItem: (CoinPouch getInstance) withAmount: 1].
+        (coinsSuspect isMemberOf: Cook) 
+            ifTrue: [BagOfFlour getInstance setItem: (CoinPouch getInstance) withAmount: 1].
+        (coinsSuspect isMemberOf: Butler) 
+            ifTrue: [Bed getInstance setItem: (CoinPouch getInstance) withAmount: 1].
+    
+        diamondSuspect := StolenDiamond getInstance getSuspect.
+        (diamondSuspect isMemberOf: Gardener) 
+            ifTrue: [GardenerChest getInstance setItem: (Diamond getInstance) withAmount: 1].
+        (diamondSuspect isMemberOf: Cook) 
+            ifTrue: [CookChest getInstance setItem: (Diamond getInstance) withAmount: 1].
+        (diamondSuspect isMemberOf: Butler) 
+            ifTrue: [ButlerChest getInstance setItem: (Diamond getInstance) withAmount: 1].
+  
+    ]
+
     init [
         locked := false.
-        items := Set new.
     ]
 
     isLocked [ ^locked ]
     getDescription  [ ^description ]
     getPlaceLocation [ ^placeLocation ]
+    getItem [ ^item ]
+    getName [ ^self class name asString ]
+
 
     setPlaceLocation: location [ placeLocation := location ]
+    setItem: gameItem withAmount: amount [
+        item := gameItem.
+        item setItemAmount: amount.
+        item setItemPlace: self.
+    ] 
     unlock [ locked := false ]
 
     " examine [
@@ -100,12 +139,13 @@ Place subclass: KingSculpture [
 ]
 
 Place subclass: DirtMound [
-    
+
     DirtMound class >> new [
         self error: 'Use getInstance class method'
     ]
 
     init [
+
         description := 'A pile of dirt in the garden.' 
     ]
 ]

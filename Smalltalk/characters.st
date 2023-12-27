@@ -23,6 +23,24 @@ Object subclass: GameCharacter [
         ^suspects.
     ]
 
+    GameCharacter class >> assignClues [
+        | shuffledSuspects shuffledClues three f_two s_two|
+        shuffledSuspects := (GameCharacter getSuspects) shuffle.
+        shuffledClues := (Clue getAllClues) shuffle.
+
+        three := shuffledClues copyFrom: 1 to: 3.
+        f_two := shuffledClues copyFrom: 4 to: 5.
+        s_two := shuffledClues copyFrom: 6 to: 7.
+
+        three displayLines. 
+        f_two displayLines. 
+        s_two displayLines. 
+        Transcript show: ''; cr.
+
+        three do: [ :clue | clue setSuspect: (shuffledSuspects at: 1). ].
+        f_two do: [ :clue | clue setSuspect: (shuffledSuspects at: 2). ].
+        s_two do: [ :clue | clue setSuspect: (shuffledSuspects at: 3). ].
+    ]
 
     "Parent class method to get singleton instance of a subclass"
     GameCharacter class >> getInstance [ 

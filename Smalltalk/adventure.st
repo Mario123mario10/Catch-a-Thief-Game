@@ -58,7 +58,8 @@ Object subclass: GameState [
     ]
 
     start [        
-        Clue assignClues.
+        GameCharacter assignClues.
+        Place assignItems.
         ^self goTo: 'Hall' isInitMove: true.
     ]
 
@@ -72,6 +73,7 @@ Object subclass: GameState [
         message := OrderedCollection new.
         initMove ifFalse: [ 
             canMove := false.
+            "TODO: Można napisać isConnectedTo"
             currentLocation getConnectedLocations do: [ :location |
                 (location = newLocation)
                     ifTrue: [
@@ -278,14 +280,94 @@ dev                 -- to see debug instructions (cheat)
                 Transcript show: suspect getCharacterText; cr.
                 isUnknown := false
             ].
+    
+            cmd = 'ladle' ifTrue: [
+                | ladle1 ladle2 ladle3 |
+                ladle1 := Ladle getInstance.
+                ladle2 := Ladle getInstance.
+                " ladle3 := Ladle new. "
+                Ladle allInstances displayLines.
+                " Transcript show: ''; cr.
+                Transcript show: suspect getCharacterText; cr. "
+                isUnknown := false
+            ].
  
-            cmd = 'tool' ifTrue: [
-                | diamond  suspect |
-                diamond := Tool getInstance.
-                suspect := diamond getSuspect.
-                diamond identityHash printOn: Transcript.
+            cmd = 'part' ifTrue: [
+                | part1 part2 part3 part4 |
+                part1 := ToolPart new. 
+                part2 := ToolPart new. 
+                " part2 := ToolPart getInstance.  "
+                ToolPart allInstances displayLines.
+
+                " part4 := ToolPart getInstance.  "
+
+                isUnknown := false
+            ].
+            cmd = 'shroom' ifTrue: [
+                1 to: 5 do: [ :i |
+                    Mushroom new.
+                ].
+                Mushroom allInstances displayLines.
+                " part4 := ToolPart getInstance.  "
+
+                isUnknown := false
+            ].
+
+            cmd = 'vdoor' ifTrue: [
+                | place item |
+                place := VaultDoor getInstance.
+                Transcript show: place getDescription; cr.
+                item := place getItem.
+                Transcript show: item getDescription; cr.
+                (item getItemAmount) printOn: Transcript.
                 Transcript show: ''; cr.
-                Transcript show: suspect getCharacterText; cr.
+                " part4 := ToolPart getInstance.  "
+
+                isUnknown := false
+            ].
+
+            cmd = 'dirt' ifTrue: [
+                | place item |
+                place := DirtMound getInstance.
+                Transcript show: place getDescription; cr.
+                item := place getItem.
+                Transcript show: item getDescription; cr.
+                (item getItemAmount) printOn: Transcript.
+                Transcript show: ''; cr.
+                " part4 := ToolPart getInstance.  "
+
+                isUnknown := false
+            ].
+
+            cmd = 'suspects' ifTrue: [
+                Clue getAllClues do: [ :clue |
+                    Transcript show: clue getName, ' - ', clue getSuspect getName; cr.
+                ].
+                " part4 := ToolPart getInstance.  "
+
+                isUnknown := false
+            ].
+            cmd = 'items' ifTrue: [
+                | items message chain |
+                items := OrderedCollection new.
+                Item subclasses do: [ :each | 
+                    each allInstances do: [ :instance | 
+                        items add: instance
+                    ]
+                ].
+                chain := ''.
+                items do: [ :item | 
+                    chain := chain, item getItemPlace getName, ' - ', item getName, ': ', item getItemAmount asString, ', '
+                ].
+
+                chain := chain trimSeparators.
+                chain := chain allButLast.
+
+                message := OrderedCollection new.
+                message add: ''; add: chain; add: ''.
+
+                self printLines: message.
+                
                 isUnknown := false
             ].
 
