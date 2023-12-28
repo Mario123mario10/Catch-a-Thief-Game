@@ -13,11 +13,12 @@ Collaborators:
 
 Collection extend [
     shuffle [
-        | n k r |
+        | n k r1 r2 |
         n := self size.
+        r1 := Random new seed: Time millisecondClockValue.
+        r2 := Random new seed: Time millisecondClockValue + (r1 between: 1 and: 100) * 1000.
         [ n > 1 ] whileTrue: [
-            r := Random new seed: (Time now asSeconds * 1000).
-            k := r between: 1 and: n.
+            k := r2 between: 1 and: n.
             self swap: n with: k.
             n := n - 1
         ].
@@ -57,18 +58,18 @@ Object subclass: GameState [
     start [        
         GameCharacter assignClues.
         Place assignItems.
-        ^self goTo: 'Hall' isInitMove: true.
+        ^self goTo: 'Hall' isInitMove: true isTp: false.
     ]
 
     getCurrentLocation [
         ^currentLocation
     ]
     
-    goTo: newLocation isInitMove: initMove [
+    goTo: newLocation isInitMove: initMove isTp: tp [
         "TODO: getConnectedLocations nie powinno zwracać listy stringów, a listę klas (lub obiektów za pomocą singleton)"
         | canMove visited message classSymbol previousLocation | 
         message := OrderedCollection new.
-        initMove ifFalse: [ 
+        (initMove or: [tp]) ifFalse: [ 
             canMove := false.
             "TODO: Można napisać isConnectedTo"
             currentLocation getConnectedLocations do: [ :location |
@@ -146,11 +147,19 @@ Object subclass: GameState [
     ]
 
     examine: place [
-        | message |
-        message := OrderedCollection new.
-        message add: ''.
-        " currentPlace examine. "
+        | placeSymbol message |
+        placeSymbol := Smalltalk at: place asSymbol.
+        message := (placeSymbol getInstance) examinePlace.
+        ^message.
     ]
+
+    " DO ANALIZY BO LADNIE WYPLULO CALY OBIEKT
+    examine: place [
+        | placeSymbol message |
+        placeSymbol := Smalltalk at: place asSymbol.
+        message := placeSymbol getInstance examine.
+        ^message.
+    ] "
 ]
 
 "Adventure"
@@ -348,6 +357,15 @@ dev                 -- to see debug instructions (cheat)
 
                 isUnknown := false
             ].
+            
+            (cmd startsWith: 'examine') ifTrue: [
+                | message place |
+                place := self separateCommandFromArgument: cmd with: 'examine'.
+                message := gameState examine: place.
+                self printLines: message.
+                isUnknown := false
+            ].
+
             cmd = 'items' ifTrue: [
                 | items message chain |
                 items := OrderedCollection new.
@@ -386,7 +404,16 @@ dev                 -- to see debug instructions (cheat)
                 | message newLocation |
                 message := OrderedCollection new.
                 newLocation := self separateCommandFromArgument: cmd with: 'go to'.
-                message addAll: (gameState goTo: newLocation isInitMove: false).
+                message addAll: (gameState goTo: newLocation isInitMove: false isTp: false).
+                self printLines: message.
+                isUnknown := false
+            ].
+
+            (cmd startsWith: 'tp') ifTrue: [
+                | message newLocation |
+                message := OrderedCollection new.
+                newLocation := self separateCommandFromArgument: cmd with: 'tp'.
+                message addAll: (gameState goTo: newLocation isInitMove: false isTp: true).
                 self printLines: message.
                 isUnknown := false
             ].

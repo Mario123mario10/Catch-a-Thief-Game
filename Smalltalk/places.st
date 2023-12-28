@@ -20,6 +20,7 @@ Object subclass: Place [
         | instance |
         (instances includesKey: self) ifFalse: [
             instance := super new.
+            instance initParent.
             instances at: self put: instance.
         ]
         ifTrue: [ instance := instances at: self].
@@ -59,9 +60,10 @@ Object subclass: Place [
         (diamondSuspect isMemberOf: Butler) 
             ifTrue: [ButlerChest getInstance setItem: (Diamond getInstance) withAmount: 1].
   
+        "TODO: dokończyć resztę itemów"
     ]
 
-    init [
+    initParent [
         locked := false.
     ]
 
@@ -79,16 +81,21 @@ Object subclass: Place [
     ] 
     unlock [ locked := false ]
 
-    " examine [
+    examinePlace [
         | message |
         message := OrderedCollection new.
-        locked isTrue: [
-            message add: ''; '', self class name, ' is locked'; ''
+        locked ifTrue: [
+            message add: ''; add: '', self getName, ' is locked'; add: ''.
         ]
         ifFalse: [
-            
+            message add: ''; add: '', description.
+            message add: ''; add: 'You are examining ', self getName; add: ''. 
+            item ifNotNil: [
+                message add: ''; add: '', item getName, ': ', item getItemAmount asString; add: ''.
+            ].
         ].
-    ] "
+        ^message
+    ]
 ]
 
 Place subclass: VaultDoor [
@@ -98,6 +105,7 @@ Place subclass: VaultDoor [
     ]
 
     init [
+        locked := false.
         description := 
 'The heavy vault door seems too heavy for one person to open. It looks like
 someone used some kind of tool to move the door.'
@@ -144,7 +152,6 @@ Place subclass: DirtMound [
     ]
 
     init [
-
         description := 'A pile of dirt in the garden.' 
     ]
 ]

@@ -56,9 +56,7 @@ Object subclass: Location [
         string := ''.
         places do: [:each | string := string, each getName, ', '].
         string := string trimSeparators.
-        places isEmpty ifFalse: [
-            string := string allButLast
-        ].
+        places isEmpty ifFalse: [ string := string allButLast ].
         ^string
     ]
 
