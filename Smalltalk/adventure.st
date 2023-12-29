@@ -281,6 +281,15 @@ dev                 -- to see debug instructions (cheat)
                 isUnknown := false
             ].
             
+            cmd = 'gen' ifTrue: [
+                | numbers |
+                numbers := self generateNumbers: 5 summingTo: 10.
+                Transcript show: ''; cr.
+                numbers displayLines.
+                Transcript show: ''; cr.
+                isUnknown := false
+            ].
+            
             cmd = 'diamond' ifTrue: [
                 | diamond  suspect |
                 diamond := StolenDiamond getInstance.

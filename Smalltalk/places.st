@@ -31,7 +31,11 @@ Object subclass: Place [
     ]
 
     Place class >> assignItems [
-        | keySuspect coinsSuspect diamondSuspect |
+        | keySuspect coinsSuspect diamondSuspect amounts allShrooms shroomsPlaces |
+        allShrooms := 10.
+        shroomsPlaces := OrderedCollection new.
+        shroomsPlaces addAll: (Forest getInstance getPlaces).
+
         DirtMound getInstance setItem: (Dirt getInstance) withAmount: 100.
         VaultDoor getInstance setItem: (ToolHandle getInstance) withAmount: 1.
         NightTable getInstance setItem: (ButlersKeys getInstance) withAmount: 1.
@@ -59,9 +63,36 @@ Object subclass: Place [
             ifTrue: [CookChest getInstance setItem: (Diamond getInstance) withAmount: 1].
         (diamondSuspect isMemberOf: Butler) 
             ifTrue: [ButlerChest getInstance setItem: (Diamond getInstance) withAmount: 1].
-  
-        "TODO: dokończyć resztę itemów"
+
+        amounts := self generateWeightedShroomAmounts: (shroomsPlaces size) for: allShrooms.
+        1 to: (shroomsPlaces size) do: [ :i |
+            | shroom |
+            ((amounts at: i) ~= 0) ifTrue: [
+                shroom := Mushroom new.
+                (shroomsPlaces at: i) setItem: shroom withAmount: (amounts at: i).
+            ].
+        ].
     ]
+    
+    Place class >> generateWeightedShroomAmounts: n for: x [
+        | numbers sum i |
+        numbers := OrderedCollection new.
+        1 to: n do: [ :i | numbers add: 0 ].
+        sum := 0.
+        [sum ~= x] whileTrue: [
+            | index currentAtIndex randomNumber |
+            randomNumber := Random between: 1 and: 3.
+            ((sum + randomNumber) <= x) ifTrue: [
+                index := Random between: 1 and: 5.
+                currentAtIndex := numbers at: index.
+                currentAtIndex := currentAtIndex + randomNumber.
+                numbers at: index put: currentAtIndex.
+                sum := sum + randomNumber.
+            ].
+        ].
+        ^numbers
+    ]
+
 
     initParent [
         locked := false.
