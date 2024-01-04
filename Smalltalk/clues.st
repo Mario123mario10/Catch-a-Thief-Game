@@ -39,7 +39,8 @@ Object subclass: Clue [
     getSuspect [ ^suspect ]
 
     setSuspect: randomSuspect [
-        suspect := randomSuspect 
+        suspect := randomSuspect.
+        randomSuspect addClue: self.
     ] 
 ]
 

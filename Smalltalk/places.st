@@ -31,7 +31,9 @@ Object subclass: Place [
     ]
 
     Place class >> assignItems [
-        | keySuspect coinsSuspect diamondSuspect amounts allShrooms shroomsPlaces |
+        | keySuspect coinsSuspect diamondSuspect amounts allShrooms 
+            shroomsPlaces toolPartsCandidates toolPartsPlaces |
+
         allShrooms := 10.
         shroomsPlaces := OrderedCollection new.
         shroomsPlaces addAll: (Forest getInstance getPlaces).
@@ -72,6 +74,24 @@ Object subclass: Place [
                 (shroomsPlaces at: i) setItem: shroom withAmount: (amounts at: i).
             ].
         ].
+
+        toolPartsCandidates := self getAllPlaces select: [ :each | 
+            ((each getInstance getPlaceLocation) ~= Forest) and: [ each getInstance getItem isNil]
+        ].
+        toolPartsCandidates := toolPartsCandidates asOrderedCollection.
+        toolPartsPlaces := Set new.
+        [             
+            | randomIndexes |
+            randomIndexes := (1 to: toolPartsCandidates size) asOrderedCollection.
+            1 to: 2 do: [ :i | 
+                randomIndexes shuffle.
+                toolPartsPlaces add: (toolPartsCandidates at: randomIndexes first).
+                randomIndexes removeFirst.
+            ].
+        ] value.
+        toolPartsPlaces do: [ :place |
+            place getInstance setItem: ToolPart new withAmount: 1.
+        ]
     ]
     
     Place class >> generateWeightedShroomAmounts: n for: x [
@@ -93,7 +113,6 @@ Object subclass: Place [
         ^numbers
     ]
 
-
     initParent [
         locked := false.
     ]
@@ -110,19 +129,44 @@ Object subclass: Place [
         item setItemAmount: amount.
         item setItemPlace: self.
     ] 
+    takeItem: gameItem [
+        | itemInstance |
+        item ifNotNil: [
+            ((gameItem ~= Mushroom) and: [gameItem ~= ToolPart]) ifTrue: [
+                itemInstance := gameItem getInstance.
+                (item = itemInstance) ifTrue: [
+                    item setItemPlace: nil.
+                    item := nil.
+                    ^itemInstance
+                ] ifFalse: [
+                    ^nil
+                ]
+            ] ifFalse: [
+                (item class = gameItem) ifTrue: [ 
+                    | tempItem |
+                    tempItem := item.
+                    item setItemPlace: nil.
+                    item := nil.
+                    ^tempItem
+                ] ifFalse: [
+                    ^nil
+                ]
+            ]
+        ] ifNil: [ ^nil ]
+    ]
     unlock [ locked := false ]
 
     examinePlace [
         | message |
         message := OrderedCollection new.
         locked ifTrue: [
-            message add: ''; add: '', self getName, ' is locked'; add: ''.
+            message add: ''; add: '', self getName, ' is locked.'; add: ''.
         ]
         ifFalse: [
             message add: ''; add: '', description.
-            message add: ''; add: 'You are examining ', self getName; add: ''. 
+            message add: ''; add: 'You are examining ', self getName, '.'; add: ''. 
             item ifNotNil: [
-                message add: ''; add: '', item getName, ': ', item getItemAmount asString; add: ''.
+                message add: '', item getName, ': ', item getItemAmount asString; add: ''.
             ].
         ].
         ^message

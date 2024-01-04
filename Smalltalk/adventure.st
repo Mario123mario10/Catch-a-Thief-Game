@@ -13,12 +13,11 @@ Collaborators:
 
 Collection extend [
     shuffle [
-        | n k r1 r2 |
+        | n k r |
         n := self size.
-        r1 := Random new seed: Time millisecondClockValue.
-        r2 := Random new seed: Time millisecondClockValue + (r1 between: 1 and: 100) * 1000.
+        r := Random new seed: Time millisecondClockValue + (Random between: 1 and: 100) * 1000.
         [ n > 1 ] whileTrue: [
-            k := r2 between: 1 and: n.
+            k := r between: 1 and: n.
             self swap: n with: k.
             n := n - 1
         ].
@@ -28,7 +27,11 @@ Collection extend [
     toString [
         | string |
         string := ''.
-        self do: [:each | string := string, each asString, ', '].
+        self do: [:each | 
+            [ string := string, each asString, ', ' ]
+                on: Exception
+                do: [ :ex | string := string, each getName, ', ' ]
+        ].
         string := string trimSeparators.
         self isEmpty ifFalse: [
             string := string allButLast
@@ -40,7 +43,7 @@ Collection extend [
 "GameState"
 
 Object subclass: GameState [
-    | currentLocation visitedLocations roomHistory |
+    | startTime endTime currentLocation visitedLocations examinedPlace roomStack inventory |
 
     GameState class >> new [
         | gs |
@@ -52,20 +55,47 @@ Object subclass: GameState [
     init [
         currentLocation := nil.
         visitedLocations := Set new.
-        
+        roomStack := OrderedCollection new.
+        inventory := Set new.
     ]
 
     start [        
         GameCharacter assignClues.
         Place assignItems.
-        ^self goTo: 'Hall' isInitMove: true isTp: false.
+        startTime := DateTime now.
+        endTime := startTime + (Duration days: 0 hours: 0 minutes: 25 seconds: 0).
+        ^self goTo: 'Hall' isInitMove: true isTp: false moveBack: false.
     ]
 
     getCurrentLocation [
         ^currentLocation
     ]
+
+    getInventory [
+        ^inventory
+    ]
+
+    timeExceeded [
+        ^(DateTime now > endTime)
+    ]
+
+    remainingTime [
+        | remaining |
+        remaining := (endTime - DateTime now).
+        ^('You have ', remaining minutes asString, ' minutes and ',
+            remaining seconds asString, ' seconds left.')
+    ]
+
+    back [
+        | lastLocation |
+        lastLocation := roomStack last.
+        lastLocation ifNotNil: [
+            roomStack removeLast.
+            ^self goTo: (lastLocation getName) isInitMove: false isTp: false moveBack: true.
+        ] ifNil: [^#('' 'No room history.' '' )]
+    ]
     
-    goTo: newLocation isInitMove: initMove isTp: tp [
+    goTo: newLocation isInitMove: initMove isTp: tp moveBack: isBack [
         "TODO: getConnectedLocations nie powinno zwracać listy stringów, a listę klas (lub obiektów za pomocą singleton)"
         | canMove visited message classSymbol previousLocation | 
         message := OrderedCollection new.
@@ -84,6 +114,7 @@ Object subclass: GameState [
             visited := false.
             previousLocation := currentLocation.
             visitedLocations do: [ :location | 
+            "TODO: ten check mozna bez sprawdzania nazwy"
                 (location getName = newLocation)
                     ifTrue: [ 
                         visited := true.
@@ -100,6 +131,8 @@ Object subclass: GameState [
                 message add: ''; add: 'You moved from ', previousLocation getName, ' to ', currentLocation getName, '.'; add: ''.
             ].
             
+            isBack ifFalse: [roomStack addLast: previousLocation.].
+
             message add: currentLocation visit; add: ''.
         
             currentLocation getCharacter ifNotNil: [
@@ -147,19 +180,65 @@ Object subclass: GameState [
     ]
 
     examine: place [
-        | placeSymbol message |
+        | placeSymbol placeInstance message |
         placeSymbol := Smalltalk at: place asSymbol.
-        message := (placeSymbol getInstance) examinePlace.
+        placeInstance := placeSymbol getInstance.
+        examinedPlace := placeInstance.
+        message := placeInstance examinePlace.
         ^message.
     ]
 
-    " DO ANALIZY BO LADNIE WYPLULO CALY OBIEKT
-    examine: place [
-        | placeSymbol message |
-        placeSymbol := Smalltalk at: place asSymbol.
-        message := placeSymbol getInstance examine.
-        ^message.
-    ] "
+    take: item [
+        | message itemSymbol itemTaken |
+        message := OrderedCollection new.
+        message add: ''.
+        [ itemSymbol := Smalltalk at: item asSymbol. ]
+            on: Exception
+            do: [ :ex | 
+                message add: 'Invalid item name.'; add: ''.
+                ^message
+            ].
+        examinedPlace ifNil: [
+            message add: 'You must first examine a Place.'; add: ''.
+
+        ] ifNotNil: [
+            itemTaken := (examinedPlace takeItem: itemSymbol).
+            itemTaken ifNil: [
+                message add: 'You can’t take ', item, ' from here.'; add: ''
+            ] ifNotNil: [
+                message add: 'You took ', itemTaken getItemAmount asString, ' ', 
+                    itemTaken getName, '.'; add: ''; add: itemTaken getDescription; add: ''.
+                (itemTaken class = Mushroom) ifTrue: [
+                    | mushroomsAmount mushroomFound |
+                    mushroomFound := false.
+                    mushroomsAmount := itemTaken getItemAmount.
+                    inventory do: [ :inventoryItem |
+                        (inventoryItem class = Mushroom) ifTrue: [
+                            mushroomFound := true.
+                            inventoryItem setItemAmount: inventoryItem getItemAmount + mushroomsAmount
+                        ]
+                    ].
+                    mushroomFound ifFalse: [ inventory add: itemTaken. ]
+                ].
+                (itemTaken class = ToolPart) ifTrue: [
+                    | toolPartAmount toolPartFound |
+                    toolPartFound := false.
+                    toolPartAmount := itemTaken getItemAmount.
+                    inventory do: [ :inventoryItem |
+                        (inventoryItem class = ToolPart) ifTrue: [
+                            toolPartFound := true.
+                            inventoryItem setItemAmount: inventoryItem getItemAmount + toolPartAmount
+                        ]
+                    ].
+                    toolPartFound ifFalse: [ inventory add: itemTaken. ]
+                ].
+                ((itemTaken class ~= ToolPart) and: [itemTaken class ~= Mushroom])
+                    ifTrue: [ inventory add: itemTaken. ]
+            ].
+        ].
+        
+        ^message
+    ]
 ]
 
 "Adventure"
@@ -248,12 +327,36 @@ dev                 -- to see debug instructions (cheat)
         ^ FileStream stdin nextLine
     ]
 
+    checkAccusation: accusation [
+        ^(accusation = GameCharacter getThief getName).
+    ]
+
     separateCommandFromArgument: input with: command [
         | argumentIndex argument |
         argumentIndex := command size + 1.
         argument := input copyFrom: argumentIndex to: input size.
         argument := argument trimSeparators.
         ^argument
+    ]
+
+    accuse: input [
+        | cmd accusation yesAnswers |
+        accusation := self separateCommandFromArgument: input with: 'accuse'.
+        Transcript cr; show: 'Are you sure? (Y/N)'; cr; cr.
+        cmd := self readCommand.
+        yesAnswers := #('Y' 'y' 'yes' 'sure').
+        (yesAnswers includes: cmd) ifTrue: [
+            | result |
+            result := self checkAccusation: accusation.
+            result ifTrue: [
+                Transcript cr; show: 'You win!'; cr; cr.
+            ] ifFalse: [
+                Transcript cr; show: 'You lose!'; cr; cr.
+            ].
+            isGameOver := true
+        ] ifFalse: [
+            Transcript show: 'Take your time!'; cr
+        ].
     ]
 
     "Run the game."
@@ -266,7 +369,7 @@ dev                 -- to see debug instructions (cheat)
         gameState := GameState new.
         self printLines: (gameState start).
         "Game loop."
-        [isGameOver] whileFalse: [
+        [isGameOver or: [gameState timeExceeded]] whileFalse: [
 
             isUnknown := true.
             cmd := self readCommand.
@@ -284,9 +387,9 @@ dev                 -- to see debug instructions (cheat)
             cmd = 'gen' ifTrue: [
                 | numbers |
                 numbers := self generateNumbers: 5 summingTo: 10.
-                Transcript show: ''; cr.
+                Transcript cr.
                 numbers displayLines.
-                Transcript show: ''; cr.
+                Transcript cr.
                 isUnknown := false
             ].
             
@@ -295,7 +398,7 @@ dev                 -- to see debug instructions (cheat)
                 diamond := StolenDiamond getInstance.
                 suspect := diamond getSuspect.
                 diamond identityHash printOn: Transcript.
-                Transcript show: ''; cr.
+                Transcript cr.
                 Transcript show: suspect getCharacterText; cr.
                 isUnknown := false
             ].
@@ -306,7 +409,7 @@ dev                 -- to see debug instructions (cheat)
                 ladle2 := Ladle getInstance.
                 " ladle3 := Ladle new. "
                 Ladle allInstances displayLines.
-                " Transcript show: ''; cr.
+                " Transcript cr.
                 Transcript show: suspect getCharacterText; cr. "
                 isUnknown := false
             ].
@@ -339,7 +442,7 @@ dev                 -- to see debug instructions (cheat)
                 item := place getItem.
                 Transcript show: item getDescription; cr.
                 (item getItemAmount) printOn: Transcript.
-                Transcript show: ''; cr.
+                Transcript cr.
                 " part4 := ToolPart getInstance.  "
 
                 isUnknown := false
@@ -352,7 +455,7 @@ dev                 -- to see debug instructions (cheat)
                 item := place getItem.
                 Transcript show: item getDescription; cr.
                 (item getItemAmount) printOn: Transcript.
-                Transcript show: ''; cr.
+                Transcript cr.
                 " part4 := ToolPart getInstance.  "
 
                 isUnknown := false
@@ -366,7 +469,35 @@ dev                 -- to see debug instructions (cheat)
 
                 isUnknown := false
             ].
+
+            cmd = 'clues' ifTrue: [
+                | suspects orderedSuspects |
+                Transcript cr.
+                suspects := GameCharacter getSuspects.
+                orderedSuspects := suspects asSortedCollection: [:a :b | a getClues size > b getClues size].
+                orderedSuspects do: [ :suspect |
+                    Transcript show: suspect getName, ': ', suspect getClues toString; cr.
+                ].
+                Transcript cr.
+                isUnknown := false
+            ].
+
+            (cmd startsWith: 'accuse') ifTrue: [
+                self accuse: cmd.
+                isUnknown := false
+            ].
+
+            cmd = 'time' ifTrue: [
+                Transcript cr; show: gameState remainingTime; cr; cr.
+                isUnknown := false
+            ].
             
+            
+            cmd = 'back' ifTrue: [
+                self printLines: gameState back.
+                isUnknown := false
+            ].
+
             (cmd startsWith: 'examine') ifTrue: [
                 | message place |
                 place := self separateCommandFromArgument: cmd with: 'examine'.
@@ -385,17 +516,41 @@ dev                 -- to see debug instructions (cheat)
                 ].
                 chain := ''.
                 items do: [ :item | 
-                    chain := chain, item getItemPlace getName, ' - ', item getName, ': ', item getItemAmount asString, ', '
+                    (item getItemPlace) ifNotNil: [
+                        chain := chain, item getItemPlace getName, ' - ', item getName, ': ',
+                            item getItemAmount asString, (Character lf asString)
+                    ]
                 ].
 
                 chain := chain trimSeparators.
-                chain := chain allButLast.
 
                 message := OrderedCollection new.
                 message add: ''; add: chain; add: ''.
 
                 self printLines: message.
 
+                isUnknown := false
+            ].
+
+            cmd = 'inventory' ifTrue: [
+                | message |
+                message := OrderedCollection new.
+                message add: ''.
+                gameState getInventory do: [ :item | 
+                    message add: item getName, ': ', item getItemAmount asString.
+                ].
+                message add: ''.
+                self printLines: message.
+                isUnknown := false
+            ].
+
+
+            (cmd startsWith: 'take') ifTrue: [
+                | message item |
+                message := OrderedCollection new.
+                item := self separateCommandFromArgument: cmd with: 'take'.
+                message addAll: (gameState take: item).
+                self printLines: message.
                 isUnknown := false
             ].
 
@@ -413,7 +568,7 @@ dev                 -- to see debug instructions (cheat)
                 | message newLocation |
                 message := OrderedCollection new.
                 newLocation := self separateCommandFromArgument: cmd with: 'go to'.
-                message addAll: (gameState goTo: newLocation isInitMove: false isTp: false).
+                message addAll: (gameState goTo: newLocation isInitMove: false isTp: false moveBack: false).
                 self printLines: message.
                 isUnknown := false
             ].
@@ -422,7 +577,7 @@ dev                 -- to see debug instructions (cheat)
                 | message newLocation |
                 message := OrderedCollection new.
                 newLocation := self separateCommandFromArgument: cmd with: 'tp'.
-                message addAll: (gameState goTo: newLocation isInitMove: false isTp: true).
+                message addAll: (gameState goTo: newLocation isInitMove: false isTp: true moveBack: false).
                 self printLines: message.
                 isUnknown := false
             ].
@@ -430,6 +585,11 @@ dev                 -- to see debug instructions (cheat)
             isUnknown ifTrue: [
                 self printLines: #('' 'Unknown command.' '')
             ]
+        ].
+        [isGameOver] whileFalse: [
+            Transcript show: 'You have ran out of time. You must accuse someone.'; cr; cr.
+            cmd := self readCommand.
+            self accuse: cmd.
         ]
     ]
 ]

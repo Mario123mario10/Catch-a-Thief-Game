@@ -1,8 +1,8 @@
 "TODO: extract Suspect from GameCharacter"
 
 Object subclass: GameCharacter [
-    " | characterText characterLocation clues | "
-    | characterText characterLocation |
+    | characterText characterLocation clues |
+    " | characterText characterLocation | "
 
     "Dictionary with subclasses keys and singleton instance as value"
     instances := Dictionary new.
@@ -22,6 +22,19 @@ Object subclass: GameCharacter [
         ].
         ^suspects.
     ]
+
+    
+    GameCharacter class >> getThief [
+        | thief |
+        thief := suspects at: 1.
+        suspects do: [ :suspect |
+            (suspect getClues size > thief getClues size) ifTrue: [
+                thief := suspect
+            ]
+        ].
+        ^thief
+    ]
+
 
     GameCharacter class >> assignClues [
         | shuffledSuspects shuffledClues three f_two s_two susIndices |
@@ -46,6 +59,7 @@ Object subclass: GameCharacter [
         | instance |
         (instances includesKey: self) ifFalse: [
             instance := super new.
+            instance initParent.
             instances at: self put: instance.
         ]
         ifTrue: [ instance := instances at: self ].
@@ -55,16 +69,20 @@ Object subclass: GameCharacter [
         ^instance
     ]
 
-    init [
+    initParent [
         characterText := 'Default text'.
         characterLocation := nil.
-        "clues := Set new "
+        clues := Set new.
     ]
 
     getCharacterLocation [ ^characterLocation ]
     getCharacterText [ ^characterText ]
     getName [ ^self class name asString ]
+    getClues [ ^clues ]
 
+    addClue: clue [
+        clues add: clue.
+    ]
     setCharacterLocation: location [ characterLocation := location ]
 ]
  
