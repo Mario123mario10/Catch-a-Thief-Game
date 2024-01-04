@@ -94,6 +94,34 @@ Object subclass: GameState [
             ^self goTo: (lastLocation getName) isInitMove: false isTp: false moveBack: true.
         ] ifNil: [^#('' 'No room history.' '' )]
     ]
+
+    drop: item [
+        | message itemSymbol |
+        message := OrderedCollection new.
+        message add: ''.
+        [ itemSymbol := Smalltalk at: item asSymbol. ]
+            on: Exception
+            do: [ :ex | 
+                message add: 'Invalid item name.'; add: ''.
+                ^message
+            ].
+        ((itemSymbol = Dirt) and: [currentLocation class = RoyalBedroom]) ifTrue: [
+            (inventory includes: (itemSymbol getInstance)) ifTrue: [
+                Butler getInstance setDistracted: true.
+                inventory remove: itemSymbol getInstance.
+                message add: 'You unnoticedly drop some dirt on the floor.'; 
+                add: '’Someone spread dirt all over the floor’, you yell to the Butler.';
+                add: '’Clean it up before king notices!’'; add: ''.
+
+            ] ifFalse: [
+                message add: 'You don’t have Dirt in inventory.'; add: ''.
+            ]
+        ] ifFalse: [
+            message add: 'You can’t drop this item here.'; add: ''
+        ].
+        ^message
+        "TODO: message jako pole klasy game"
+    ]
     
     goTo: newLocation isInitMove: initMove isTp: tp moveBack: isBack [
         "TODO: getConnectedLocations nie powinno zwracać listy stringów, a listę klas (lub obiektów za pomocą singleton)"
@@ -269,25 +297,25 @@ Object subclass: Game [
 '
 Available commands are:
 
-instructions        -- to see these instructions.
-time                -- to see remaining time.
-look                -- to look around the room.
-inventory           -- to see what’s currently in inventory.
-evidence            -- to see all evidence we know about.
+instructions            -- to see these instructions.
+time                    -- to see remaining time.
+look                    -- to look around the room.
+inventory               -- to see what’s currently in inventory.
+evidence                -- to see all evidence we know about.
 
-talk to [Character] -- to start conversation with character.
-ask about [Clue]    -- to ask about clue.
-give [Item]         -- to give all items of this type to character.
-examine [Place]     -- to examine specific place in a room.
-take [Item]         -- to take avaiable item to inventory.
-drop [Item]         -- to drop an item.
-go to [Location]    -- to go to one of avaiable rooms.
-back                -- to go to last room.
+talk to [Character]     -- to start conversation with character.
+ask about [Clue]        -- to ask about clue.
+give [Item]             -- to give all items of this type to character.
+examine [Place]         -- to examine specific place in a room.
+take [Item]             -- to take avaiable item to inventory.
+drop [Item]             -- to drop an item.
+go to [Location]        -- to go to one of avaiable rooms.
+back                    -- to go to last room.
 unlock [Location/Place] -- to unlock locked location/place with keys
-accuse [Character]  -- to character and if correct win the game
+accuse [Character]      -- to character and if correct win the game
 
-quit                -- to end the game and quit.
-dev                 -- to see debug instructions (cheat)
+quit                    -- to end the game and quit.
+dev                     -- to see debug instructions (cheat)
 '.
     
  
@@ -539,6 +567,9 @@ dev                 -- to see debug instructions (cheat)
                 gameState getInventory do: [ :item | 
                     message add: item getName, ': ', item getItemAmount asString.
                 ].
+                (gameState getInventory size = 0) ifTrue: [ 
+                    message add: 'The inventory is empty.'
+                ].
                 message add: ''.
                 self printLines: message.
                 isUnknown := false
@@ -550,6 +581,15 @@ dev                 -- to see debug instructions (cheat)
                 message := OrderedCollection new.
                 item := self separateCommandFromArgument: cmd with: 'take'.
                 message addAll: (gameState take: item).
+                self printLines: message.
+                isUnknown := false
+            ].
+
+            (cmd startsWith: 'drop') ifTrue: [
+                | message item |
+                message := OrderedCollection new.
+                item := self separateCommandFromArgument: cmd with: 'drop'.
+                message addAll: (gameState drop: item).
                 self printLines: message.
                 isUnknown := false
             ].

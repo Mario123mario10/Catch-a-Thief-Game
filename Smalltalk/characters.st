@@ -2,7 +2,6 @@
 
 Object subclass: GameCharacter [
     | characterText characterLocation clues |
-    " | characterText characterLocation | "
 
     "Dictionary with subclasses keys and singleton instance as value"
     instances := Dictionary new.
@@ -183,6 +182,7 @@ People are trying to work here!’ he says, irritated.'
 ] 
 
 GameCharacter subclass: Butler [
+    | distracted |
     Butler class >> new [ 
         self error: 'Use getInstance class method'
     ]
@@ -202,7 +202,16 @@ and speaks calmly. ’What brings you here, noble lord?’
 he confesses with a hint of sadness in his voice. ’I had no idea what was 
 happening in the courtyard or the commotion at the vault. It’s really strange. 
 I can assure you that I had nothing to do with it. I worked most of the day, 
-unfortunately, there is no one to testify about it.’'
+unfortunately, there is no one to testify about it.’'.
+        distracted := false.
+    ]
+
+    isDistracted [
+        ^distracted
+    ]
+
+    setDistracted: dirtDropped [
+        distracted := dirtDropped
     ]
 ] 
 

@@ -60,31 +60,31 @@ Item subclass: ToolHandle [
     init [
         description :=
 'Broken part of a tool used to open the heavy vault door. There is blood on the
-broken part'
+broken part...'
     ]
 ].
 
 Item subclass: VaultKey [
     init [
-        description := 'Key that opens the vault door'
+        description := 'Key that opens the vault door.'
     ]
 ].
 
 Item subclass: ButlersKeys [
     init [
-        description := 'Keys that unlock every lock in the castle'
+        description := 'Keys that unlock every lock in the castle.'
     ]
 ].
 
 Item subclass: Diamond [
     init [
-        description := 'Precious gem, possibly from the vault'
+        description := 'Precious gem, possibly from the vault.'
     ]
 ].
 
 Item subclass: CoinPouch [
     init [
-        description := 'Pouch containing coins believed to be from the vault'
+        description := 'Pouch containing coins believed to be from the vault.'
     ]
 ].
 
@@ -115,7 +115,7 @@ Item subclass: ToolPart [
     ]
 
     init [
-        description := 'Part of a tool used to open the heavy vault door'
+        description := 'Part of a tool used to open the heavy vault door.'
     ]
 ].
 
@@ -126,6 +126,6 @@ Item subclass: Mushroom [
     ]
 
     init [
-        description := 'Magical mushroom'
+        description := 'Magical mushroom.'
     ]
 ]
