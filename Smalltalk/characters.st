@@ -69,13 +69,11 @@ Object subclass: GameCharacter [
     ]
 
     initParent [
-        characterText := 'Default text'.
-        characterLocation := nil.
         clues := Set new.
     ]
 
     getCharacterLocation [ ^characterLocation ]
-    getCharacterText [ ^characterText ]
+    getCharacterText [ ^(self splitString: characterText at: 80) ]
     getName [ ^self class name asString ]
     getClues [ ^clues ]
 
@@ -126,15 +124,22 @@ allow that. He’s in a guard room right now.’'
 ] 
 
 GameCharacter subclass: Gardener [
+    | optionalText |
     Gardener class >> new [ 
         self error: 'Use getInstance class method'
     ]
 
     init [
+        (clues includes: BloodStains getInstance) ifTrue: [
+            optionalText := ' There is a fresh wound on his forearm, as if something cut him. '
+        ] ifFalse: [
+            optionalText := '' 
+        ].
+
         characterText := 
 'While wandering through the royal garden, you come across a gardener. He is a 
-middle-aged man with hard hands and dark spots on his clothes. ++ 
-optionalText ++  His gaze shows signs of hard work and devotion to the royal 
+middle-aged man with hard hands and dark spots on his clothes.', optionalText, 
+'His gaze shows signs of hard work and devotion to the royal 
 garden. 
 
 Surprised by your presence, the gardener puts down his tools and approaches 
@@ -154,15 +159,21 @@ work.’ The gardener seems nervous and a bit concerned about the situation.'
 ] 
 
 GameCharacter subclass: Cook [
+    | optionalText |
     Cook class >> new [ 
         self error: 'Use getInstance class method'
     ]
 
     init [
+        (clues includes: BloodStains getInstance) ifTrue: [
+            optionalText := ' You notice a fresh wound on his hand. '
+        ] ifFalse: [
+            optionalText := '' 
+        ].
         characterText := 
 'You see a man wearing a white apron that is now slightly stained from working 
 in the kitchen. There are traces of flour on his hands, and his face is 
-slightly flushed from the heat. ++ optionalText ++  The cook seems to be a hard-
+slightly flushed from the heat.', optionalText, 'The cook seems to be a hard-
 working and busy man who devotes himself to his role in the royal kitchen with 
 passion. 
 
@@ -182,18 +193,23 @@ People are trying to work here!’ he says, irritated.'
 ] 
 
 GameCharacter subclass: Butler [
-    | distracted |
+    | optionalText distracted |
     Butler class >> new [ 
         self error: 'Use getInstance class method'
     ]
 
-    init [
+    init [ 
+        (clues includes: BloodStains getInstance) ifTrue: [
+            optionalText := ' There is a fresh wound on his left cheek; he cut himself with something. '
+        ] ifFalse: [
+            optionalText := '' 
+        ].
         characterText := 
 'You stand before an unassuming, delicately built butler, seemingly one of the 
 quieter figures at the court throughout the years. His pale face seems to blend 
 into the background, and his eyes, filled with a mysterious glow, scan the 
 surroundings. The butler wears a modest uniform that betrays his low status at 
-court, yet it’s carefully ironed and clean. ++ optionalText 
+court, yet it’s carefully ironed and clean.', optionalText, ' 
 
 The butler stands still and awaits a signal. After a while, he opens his mouth 
 and speaks calmly. ’What brings you here, noble lord?’ 
@@ -306,8 +322,17 @@ wizard says dismissingly.
 says, clearly implying that the conversation is over.'
 
     ]
-    giveMushrooms [
-        gotMushrooms := true.
+    giveMushrooms: amount [
+        (amount = 10) ifTrue: [
+            gotMushrooms := true.
+            ^self getCharacterText
+        ].
+        (amount = 0) ifTrue: [
+            ^'’You want to give me nothing?! Come back when you have 10 mushrooms.’'
+        ].
+        ((amount < 10) and: [amount > 0]) ifTrue: [
+            ^'’You don’t have enough mushrooms! Come back when you have them.’'
+        ]
     ]
     
     hasMushrooms [

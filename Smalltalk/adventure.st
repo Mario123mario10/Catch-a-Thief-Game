@@ -11,6 +11,37 @@ Responsibilities:
 Collaborators:
 * ..."
 
+Object extend [
+    splitString: aString at: aNumber [
+        | stream newString paragraphs doubleNewline uniqueChar |
+        uniqueChar := '_'.
+        newString := aString copyReplaceAll: 
+            (String with: Character lf with: Character lf) with: uniqueChar.
+
+        paragraphs := newString substrings: uniqueChar.
+        stream := WriteStream on: (String new: aString size).
+        
+        paragraphs do: [ :par |
+           | words line |
+            words := par subStrings.
+            line := ''.
+            words do: [:each |
+                | tempLine |
+                tempLine := line, each, ' '.
+                (tempLine size <= aNumber)
+                ifTrue: [line := tempLine]
+                ifFalse: [
+                    stream nextPutAll: line; nl. 
+                    line := each, ' '
+                    ]
+                ].
+            stream nextPutAll: line; nl; nl.
+        ].
+        ^stream contents trimSeparators
+    ]
+]
+
+
 Collection extend [
     shuffle [
         | n k r |
@@ -43,7 +74,8 @@ Collection extend [
 "GameState"
 
 Object subclass: GameState [
-    | startTime endTime currentLocation visitedLocations examinedPlace roomStack inventory |
+    | startTime endTime currentLocation visitedLocations examinedPlace 
+        roomStack inventory talkingTo |
 
     GameState class >> new [
         | gs |
@@ -95,34 +127,6 @@ Object subclass: GameState [
         ] ifNil: [^#('' 'No room history.' '' )]
     ]
 
-    drop: item [
-        | message itemSymbol |
-        message := OrderedCollection new.
-        message add: ''.
-        [ itemSymbol := Smalltalk at: item asSymbol. ]
-            on: Exception
-            do: [ :ex | 
-                message add: 'Invalid item name.'; add: ''.
-                ^message
-            ].
-        ((itemSymbol = Dirt) and: [currentLocation class = RoyalBedroom]) ifTrue: [
-            (inventory includes: (itemSymbol getInstance)) ifTrue: [
-                Butler getInstance setDistracted: true.
-                inventory remove: itemSymbol getInstance.
-                message add: 'You unnoticedly drop some dirt on the floor.'; 
-                add: '’Someone spread dirt all over the floor’, you yell to the Butler.';
-                add: '’Clean it up before king notices!’'; add: ''.
-
-            ] ifFalse: [
-                message add: 'You don’t have Dirt in inventory.'; add: ''.
-            ]
-        ] ifFalse: [
-            message add: 'You can’t drop this item here.'; add: ''
-        ].
-        ^message
-        "TODO: message jako pole klasy game"
-    ]
-    
     goTo: newLocation isInitMove: initMove isTp: tp moveBack: isBack [
         "TODO: getConnectedLocations nie powinno zwracać listy stringów, a listę klas (lub obiektów za pomocą singleton)"
         | canMove visited message classSymbol previousLocation | 
@@ -195,7 +199,10 @@ Object subclass: GameState [
                 ifTrue: [
                     (currentLocation getCharacter) ifNotNil: [ :characterObj |
                         (characterObj getName = character)
-                            ifTrue: [message add: (characterObj getCharacterText)]
+                            ifTrue: [
+                                message add: (characterObj getCharacterText).
+                                talkingTo := characterObj.
+                            ]
                             ifFalse: [message add: 'You can’t talk to him right now']
                     ] ifNil: [message add: 'You can’t talk to him right now'].
                     message add: ''.
@@ -264,7 +271,72 @@ Object subclass: GameState [
                     ifTrue: [ inventory add: itemTaken. ]
             ].
         ].
-        
+        ^message
+    ]
+
+    
+    drop: item [
+        | message itemSymbol |
+        message := OrderedCollection new.
+        message add: ''.
+        [ itemSymbol := Smalltalk at: item asSymbol. ]
+            on: Exception
+            do: [ :ex | 
+                message add: 'Invalid item name.'; add: ''.
+                ^message
+            ].
+        ((itemSymbol = Dirt) and: [currentLocation class = RoyalBedroom]) ifTrue: [
+            (inventory includes: (itemSymbol getInstance)) ifTrue: [
+                Butler getInstance setDistracted: true.
+                inventory remove: itemSymbol getInstance.
+                message add: 'You unnoticedly drop some dirt on the floor.'; 
+                add: '’Someone spread dirt all over the floor’, you yell to the Butler.';
+                add: '’Clean it up before king notices!’'; add: ''.
+
+            ] ifFalse: [
+                message add: 'You don’t have Dirt in inventory.'; add: ''.
+            ]
+        ] ifFalse: [
+            message add: 'You can’t drop this item here.'; add: ''
+        ].
+        ^message
+        "TODO: message jako pole klasy game"
+    ]
+    
+
+    give: item [
+        | inventoryMapped message itemSymbol |
+        inventoryMapped := inventory collect: [ :each | each class ].
+        message := OrderedCollection new.
+        message add: ''.
+        [ itemSymbol := Smalltalk at: item asSymbol. ]
+            on: Exception
+            do: [ :ex | 
+                message add: 'Invalid item name.'; add: ''.
+                ^message
+            ].
+        talkingTo ifNil: [
+            message add: 'Who are you talking to? You must first talk to a Character before you can give 
+him anything.'; add: ''.
+        ] ifNotNil: [
+            ((itemSymbol = Mushroom) and: [talkingTo class = Wizard]) ifTrue: [
+                | mushroomsItem mushroomsAmount |
+                (inventoryMapped includes: Mushroom) ifTrue: [
+                    mushroomsItem := (inventory select: [ :each | each class = Mushroom ]) anyOne.
+                    mushroomsAmount := mushroomsItem getItemAmount.
+                    (mushroomsAmount = 10) ifTrue: [ message add: 'You gave Wizard 10 mushrooms.'; add: '' ].
+                ] ifFalse: [
+                    mushroomsAmount := 0.
+                ].
+                message add: (Wizard getInstance giveMushrooms: mushroomsAmount); add: ''.
+            ] ifFalse: [
+                (inventoryMapped includes: itemSymbol) ifTrue: [
+                    message add: 'I don’t need it. Stop bothering me!'; add: ''
+                ] ifFalse: [
+                    message add: 'You don’t have this item.'; add: ''
+                ]
+            ]
+        ].
         ^message
     ]
 ]
@@ -476,18 +548,19 @@ dev                     -- to see debug instructions (cheat)
                 isUnknown := false
             ].
 
-            cmd = 'dirt' ifTrue: [
-                | place item |
-                place := DirtMound getInstance.
-                Transcript show: place getDescription; cr.
-                item := place getItem.
-                Transcript show: item getDescription; cr.
-                (item getItemAmount) printOn: Transcript.
-                Transcript cr.
-                " part4 := ToolPart getInstance.  "
+            cmd = 'butler' ifTrue: [
+                
+                Butler getInstance examine.
 
                 isUnknown := false
             ].
+              cmd = 'king' ifTrue: [
+                
+                King getInstance examine.
+
+                isUnknown := false
+            ].
+
 
             cmd = 'suspects' ifTrue: [
                 Clue getAllClues do: [ :clue |
@@ -575,6 +648,13 @@ dev                     -- to see debug instructions (cheat)
                 isUnknown := false
             ].
 
+            cmd = 'split' ifTrue: [
+                | text |
+                text := 'When you enter the kitchen as a knight, the cook seems surprised by your presence. He puts down the knife he was sharpening and shifts the egg from one hand to the other, suddenly becoming more careful.'.
+                Transcript cr; show: (self splitString: text at: 80); cr.
+                isUnknown := false
+            ].
+
 
             (cmd startsWith: 'take') ifTrue: [
                 | message item |
@@ -590,6 +670,15 @@ dev                     -- to see debug instructions (cheat)
                 message := OrderedCollection new.
                 item := self separateCommandFromArgument: cmd with: 'drop'.
                 message addAll: (gameState drop: item).
+                self printLines: message.
+                isUnknown := false
+            ].
+
+            (cmd startsWith: 'give') ifTrue: [
+                | message item |
+                message := OrderedCollection new.
+                item := self separateCommandFromArgument: cmd with: 'give'.
+                message addAll: (gameState give: item).
                 self printLines: message.
                 isUnknown := false
             ].

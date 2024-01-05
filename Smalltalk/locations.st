@@ -193,6 +193,7 @@ Location subclass: Garden [
     init [
         super init.      
         connectedLocations add: 'Courtyard'.
+        self setCharacter: Gardener getInstance.
         self addPlace: GardenPond getInstance; addPlace: RoseBushes getInstance; addPlace: KingSculpture getInstance; addPlace: DirtMound getInstance.
         shortDescription := 'A vast garden filled with flourishing vegetables and vibrant flowers.'.
         longDescription := 
