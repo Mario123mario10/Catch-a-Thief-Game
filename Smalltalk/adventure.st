@@ -165,18 +165,7 @@ Object subclass: GameState [
             
             isBack ifFalse: [roomStack addLast: previousLocation.].
 
-            message add: currentLocation visit; add: ''.
-        
-            currentLocation getCharacter ifNotNil: [
-                message add: 'Here you can talk to ', currentLocation getCharacter getName, '.'; add: ''.
-            ].
-
-            (currentLocation getPlaces notEmpty) ifTrue: [
-                message add: 'You can examine following places: ', currentLocation placesToString, '.'; add: ''.
-            ]. 
-
-            message add: 'From ', currentLocation getName, ' you can go to ', currentLocation getConnectedLocations toString, '.'; add: ''.
-
+            message addAll: currentLocation visit.
         ]
 
         ifFalse: [
@@ -398,7 +387,7 @@ him anything.'; add: ''.
                 objectInstance unlock.
                 message add: 'You unlocked ', objectInstance getName, '.'; add: ''.
                 (currentLocation = ServantsHouse getInstance) ifTrue: [ 
-                    message add: objectInstance visit; add: ''.
+                    message addAll: objectInstance visit.
                 ].
                 ^message
             ] ifFalse: [

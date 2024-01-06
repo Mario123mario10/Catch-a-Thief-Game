@@ -34,14 +34,25 @@ Object subclass: Location [
     ]
 
     visit [
-        visited 
-            ifFalse: [ 
-                visited := true.
-                ^self getLongDescription.
-            ]
-            ifTrue: [ 
-                ^self getShortDescription. 
-            ]
+        | message |
+        message := self getFullLocationDescription.
+        visited := true.
+        ^message
+    ]
+
+    getFullLocationDescription [
+        | description |
+        description := OrderedCollection new.
+        visited ifFalse: [ description add: self getLongDescription; add: ''. ]
+                ifTrue: [ description add: self getShortDescription; add: ''. ].
+        character ifNotNil: [
+            description add: 'Here you can talk to ', self getCharacter getName, '.'; add: ''.
+        ].
+        (places notEmpty) ifTrue: [
+            description add: 'You can examine following places: ', self getPlaces toString, '.'; add: ''.
+        ].
+        description add: 'From ', self getName, ' you can go to ', self getConnectedLocations toString, '.'; add: ''.
+        ^description.
     ]
 
     getShortDescription [ ^shortDescription ]
@@ -51,15 +62,6 @@ Object subclass: Location [
     getConnectedLocations [ ^connectedLocations ]
     getPlaces [ ^places ]
     getCharacter [ ^character ]
-    placesToString [
-        | string |
-        string := ''.
-        places do: [:each | string := string, each getName, ', '].
-        string := string trimSeparators.
-        places isEmpty ifFalse: [ string := string allButLast ].
-        ^string
-    ]
-
 
     setVisited [ visited := true ]
     setCharacter: gameCharacter [
@@ -328,13 +330,26 @@ smell of cooking food coming from a nearby kitchen.'.
         locked := true.
     ]
 
-    visit [
+    getFullLocationDescription [
+        | description |
+        description := OrderedCollection new.
         locked ifTrue: [
-            ^'You are welcomed by a locked door. You won’t get inside without a key. Royal 
-Chamberlains used to carry keys for every lock on a single keychain.'
+            description add: 'You are welcomed by a locked door. You won’t get inside without a key. Royal 
+Chamberlains used to carry keys for every lock on a single keychain.'; add: ''.
+        description add: 'From ', self getName, ' you can go to ', self getConnectedLocations toString, '.'; add: ''.
         ] ifFalse: [
-            ^super visit.
-        ]
+            description := super getFullLocationDescription.
+        ].
+        ^description 
+    ]
+ 
+    visit [
+        | message |
+        message := self getFullLocationDescription.
+        locked ifFalse: [
+            visited := true.
+        ].
+        ^message
     ]
 
     isLocked [ ^locked ]
