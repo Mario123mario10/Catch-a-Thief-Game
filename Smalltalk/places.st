@@ -1,5 +1,5 @@
 Object subclass: Place [
-    | description locked item placeLocation |
+    | description item placeLocation |
 
     "Dictionary with subclasses keys and singleton instance as value"
     instances := Dictionary new.
@@ -12,7 +12,7 @@ Object subclass: Place [
     ]
 
     Place class >> getAllPlaces [
-        ^(OrderedCollection new addAll: (Place subclasses))
+        ^(OrderedCollection new addAll: (Place allSubclasses select: [ :each | each ~= Chest ]))
     ] 
 
     "Parent class method to get singleton instance of a subclass"
@@ -20,13 +20,12 @@ Object subclass: Place [
         | instance |
         (instances includesKey: self) ifFalse: [
             instance := super new.
-            instance initParent.
             instances at: self put: instance.
-        ]
-        ifTrue: [ instance := instances at: self].
-        [ instance init ]
+            [ instance init ]
             on: Exception
             do: [ :ex | "Do nothing if init does not exist in subclass" ].
+        ]
+        ifTrue: [ instance := instances at: self].
         ^instance
     ]
 
@@ -113,11 +112,6 @@ Object subclass: Place [
         ^numbers
     ]
 
-    initParent [
-        locked := false.
-    ]
-
-    isLocked [ ^locked ]
     getDescription  [ ^description ]
     getPlaceLocation [ ^placeLocation ]
     getItem [ ^item ]
@@ -154,20 +148,14 @@ Object subclass: Place [
             ]
         ] ifNil: [ ^nil ]
     ]
-    unlock [ locked := false ]
 
     examinePlace [
         | message |
         message := OrderedCollection new.
-        locked ifTrue: [
-            message add: ''; add: '', self getName, ' is locked.'; add: ''.
-        ]
-        ifFalse: [
-            message add: ''; add: '', description.
-            message add: ''; add: 'You are examining ', self getName, '.'; add: ''. 
-            item ifNotNil: [
-                message add: '', item getName, ': ', item getItemAmount asString; add: ''.
-            ].
+        message add: ''; add: '', description.
+        message add: ''; add: 'You are examining ', self getName, '.'; add: ''. 
+        item ifNotNil: [
+            message add: '', item getName, ': ', item getItemAmount asString; add: ''.
         ].
         ^message
     ]
@@ -180,7 +168,6 @@ Place subclass: VaultDoor [
     ]
 
     init [
-        locked := false.
         description := 
 'The heavy vault door seems too heavy for one person to open. It looks like
 someone used some kind of tool to move the door.'
@@ -308,38 +295,6 @@ Place subclass: KitchenUnit [
     ]
 ]
 
-Place subclass: ButlerChest [
-    
-    ButlerChest class >> new [
-        self error: 'Use getInstance class method'
-    ]
-
-    init [
-        description := 'A chest belonging to the butler.' 
-    ]
-]
-
-Place subclass: CookChest [
-    
-    CookChest class >> new [
-        self error: 'Use getInstance class method'
-    ]
-
-    init [
-        description := 'A chest belonging to the cook.' 
-    ]
-]
-
-Place subclass: GardenerChest [
-    
-    GardenerChest class >> new [
-        self error: 'Use getInstance class method'
-    ]
-
-    init [
-        description := 'A chest belonging to the gardener.' 
-    ]
-]
 
 Place subclass: Lakeshore [
     
@@ -393,5 +348,77 @@ Place subclass: WildlifeNest [
 
     init [
         description := 'A nest, possibly home to some wildlife.'
+    ]
+]
+
+Place subclass: Chest [
+    | locked |
+    Chest class >> new [
+        self error: 'Use getInstance class method'
+    ]
+
+    Chest class >> getAllChests [
+        ^(OrderedCollection new addAll: Chest subclasses)
+    ]
+
+    examinePlace [
+        | message |
+        message := OrderedCollection new.
+        (placeLocation isLocked) ifTrue: [
+            message add: ''; add: placeLocation getName, 
+            ' is locked now, you can’t examine anything.'; add: ''.
+        ] ifFalse: [
+            locked ifTrue: [
+                message add: ''; add: '', self getName, ' is locked.'; add: ''.
+            ]
+            ifFalse: [ message := super examinePlace ].
+        ].
+        ^message
+    ]
+
+    init [
+        locked := true.
+        description := 'A chest belonging to the butler.' 
+    ]
+
+    isLocked [ ^locked ]
+
+    unlock [ locked := false ]
+]
+
+Chest subclass: ButlerChest [
+    
+    ButlerChest class >> new [
+        self error: 'Use getInstance class method'
+    ]
+
+    init [
+        super init.
+        description := 'A chest belonging to the butler.' 
+    ]
+
+]
+
+Chest subclass: CookChest [
+    
+    CookChest class >> new [
+        self error: 'Use getInstance class method'
+    ]
+
+    init [
+        super init.
+        description := 'A chest belonging to the cook.' 
+    ]
+]
+
+Chest subclass: GardenerChest [
+    
+    GardenerChest class >> new [
+        self error: 'Use getInstance class method'
+    ]
+
+    init [
+        super init.
+        description := 'A chest belonging to the gardener.' 
     ]
 ]

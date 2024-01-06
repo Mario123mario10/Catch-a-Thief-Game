@@ -209,17 +209,37 @@ Object subclass: GameState [
                     ^message.
                 ]
         ].
-        message add: 'Invalid character name'.
+        message add: 'Invalid character name.'.
         message add: ''.
         ^message
     ]
 
     examine: place [
         | placeSymbol placeInstance message |
-        placeSymbol := Smalltalk at: place asSymbol.
+        message := OrderedCollection new.
+        message add: ''.
+        [ placeSymbol := Smalltalk at: place asSymbol. ]
+            on: Exception
+            do: [:ex | message add: 'Invalid place name.'; add: ''. ^message ].
+        (Place getAllPlaces includes: placeSymbol) ifFalse: [
+            message add: 'Invalid place name.'; add: ''. 
+            ^message
+        ].
         placeInstance := placeSymbol getInstance.
-        examinedPlace := placeInstance.
-        message := placeInstance examinePlace.
+        (placeInstance getPlaceLocation = currentLocation) ifTrue: [
+            [ 
+                (currentLocation isLocked) ifTrue: [
+                    message add: currentLocation getName, ' is locked now, you can’t examine anything.'; add: ''.
+                    ^message
+                ]
+            ]
+                on: Exception
+                do: [:ex | "Do nothing if isLocked method does not exist in subclass" ].
+            examinedPlace := placeInstance.
+            message := placeInstance examinePlace.
+        ] ifFalse: [
+            message add: 'You can’t examine ', place, ' right now.'; add: ''
+        ].
         ^message.
     ]
 
@@ -274,6 +294,7 @@ Object subclass: GameState [
         ^message
     ]
 
+    "TODO: inventory jako osobna klasa"
     
     drop: item [
         | message itemSymbol |
@@ -336,6 +357,64 @@ him anything.'; add: ''.
                     message add: 'You don’t have this item.'; add: ''
                 ]
             ]
+        ].
+        ^message
+    ]
+
+    isInInventory: item [
+        | inventoryMapped message |
+        inventoryMapped := inventory collect: [ :each | each class ].
+        ^inventoryMapped includes: item
+    ]
+
+    unlock: gameObject [
+        | message objectSymbol objectInstance |
+        message := OrderedCollection new.
+        message add: ''.
+        [ objectSymbol := Smalltalk at: (gameObject asSymbol). ]
+            on: Exception
+            do: [ :ex | 
+                message add: 'Invalid input. Neither location nor a place.'; add: ''.
+                ^message
+            ].
+        (self isInInventory: ButlersKeys) ifTrue: [
+            (objectSymbol superclass = Chest) ifTrue: [
+                objectInstance := objectSymbol getInstance.
+                (objectInstance getPlaceLocation ~= currentLocation) ifTrue: [
+                    message add: 'You can’t unlock ', objectInstance getName, ' from here'; add: ''.
+                    ^message
+                ].
+                objectInstance unlock.
+                message add: 'You unlocked ', objectInstance getName, '.'; add: ''.
+                ^message
+            ].
+            (objectSymbol = ServantsHouse) ifTrue: [
+                objectInstance := objectSymbol getInstance.
+                ((currentLocation ~= Courtyard getInstance) and: [currentLocation ~= ServantsHouse getInstance]) ifTrue: [
+                    message add: 'You can’t unlock ', objectInstance getName, ' from here.'; add: ''.
+                    ^message
+                ]. 
+                objectInstance := objectSymbol getInstance.
+                objectInstance unlock.
+                message add: 'You unlocked ', objectInstance getName, '.'; add: ''.
+                (currentLocation = ServantsHouse getInstance) ifTrue: [ 
+                    message add: objectInstance visit; add: ''.
+                ].
+                ^message
+            ] ifFalse: [
+                | possiblyLockableTypes |
+                possiblyLockableTypes := Set new.
+                possiblyLockableTypes add: Place; add: Location; add: Item.
+                possiblyLockableTypes := possiblyLockableTypes collect: [ :plt | plt name ].
+                (possiblyLockableTypes includes: (objectSymbol superclass name)) ifFalse: [
+                    message add: 'Invalid input. Neither location nor a place.'; add: ''.
+                ] ifTrue: [
+                    message add: objectSymbol name asString, ' does not have any lock.'; add: ''.
+                ].
+                ^message
+            ].
+        ] ifFalse: [
+            message add: 'You don’t have any keys you could use.'; add: ''.
         ].
         ^message
     ]
@@ -598,6 +677,17 @@ dev                     -- to see debug instructions (cheat)
                 self printLines: gameState back.
                 isUnknown := false
             ].
+ 
+            cmd = 'places' ifTrue: [
+                Place getAllPlaces displayLines.
+                Chest getInstance examine.
+                ButlerChest getInstance examine.
+                GardenerChest getInstance examine.
+                CookChest getInstance examine.
+                DirtMound getInstance examine.
+                Chest getAllChests displayLines.
+                isUnknown := false
+            ].
 
             (cmd startsWith: 'examine') ifTrue: [
                 | message place |
@@ -679,6 +769,15 @@ dev                     -- to see debug instructions (cheat)
                 message := OrderedCollection new.
                 item := self separateCommandFromArgument: cmd with: 'give'.
                 message addAll: (gameState give: item).
+                self printLines: message.
+                isUnknown := false
+            ].
+ 
+            (cmd startsWith: 'unlock') ifTrue: [
+                | message object |
+                message := OrderedCollection new.
+                object := self separateCommandFromArgument: cmd with: 'unlock'.
+                message addAll: (gameState unlock: object).
                 self printLines: message.
                 isUnknown := false
             ].

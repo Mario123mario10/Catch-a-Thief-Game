@@ -18,13 +18,13 @@ Object subclass: Clue [
         (instances includesKey: self) ifFalse: [
             instance := super new.
             instances at: self put: instance.
+            [ instance init ]
+            on: Exception
+            do: [ :ex | "Do nothing if init does not exist in subclass" ].
         ]
         ifTrue: [ 
             instance := instances at: self.
         ].
-        [ instance init ]
-            on: Exception
-            do: [ :ex | "Do nothing if init does not exist in subclass" ].
         ^instance
     ]
 

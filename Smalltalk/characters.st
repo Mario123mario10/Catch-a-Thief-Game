@@ -60,11 +60,11 @@ Object subclass: GameCharacter [
             instance := super new.
             instance initParent.
             instances at: self put: instance.
-        ]
-        ifTrue: [ instance := instances at: self ].
-        [ instance init ]
+            [ instance init ]
             on: Exception
             do: [ :ex | "Do nothing if init does not exist in subclass" ].
+        ]
+        ifTrue: [ instance := instances at: self ].    
         ^instance
     ]
 

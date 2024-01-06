@@ -18,11 +18,11 @@ Object subclass: Location [
         (instances includesKey: self) ifFalse: [
             instance := super new.
             instances at: self put: instance.
-        ]
-        ifTrue: [ instance := instances at: self ].
-        [ instance init ]
+            [ instance init ]
             on: Exception
             do: [ :ex | "Do nothing if init does not exist in subclass" ].
+        ]
+        ifTrue: [ instance := instances at: self ].
         ^instance
     ]
 
@@ -309,6 +309,7 @@ they have some special use, who knows?'.
 ] 
 
 Location subclass: ServantsHouse [
+    | locked |
     init [
         super init.
         connectedLocations add: 'Courtyard'.
@@ -324,8 +325,21 @@ belongings.
 
 The room is dimly lit with candles, and the air is smoky and filled with the
 smell of cooking food coming from a nearby kitchen.'.
-
+        locked := true.
     ]
+
+    visit [
+        locked ifTrue: [
+            ^'You are welcomed by a locked door. You won’t get inside without a key. Royal 
+Chamberlains used to carry keys for every lock on a single keychain.'
+        ] ifFalse: [
+            ^super visit.
+        ]
+    ]
+
+    isLocked [ ^locked ]
+
+    unlock [ locked := false ]
 
     ServantsHouse class >> new [
         self error: 'Use getInstance class method'
