@@ -75,7 +75,7 @@ Object subclass: Place [
         ].
 
         toolPartsCandidates := self getAllPlaces select: [ :each | 
-            ((each getInstance getPlaceLocation) ~= Forest) and: [ each getInstance getItem isNil]
+            (each getInstance getItem isNil) or: [ each getInstance getItem getItemAmount = 0 ]
         ].
         toolPartsCandidates := toolPartsCandidates asOrderedCollection.
         toolPartsPlaces := Set new.
@@ -152,7 +152,7 @@ Object subclass: Place [
     examinePlace [
         | message |
         message := OrderedCollection new.
-        message add: ''; add: '', description.
+        message add: '', description.
         message add: ''; add: 'You are examining ', self getName, '.'; add: ''. 
         item ifNotNil: [
             message add: '', item getName, ': ', item getItemAmount asString; add: ''.

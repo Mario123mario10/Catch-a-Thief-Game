@@ -29,6 +29,26 @@ Object subclass: Item [
         ^instance
     ]
 
+    Item class >> craftTool [
+        | thief tool message result |
+        result := OrderedCollection new.
+        message := OrderedCollection new.
+        thief := Suspect getThief.
+        (thief isMemberOf: Cook) ifTrue: [
+            tool := Ladle getInstance
+        ].
+        (thief isMemberOf: Butler) ifTrue: [
+            tool := FeatherDuster getInstance
+        ].
+        (thief isMemberOf: Gardener) ifTrue: [
+            tool := Rake getInstance
+        ].
+        tool setItemAmount: 1.
+        message add: 'You crafted ', tool getName, ' using 2 ToolPart and 1 ToolHandle'; add: ''.
+        result add: tool; add: message.
+        ^result.
+    ]
+
     getDescription [ ^description ]
     getName [ ^self class name asString ]
     getItemPlace [ ^itemPlace ]

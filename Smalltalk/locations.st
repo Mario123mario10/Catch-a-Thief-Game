@@ -35,16 +35,16 @@ Object subclass: Location [
 
     visit [
         | message |
-        message := self getFullLocationDescription.
+        message := self getFullLocationDescription: false.
         visited := true.
         ^message
     ]
 
-    getFullLocationDescription [
+    getFullLocationDescription: look [
         | description |
         description := OrderedCollection new.
-        visited ifFalse: [ description add: self getLongDescription; add: ''. ]
-                ifTrue: [ description add: self getShortDescription; add: ''. ].
+        (visited not | look) ifTrue: [ description add: self getLongDescription; add: ''. ]
+                ifFalse: [ description add: self getShortDescription; add: ''. ].
         character ifNotNil: [
             description add: 'Here you can talk to ', self getCharacter getName, '.'; add: ''.
         ].
@@ -330,7 +330,7 @@ smell of cooking food coming from a nearby kitchen.'.
         locked := true.
     ]
 
-    getFullLocationDescription [
+    getFullLocationDescription: look [
         | description |
         description := OrderedCollection new.
         locked ifTrue: [
@@ -338,14 +338,14 @@ smell of cooking food coming from a nearby kitchen.'.
 Chamberlains used to carry keys for every lock on a single keychain.'; add: ''.
         description add: 'From ', self getName, ' you can go to ', self getConnectedLocations toString, '.'; add: ''.
         ] ifFalse: [
-            description := super getFullLocationDescription.
+            description := super getFullLocationDescription: look.
         ].
         ^description 
     ]
  
     visit [
         | message |
-        message := self getFullLocationDescription.
+        message := self getFullLocationDescription: false.
         locked ifFalse: [
             visited := true.
         ].
