@@ -75,7 +75,7 @@ Collection extend [
 
 Object subclass: GameState [
     | startTime endTime currentLocation visitedLocations examinedPlace 
-        roomStack inventory talkingTo |
+        roomStack inventory talkingTo evidenceDict |
 
     GameState class >> new [
         | gs |
@@ -89,6 +89,7 @@ Object subclass: GameState [
         visitedLocations := Set new.
         roomStack := OrderedCollection new.
         inventory := Set new.
+        evidenceDict := Dictionary new.
     ]
 
     start [        
@@ -105,6 +106,10 @@ Object subclass: GameState [
 
     getInventory [
         ^inventory
+    ]
+
+    getEvidence [
+        ^evidenceDict
     ]
 
     timeExceeded [
@@ -175,6 +180,8 @@ Object subclass: GameState [
         ^message.
     ]
 
+    wizardGotMushrooms [ ^Wizard getInstance hasMushrooms ]
+
     
     talkTo: character [
         "TODO: metoda talkTo w klasie GameCharacter"
@@ -189,7 +196,7 @@ Object subclass: GameState [
                     (currentLocation getCharacter) ifNotNil: [ :characterObj |
                         (characterObj getName = character)
                             ifTrue: [
-                                message add: (characterObj getCharacterText).
+                                message add: (characterObj talkToAtState: self).
                                 talkingTo := characterObj.
                             ]
                             ifFalse: [message add: 'You can’t talk to him right now']
@@ -250,6 +257,8 @@ Object subclass: GameState [
             itemTaken ifNil: [
                 message add: 'You can’t take ', item, ' from here.'; add: ''
             ] ifNotNil: [
+                | basicItem |
+                basicItem := true.
                 message add: 'You took ', itemTaken getItemAmount asString, ' ', 
                     itemTaken getName, '.'; add: ''; add: itemTaken getDescription; add: ''.
                 (itemTaken class = Mushroom) ifTrue: [
@@ -262,6 +271,7 @@ Object subclass: GameState [
                             inventoryItem setItemAmount: inventoryItem getItemAmount + mushroomsAmount
                         ]
                     ].
+                    basicItem := false.
                     mushroomFound ifFalse: [ inventory add: itemTaken. ]
                 ].
                 (itemTaken class = ToolPart) ifTrue: [
@@ -274,17 +284,24 @@ Object subclass: GameState [
                             inventoryItem setItemAmount: inventoryItem getItemAmount + toolPartAmount
                         ]
                     ].
+                    basicItem := false.
                     toolPartFound ifFalse: [ inventory add: itemTaken. ]
                 ].
-                ((itemTaken class ~= ToolPart) and: [itemTaken class ~= Mushroom])
-                    ifTrue: [ inventory add: itemTaken. ]
+                basicItem ifTrue: [ inventory add: itemTaken. ].
+                (itemTaken class superclass = Evidence) ifTrue: [
+                    self addEvidenceTo: (itemTaken getConnectedClue) of: (itemTaken whoIsGuilty).
+                ].
             ].
         ].
         ^message
     ]
 
+    addEvidenceTo: clue of: guilty [
+        evidenceDict at: clue put: guilty.
+    ]
+
     "TODO: inventory jako osobna klasa"
-    
+    "TODO: string to object z dwoma parametrami - string i klasa"
     drop: item [
         | message itemSymbol |
         message := OrderedCollection new.
@@ -295,13 +312,17 @@ Object subclass: GameState [
                 message add: 'Invalid item name.'; add: ''.
                 ^message
             ].
+        (itemSymbol isKindOf: Item) ifFalse: [
+            message add: 'Invalid item name.'; add: ''.
+            ^message
+        ].
         ((itemSymbol = Dirt) and: [currentLocation class = RoyalBedroom]) ifTrue: [
             (inventory includes: (itemSymbol getInstance)) ifTrue: [
                 Butler getInstance setDistracted: true.
-                inventory remove: itemSymbol getInstance.
-                message add: 'You unnoticedly drop some dirt on the floor.'; 
-                add: '’Someone spread dirt all over the floor’, you yell to the Butler.';
-                add: '’Clean it up before king notices!’'; add: ''.
+                itemSymbol getInstance setItemAmount: (itemSymbol getInstance getItemAmount - 1).
+                message add: 
+'You unnoticedly drop some dirt on the floor. ’Someone spread dirt all over the 
+floor’, you yell to the Butler. ’Clean it up before king notices!’'; add: ''.
 
             ] ifFalse: [
                 message add: 'You don’t have Dirt in inventory.'; add: ''.
@@ -338,7 +359,7 @@ him anything.'; add: ''.
                 ] ifFalse: [
                     mushroomsAmount := 0.
                 ].
-                message add: (Wizard getInstance giveMushrooms: mushroomsAmount); add: ''.
+                message add: (Wizard getInstance giveMushrooms: mushroomsAmount atState: self); add: ''.
             ] ifFalse: [
                 (inventoryMapped includes: itemSymbol) ifTrue: [
                     message add: 'I don’t need it. Stop bothering me!'; add: ''
@@ -407,31 +428,53 @@ him anything.'; add: ''.
         ].
         ^message
     ]
+
+    spawn: item [
+        | currentItemAmount message itemSymbol itemInstance |
+        message := OrderedCollection new.
+        message add: ''.
+        currentItemAmount := 0.
+        [ itemSymbol := Smalltalk at: item asSymbol. ]
+            on: Exception
+            do: [ :ex | 
+                message add: 'Invalid item name.'; add: ''.
+                ^message
+            ].
+        (itemSymbol superclass = Item) ifFalse: [
+            message add: 'Invalid item name.'; add: ''.
+            ^message
+        ].
+        [ itemInstance := itemSymbol getInstance ]
+            on: Exception
+            do: [ :ex | itemInstance := itemSymbol new ].
+        itemInstance setItemAmount: 1.
+        inventory add: itemInstance.
+        message add: 'You took ', itemInstance getItemAmount asString, ' ', 
+        itemInstance getName, '.'; add: ''; add: itemInstance getDescription; add: ''.        
+        ^message.
+    ]
 ]
 
 "Adventure"
 
 Object subclass: Game [
-    | instructions isGameOver |
+    | instructions introduction isGameOver |
 
 
-    introductionText := #(
-        ''
-        '===================================================='
-        '    Mystery of a missing Diamond'
-        '===================================================='
-        ''
-        'As a detective you''ve been entrusted with'
-        'solving the mystery of a missing diamond.'
-        'To crack the case you''ll need to uncover'
-        'scattered evidence hidden throughout the castle.'
-        ''
-        'Gather three pieces of evidence against'
-        'a suspect to uncover the thief''s identity.'
-        'Use the command accuse [Character]'
-        'to make your accusation.'
-        'A correct accusation leads to victory!'
-    ).
+    introductionText := 
+'
+==============================================================================
+                       Mystery of a missing Diamond
+==============================================================================
+
+As a detective you’ve been entrusted with solving the mystery of a missing 
+diamond. To crack the case you’ll need to uncover scattered evidence hidden 
+throughout the castle. 
+
+Gather three pieces of evidence against a suspect to uncover the thief’s 
+identity. Use the command accuse [Character] to make your accusation. 
+A correct accusation leads to victory!
+'.
 
     instructionsText := 
 '
@@ -474,6 +517,8 @@ dev                     -- to see debug instructions (cheat)
         FileStream fileIn: 'items.st'.
         instructions := OrderedCollection new.
         instructions add: instructionsText.
+        introduction := OrderedCollection new.
+        introduction add: introductionText.
         isGameOver := false
     ]
 
@@ -483,7 +528,7 @@ dev                     -- to see debug instructions (cheat)
     ]
 
     printIntroduction [
-       self printLines: introductionText.
+       self printLines: introduction.
     ]
 
     printInstructions [
@@ -517,9 +562,9 @@ dev                     -- to see debug instructions (cheat)
             | result |
             result := self checkAccusation: accusation.
             result ifTrue: [
-                Transcript cr; show: 'You win!'; cr; cr.
+                Transcript cr; show: 'You win! 👍'; cr; cr.
             ] ifFalse: [
-                Transcript cr; show: 'You lose!'; cr; cr.
+                Transcript cr; show: 'You lose! 😢'; cr; cr.
             ].
             isGameOver := true
         ] ifFalse: [
@@ -551,103 +596,35 @@ dev                     -- to see debug instructions (cheat)
                 isGameOver := true.
                 isUnknown := false
             ].
-            
-            cmd = 'gen' ifTrue: [
-                | numbers |
-                numbers := self generateNumbers: 5 summingTo: 10.
-                Transcript cr.
-                numbers displayLines.
-                Transcript cr.
-                isUnknown := false
-            ].
-            
-            cmd = 'diamond' ifTrue: [
-                | diamond  suspect |
-                diamond := StolenDiamond getInstance.
-                suspect := diamond getSuspect.
-                diamond identityHash printOn: Transcript.
-                Transcript cr.
-                Transcript show: suspect getCharacterText; cr.
-                isUnknown := false
-            ].
-    
-            cmd = 'ladle' ifTrue: [
-                | ladle1 ladle2 ladle3 |
-                ladle1 := Ladle getInstance.
-                ladle2 := Ladle getInstance.
-                " ladle3 := Ladle new. "
-                Ladle allInstances displayLines.
-                " Transcript cr.
-                Transcript show: suspect getCharacterText; cr. "
-                isUnknown := false
-            ].
- 
-            cmd = 'part' ifTrue: [
-                | part1 part2 part3 part4 |
-                part1 := ToolPart new. 
-                part2 := ToolPart new. 
-                " part2 := ToolPart getInstance.  "
-                ToolPart allInstances displayLines.
-
-                " part4 := ToolPart getInstance.  "
-
-                isUnknown := false
-            ].
-            cmd = 'shroom' ifTrue: [
-                1 to: 5 do: [ :i |
-                    Mushroom new.
-                ].
-                Mushroom allInstances displayLines.
-                " part4 := ToolPart getInstance.  "
-
-                isUnknown := false
-            ].
-
-            cmd = 'vdoor' ifTrue: [
-                | place item |
-                place := VaultDoor getInstance.
-                Transcript show: place getDescription; cr.
-                item := place getItem.
-                Transcript show: item getDescription; cr.
-                (item getItemAmount) printOn: Transcript.
-                Transcript cr.
-                " part4 := ToolPart getInstance.  "
-
-                isUnknown := false
-            ].
-
-            cmd = 'butler' ifTrue: [
-                
-                Butler getInstance examine.
-
-                isUnknown := false
-            ].
-              cmd = 'king' ifTrue: [
-                
-                King getInstance examine.
-
-                isUnknown := false
-            ].
-
-
-            cmd = 'suspects' ifTrue: [
-                Clue getAllClues do: [ :clue |
-                    Transcript show: clue getName, ' - ', clue getSuspect getName; cr.
-                ].
-                " part4 := ToolPart getInstance.  "
-
-                isUnknown := false
-            ].
 
             cmd = 'clues' ifTrue: [
                 | suspects orderedSuspects |
                 Transcript cr.
                 suspects := GameCharacter getSuspects.
-                orderedSuspects := suspects asSortedCollection: [:a :b | a getClues size > b getClues size].
+                orderedSuspects := suspects asSortedCollection: [ :a :b | a getClues size > b getClues size].
                 orderedSuspects do: [ :suspect |
                     Transcript show: suspect getName, ': ', suspect getClues toString; cr.
                 ].
                 Transcript cr.
+                isUnknown := false
+            ].
+
+            cmd = 'evidence' ifTrue: [
+                | message |
+                message := OrderedCollection new.
+                message add: ''.
+                gameState getEvidence associationsDo: [ :evidence |
+                    | guiltyAsString |
+                    evidence value 
+                        ifNil: [ guiltyAsString := 'Unknown suspect']
+                        ifNotNil: [ guiltyAsString := evidence value getName].
+                    message add: evidence key getName, ' - ', guiltyAsString.
+                ].
+                (gameState getEvidence isEmpty) ifTrue: [
+                    message add: 'You have no evidence in the case.'
+                ].
+                message add: ''.
+                self printLines: message.
                 isUnknown := false
             ].
 
@@ -667,14 +644,10 @@ dev                     -- to see debug instructions (cheat)
                 isUnknown := false
             ].
  
-            cmd = 'places' ifTrue: [
-                Place getAllPlaces displayLines.
-                Chest getInstance examine.
-                ButlerChest getInstance examine.
-                GardenerChest getInstance examine.
-                CookChest getInstance examine.
-                DirtMound getInstance examine.
-                Chest getAllChests displayLines.
+            cmd = 'suspects' ifTrue: [
+                Gardener getInstance examine.
+                Cook getInstance examine.
+                Butler getInstance examine.
                 isUnknown := false
             ].
 
@@ -689,7 +662,7 @@ dev                     -- to see debug instructions (cheat)
             cmd = 'items' ifTrue: [
                 | items message chain |
                 items := OrderedCollection new.
-                Item subclasses do: [ :each | 
+                Item allSubclasses do: [ :each | 
                     each allInstances do: [ :instance | 
                         items add: instance
                     ]
@@ -771,6 +744,15 @@ dev                     -- to see debug instructions (cheat)
                 isUnknown := false
             ].
 
+            (cmd startsWith: 'spawn') ifTrue: [
+                | message item |
+                message := OrderedCollection new.
+                item := self separateCommandFromArgument: cmd with: 'spawn'.
+                message addAll: (gameState spawn: item).
+                self printLines: message.
+                isUnknown := false
+            ].
+
             (cmd startsWith: 'talk to') ifTrue: [
                 | message character |
                 message := OrderedCollection new.
@@ -779,7 +761,6 @@ dev                     -- to see debug instructions (cheat)
                 self printLines: message.
                 isUnknown := false
             ].
-
 
             (cmd startsWith: 'go to') ifTrue: [
                 | message newLocation |

@@ -72,6 +72,10 @@ Object subclass: GameCharacter [
         clues := Set new.
     ]
 
+    talkToAtState: gameState [
+        ^self getCharacterText
+    ]
+
     getCharacterLocation [ ^characterLocation ]
     getCharacterText [ ^(self splitString: characterText at: 80) ]
     getName [ ^self class name asString ]
@@ -129,13 +133,12 @@ GameCharacter subclass: Gardener [
         self error: 'Use getInstance class method'
     ]
 
-    init [
+    getCharacterText [
         (clues includes: BloodStains getInstance) ifTrue: [
             optionalText := ' There is a fresh wound on his forearm, as if something cut him. '
         ] ifFalse: [
-            optionalText := '' 
+            optionalText := ' ' 
         ].
-
         characterText := 
 'While wandering through the royal garden, you come across a gardener. He is a 
 middle-aged man with hard hands and dark spots on his clothes.', optionalText, 
@@ -153,8 +156,8 @@ these plants like my own children. I haven’t noticed anything suspicious. It
 must be some kind of mistake. Maybe the diamond will come back on its own; 
 things like that happen. And besides, we all lose things sometimes. If you have 
 any questions, we can discuss them with the king. But let me get back to my 
-work.’ The gardener seems nervous and a bit concerned about the situation.' 
- 
+work.’ The gardener seems nervous and a bit concerned about the situation.'.
+        ^super getCharacterText
     ]
 ] 
 
@@ -164,11 +167,11 @@ GameCharacter subclass: Cook [
         self error: 'Use getInstance class method'
     ]
 
-    init [
+    getCharacterText [
         (clues includes: BloodStains getInstance) ifTrue: [
-            optionalText := ' You notice a fresh wound on his hand. '
+            optionalText := ' There is a fresh wound on his forearm, as if something cut him. '
         ] ifFalse: [
-            optionalText := '' 
+            optionalText := ' ' 
         ].
         characterText := 
 'You see a man wearing a white apron that is now slightly stained from working 
@@ -188,7 +191,8 @@ wonders what brought you there.
 
 ’Oh? It’s about the robbery?’ says the cook with a bit of shock. ’Fair enough, 
 if you must snoop around, then do what you must. Just don’t get in my way. 
-People are trying to work here!’ he says, irritated.'
+People are trying to work here!’ he says, irritated.'.
+        ^super getCharacterText
     ]
 ] 
 
@@ -199,10 +203,14 @@ GameCharacter subclass: Butler [
     ]
 
     init [ 
+        distracted := false.
+    ]
+
+    getCharacterText [
         (clues includes: BloodStains getInstance) ifTrue: [
-            optionalText := ' There is a fresh wound on his left cheek; he cut himself with something. '
+            optionalText := ' There is a fresh wound on his forearm, as if something cut him. '
         ] ifFalse: [
-            optionalText := '' 
+            optionalText := ' ' 
         ].
         characterText := 
 'You stand before an unassuming, delicately built butler, seemingly one of the 
@@ -219,7 +227,7 @@ he confesses with a hint of sadness in his voice. ’I had no idea what was
 happening in the courtyard or the commotion at the vault. It’s really strange. 
 I can assure you that I had nothing to do with it. I worked most of the day, 
 unfortunately, there is no one to testify about it.’'.
-        distracted := false.
+        ^super getCharacterText
     ]
 
     isDistracted [
@@ -322,10 +330,10 @@ wizard says dismissingly.
 says, clearly implying that the conversation is over.'
 
     ]
-    giveMushrooms: amount [
+    giveMushrooms: amount atState: gameState [
         (amount = 10) ifTrue: [
             gotMushrooms := true.
-            ^self getCharacterText
+            ^self talkToAtState: gameState
         ].
         (amount = 0) ifTrue: [
             ^'’You want to give me nothing?! Come back when you have 10 mushrooms.’'
@@ -349,4 +357,10 @@ says, clearly implying that the conversation is over.'
             ]
     ]
 
+    talkToAtState: gameState [
+        | clue |
+        clue := WizardsClue getInstance.
+        gotMushrooms ifTrue: [ gameState addEvidenceTo: clue of: clue getSuspect ].
+        ^super talkToAtState: gameState
+    ]
 ] 

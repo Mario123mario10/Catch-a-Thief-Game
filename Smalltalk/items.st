@@ -21,11 +21,11 @@ Object subclass: Item [
         (instances includesKey: self) ifFalse: [
             instance := super new.
             instances at: self put: instance.
+            [ instance init ]
+                on: Exception
+                do: [ :ex | "Do nothing if init does not exist in subclass" ].
         ]
         ifTrue: [ instance := instances at: self].
-        [ instance init ]
-            on: Exception
-            do: [ :ex | "Do nothing if init does not exist in subclass" ].
         ^instance
     ]
 
@@ -38,91 +38,102 @@ Object subclass: Item [
     setItemAmount: amount [ itemAmount := amount ]
 ]
 
-Item subclass: Ladle [
+Item subclass: Evidence [
+    | connectedClue guilty |
+    
+    getConnectedClue [ ^connectedClue ]
+    whoIsGuilty [ ^guilty ]
+
+    setGuilty: guiltyCharacter [
+        guilty := guiltyCharacter
+    ]
+]
+
+Evidence subclass: Ladle [
     init [
+        guilty := Cook getInstance.
+        connectedClue := Tool getInstance.
         description := 'Kitchen utensil used by Cook for serving soups and sauces.'
     ]
-].
+]
 
-Item subclass: Rake [
+Evidence subclass: Rake [
     init [
+        guilty := Gardener getInstance.
+        connectedClue := Tool getInstance.
         description := 'Gardening tool with tines used by Gardener for collecting leaves or debris.'
     ]
-].
+]
 
-Item subclass: FeatherDuster [
+Evidence subclass: FeatherDuster [
     init [
+        guilty := Butler getInstance.
+        connectedClue := Tool getInstance.
         description := 'Cleaning tool made of feathers used by Butler to remove dust.'
     ]
-].
+]
 
-Item subclass: ToolHandle [
+Evidence subclass: ToolHandle [
     init [
+        guilty := nil.
+        connectedClue := BloodStains getInstance.
         description :=
 'Broken part of a tool used to open the heavy vault door. There is blood on the
 broken part...'
     ]
-].
+]
 
-Item subclass: VaultKey [
+Evidence subclass: VaultKey [
     init [
+        guilty := nil.
+        connectedClue := StolenVaultKey getInstance.
         description := 'Key that opens the vault door.'
     ]
-].
+]
+
+
+Evidence subclass: Diamond [
+    init [
+        guilty := nil.
+        connectedClue := StolenDiamond getInstance.
+        description := 'Precious gem, possibly from the vault.'
+    ]
+]
+
+Evidence subclass: CoinPouch [
+    init [
+        guilty := nil.
+        connectedClue := StolenCoins getInstance.
+        description := 'Pouch containing coins believed to be from the vault.'
+    ]
+]
 
 Item subclass: ButlersKeys [
     init [
         description := 'Keys that unlock every lock in the castle.'
     ]
-].
-
-Item subclass: Diamond [
-    init [
-        description := 'Precious gem, possibly from the vault.'
-    ]
-].
-
-Item subclass: CoinPouch [
-    init [
-        description := 'Pouch containing coins believed to be from the vault.'
-    ]
-].
+]
 
 Item subclass: Dirt [
     init [
         description := 'Ordinary dirt. You can make quite a mess with this.'
     ]
-].
+]
 
 Item subclass: ToolPart [
-    instancesCount := 0.
-
     ToolPart class >> getInstance [
-        self error: 'Use "new" class method, there is more than one ToolPart...'
-    ]
-
-    ToolPart class >> new [
-        | i |
-        (instancesCount < 2) ifTrue: [
-            i := super new.
-            " i init. "
-            instancesCount := instancesCount + 1.
-            ^i
-        ]
-        ifFalse: [
-            self error: '...but not more than two :)'
-        ]
+        self error: 'Use "new" class method, there is more than one ToolPart instance'
     ]
 
     init [
         description := 'Part of a tool used to open the heavy vault door.'
     ]
-].
+]
 
 
 Item subclass: Mushroom [
     Mushroom class >> getInstance [
-        self error: 'Use getInstance class method, there is more than one Mushroom'
+        self error: 'Use "new" class method, there is more than one Mushroom instance'
     ]
 
     init [
