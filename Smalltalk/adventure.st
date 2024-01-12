@@ -152,65 +152,65 @@ Object subclass: GameState [
     ]
 
     goTo: newLocation isInitMove: initMove isTp: tp moveBack: isBack [
-        "TODO: getConnectedLocations nie powinno zwracać listy stringów, a listę klas (lub obiektów za pomocą singleton)"
-        | canMove visited message classSymbol previousLocation | 
+        | canMove allLocationsAsStrings visited message classSymbol previousLocation | 
         message := OrderedCollection new.
-        (initMove | tp | isBack) ifFalse: [ 
-            canMove := false.
-            "TODO: Można napisać isConnectedTo"
-            currentLocation getConnectedLocations do: [ :location |
-                (location = newLocation)
-                    ifTrue: [
-                        canMove := true.
-                    ]
+        allLocationsAsStrings := Location subclasses collect: [ :each | each name asString ].
+        (allLocationsAsStrings includes: newLocation) ifTrue: [
+            (initMove | tp | isBack) ifFalse: [ 
+                canMove := false.
+                currentLocation getConnectedLocations do: [ :location |
+                    (location = newLocation)
+                        ifTrue: [
+                            canMove := true.
+                        ]
+                ]
+            ] ifTrue: [ canMove := true ].
+
+            canMove ifTrue: [
+                visited := false.
+                previousLocation := currentLocation.
+                visitedLocations do: [ :location | 
+                    (location getName = newLocation)
+                        ifTrue: [ 
+                            visited := true.
+                            currentLocation := location.
+                        ]
+                ].
+                visited ifFalse: [
+                    classSymbol := Smalltalk at: newLocation asSymbol.
+                    currentLocation := classSymbol getInstance.
+                    visitedLocations add: currentLocation.
+                ].
+                
+                talkingTo := nil.
+                examinedPlace := nil.
+
+                initMove ifFalse: [ 
+                    message add: ''; add: 'You moved from ', previousLocation getName, ' to ', currentLocation getName, '.'; add: ''.
+                ].
+                
+                isBack ifFalse: [roomStack addLast: previousLocation.].
+
+                message addAll: currentLocation visit.
             ]
-        ] ifTrue: [ canMove := true ].
 
-        canMove ifTrue: [
-            visited := false.
-            previousLocation := currentLocation.
-            visitedLocations do: [ :location | 
-            "TODO: ten check mozna bez sprawdzania nazwy"
-                (location getName = newLocation)
-                    ifTrue: [ 
-                        visited := true.
-                        currentLocation := location.
-                    ]
+            ifFalse: [
+                message add: ''; add: 'You can’t move from ', currentLocation getName, ' to ', newLocation, '.'; add: ''.
             ].
-            visited ifFalse: [
-                classSymbol := Smalltalk at: newLocation asSymbol.
-                currentLocation := classSymbol getInstance.
-                visitedLocations add: currentLocation.
-            ].
-            
-            talkingTo := nil.
-            examinedPlace := nil.
-
-            initMove ifFalse: [ 
-                message add: ''; add: 'You moved from ', previousLocation getName, ' to ', currentLocation getName, '.'; add: ''.
-            ].
-            
-            isBack ifFalse: [roomStack addLast: previousLocation.].
-
-            message addAll: currentLocation visit.
         ]
-
         ifFalse: [
-            message add: ''; add: 'You can’t move from ', currentLocation getName, ' to ', newLocation, '.'; add: ''.
+            message add: ''; add: 'Invalid location name.'; add: ''.
         ].
-
         ^message.
     ]
 
     wizardGotMushrooms [ ^Wizard getInstance hasMushrooms ]
 
     talkTo: character [
-        "TODO: metoda talkTo w klasie GameCharacter"
         | message |
         message := OrderedCollection new.
         message add: ''.
 
-        "TODO: metoda getAllCharacters w klasise GameCharacter"
         GameCharacter allSubclasses do: [:sub |
             sub name asString = character
                 ifTrue: [
@@ -389,8 +389,6 @@ distract thisfanatic cleaner somehow.'; add: ''.
         ^evidenceMapped includes: clue
     ]
 
-    "TODO: inventory jako osobna klasa"
-    "TODO: string to object z dwoma parametrami - string i klasa"
     drop: item [
         | message itemSymbol |
         message := OrderedCollection new.
@@ -420,7 +418,6 @@ floor’, you yell to the Butler. ’Clean it up before king notices!’'; add: 
             message add: 'You can’t drop this item here.'; add: ''
         ].
         ^message
-        "TODO: message jako pole klasy game"
     ]
     
 

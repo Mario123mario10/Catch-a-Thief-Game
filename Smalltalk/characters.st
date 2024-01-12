@@ -1,5 +1,3 @@
-"TODO: extract Suspect from GameCharacter"
-
 Object subclass: GameCharacter [
     | characterText characterLocation clues |
 
